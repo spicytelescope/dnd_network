@@ -1,0 +1,116 @@
+INFO:PHYM_LOGGER:Loading playerConf
+INFO:PHYM_LOGGER:Loading itemConf
+INFO:PHYM_LOGGER:Loading eventConf
+INFO:PHYM_LOGGER:Loading mapConf
+INFO:PHYM_LOGGER:Loading UI Conf
+INFO:PHYM_LOGGER:Loading musicConf
+INFO:PHYM_LOGGER:Loading menuConf
+INFO:PHYM_LOGGER:Loading spellConf
+INFO:PHYM_LOGGER:Loading textureConf
+DEBUG:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
+DEBUG:PIL.PngImagePlugin:STREAM b'bKGD' 41 6
+DEBUG:PIL.PngImagePlugin:b'bKGD' 41 6 (unknown)
+DEBUG:PIL.PngImagePlugin:STREAM b'pHYs' 59 9
+DEBUG:PIL.PngImagePlugin:STREAM b'tIME' 80 7
+DEBUG:PIL.PngImagePlugin:b'tIME' 80 7 (unknown)
+DEBUG:PIL.PngImagePlugin:STREAM b'IDAT' 99 8192
+DEBUG:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
+DEBUG:PIL.PngImagePlugin:STREAM b'bKGD' 41 6
+DEBUG:PIL.PngImagePlugin:b'bKGD' 41 6 (unknown)
+DEBUG:PIL.PngImagePlugin:STREAM b'pHYs' 59 9
+DEBUG:PIL.PngImagePlugin:STREAM b'tIME' 80 7
+DEBUG:PIL.PngImagePlugin:b'tIME' 80 7 (unknown)
+DEBUG:PIL.PngImagePlugin:STREAM b'IDAT' 99 8192
+DEBUG:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
+DEBUG:PIL.PngImagePlugin:STREAM b'sRGB' 41 1
+DEBUG:PIL.PngImagePlugin:STREAM b'gAMA' 54 4
+DEBUG:PIL.PngImagePlugin:STREAM b'PLTE' 70 768
+DEBUG:PIL.PngImagePlugin:STREAM b'tRNS' 850 256
+DEBUG:PIL.PngImagePlugin:STREAM b'pHYs' 1118 9
+DEBUG:PIL.PngImagePlugin:STREAM b'IDAT' 1139 11819
+DEBUG:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
+DEBUG:PIL.PngImagePlugin:STREAM b'sRGB' 41 1
+DEBUG:PIL.PngImagePlugin:STREAM b'gAMA' 54 4
+DEBUG:PIL.PngImagePlugin:STREAM b'PLTE' 70 60
+DEBUG:PIL.PngImagePlugin:STREAM b'tRNS' 142 20
+DEBUG:PIL.PngImagePlugin:STREAM b'pHYs' 174 9
+DEBUG:PIL.PngImagePlugin:STREAM b'IDAT' 195 3277
+INFO:PHYM_LOGGER:LOADING MUSIC RESSOURCES
+INFO:PHYM_LOGGER:LOADING PLAYER RESSOURCES
+INFO:PHYM_LOGGER:LOADING MENU RESSOURCES
+DEBUG:PHYM_LOGGER:Loading ressource for : Snow_tree
+DEBUG:PHYM_LOGGER:Loading ressource for : Snow_rock
+DEBUG:PHYM_LOGGER:Loading ressource for : Snow_random_wood
+DEBUG:PHYM_LOGGER:Loading ressource for : Snow_flower
+DEBUG:PHYM_LOGGER:Loading ressource for : Plains_tree
+DEBUG:PHYM_LOGGER:Loading ressource for : Plains_rock
+DEBUG:PHYM_LOGGER:Loading ressource for : Plains_random_wood
+DEBUG:PHYM_LOGGER:Loading ressource for : Plains_flower
+DEBUG:PHYM_LOGGER:Loading ressource for : Sand_tree
+DEBUG:PHYM_LOGGER:Loading ressource for : Sand_rock
+DEBUG:PHYM_LOGGER:Loading ressource for : Sand_random_wood
+DEBUG:PHYM_LOGGER:Loading ressource for : Sand_flower
+DEBUG:PHYM_LOGGER:Loading ressource for : Mountain_tree
+DEBUG:PHYM_LOGGER:Loading ressource for : Mountain_rock
+DEBUG:PHYM_LOGGER:Loading ressource for : Mountain_random_wood
+DEBUG:PHYM_LOGGER:Loading ressource for : Mountain_flower
+INFO:PHYM_LOGGER:Addded zone Init_Zone on chunks : [(-1, 0), (0, -1), (0, 0), (0, 1), (1, 0)] with elements : {} and structures {'Village': 1}
+DEBUG:PHYM_LOGGER:0 and 0
+DEBUG:PHYM_LOGGER:1 and 0
+DEBUG:PHYM_LOGGER:1 and 1
+DEBUG:PHYM_LOGGER:1 and 2
+DEBUG:PHYM_LOGGER:2 and 2
+INFO:PHYM_LOGGER:LOADING HUD RESSOURCES
+DEBUG:PHYM_LOGGER:ADDING to HUDLoading : 6 
+INFO:PHYM_LOGGER:LOADING ITEM RESSOURCES
+DEBUG:PHYM_LOGGER:ADDING to ItemDBLoading : 20 
+INFO:PHYM_LOGGER:LOADING SPELL RESSOURCES
+DEBUG:PHYM_LOGGER:ADDING to spellDBLoading : 20 
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/KnightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/EliteGuardArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/IronArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon2H/BroadSword.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
+INFO:PHYM_LOGGER:LOADING OPEN WORLD RESSOURCES
+DEBUG:PHYM_LOGGER:ADDING to biomeTextures : 10 
+INFO:PHYM_LOGGER:LOADING MINIMAP RESSOURCES
+DEBUG:PHYM_LOGGER:ADDING to chunk_1 : 1 
+DEBUG:PHYM_LOGGER:ADDING to chunk_2 : 1 
+DEBUG:PHYM_LOGGER:ADDING to chunk_3 : 1 
+DEBUG:PHYM_LOGGER:ADDING to chunk_4 : 1 
+DEBUG:PHYM_LOGGER:ADDING to chunk_5 : 1 
+DEBUG:PHYM_LOGGER:ADDING to chunk_6 : 1 
+DEBUG:PHYM_LOGGER:ADDING to chunk_7 : 1 
+DEBUG:PHYM_LOGGER:ADDING to chunk_8 : 1 
+DEBUG:PHYM_LOGGER:ADDING to chunk_9 : 1 
+INFO:PHYM_LOGGER:Generating Init_Zone
+DEBUG:PHYM_LOGGER:ADDING to worldElements : 15 
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/KnightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/EliteGuardArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/IronArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon2H/BroadSword.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/KnightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/EliteGuardArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/IronArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon2H/BroadSword.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
+INFO:PHYM_LOGGER:LOADING OPEN WORLD RESSOURCES
+INFO:PHYM_LOGGER:HEALING aaaa DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING bb DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING ccc DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING aaaa DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING bb DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING ccc DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING aaaa DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING bb DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING ccc DUE TO REST MECHANICS

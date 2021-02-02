@@ -1,0 +1,139 @@
+ITEM ID,NAME,RARETY,DESC,DURABILITY,TYPE ID,SLOT ID,ICON PATH,CLASS RESTRICT,META TYPE,STATS,GOLD VALUE
+0,Ariel Dress,rare,Boots for slaves,50,4,8,./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png,Warrior,ARMOR,9,11
+1,BranditArmor,common,Boots for low level,50,4,8,./assets/Items/Transparent/Armor/Boots/BanditArmor.png,Warrior,ARMOR,8,18
+2,ChainmailLightArmor,legendary,Boots for legends,50,4,8,./assets/Items/Transparent/Armor/Boots/ChainmailLightArmor_Paint.png,Warrior,ARMOR,10,19
+3,Cleric,uncommon,classical Boots,50,4,8,./assets/Items/Transparent/Armor/Boots/Cleric_Paint.png,Wizard,ARMOR,10,19
+4,CrusaderChainmail,common,Boots for amaters,50,4,8,./assets/Items/Transparent/Armor/Boots/CrusaderChainmail_Paint.png,Warrior,ARMOR,6,16
+5,Deserter,rare,Boots for low level,50,4,8,./assets/Items/Transparent/Armor/Boots/Deserter.png,Warrior,ARMOR,14,12
+6,EliteGuardArmor,rare,Boots for legends,50,4,8,./assets/Items/Transparent/Armor/Boots/EliteGuardArmor_Paint.png,Warrior,ARMOR,7,20
+7,FlaconLightArmor,common,Boots for amaters,50,4,8,./assets/Items/Transparent/Armor/Boots/FalconLightArmor.png, Hunter,ARMOR,9,14
+8,FireAdept,legendary,Boots for slaves,50,4,8,./assets/Items/Transparent/Armor/Boots/FireAdept.png,Warrior,ARMOR,15,14
+9,GuardArmor,common,Boots for low level,50,4,8,./assets/Items/Transparent/Armor/Boots/GuardArmor_Paint.png,Warrior,ARMOR,10,13
+10,Hermit,common,Boots for legends,50,4,8,./assets/Items/Transparent/Armor/Boots/Hermit.png, Hunter,ARMOR,5,13
+11,Hunter,rare,Boots for low level,50,4,8,./assets/Items/Transparent/Armor/Boots/Hunter.png,Warrior,ARMOR,12,18
+12,HunterLightArmor,mythic,Boots for amaters,50,4,8,./assets/Items/Transparent/Armor/Boots/HunterLightArmor.png,Wizard,ARMOR,9,17
+13,HunterTunic,legendary,Boots for low level,50,4,8,./assets/Items/Transparent/Armor/Boots/HunterTunic.png, Hunter,ARMOR,10,10
+14,IronArmor,rare,Boots for legends,50,4,8,./assets/Items/Transparent/Armor/Boots/IronArmor_Paint.png,Warrior,ARMOR,14,13
+15,KnightArmor,common,Boots for legends,50,4,8,./assets/Items/Transparent/Armor/Boots/KnightArmor.png, Hunter,ARMOR,9,15
+16,LeatherJacket,uncommon,Boots for legends,50,4,8,./assets/Items/Transparent/Armor/Boots/LeatherJacket.png,Wizard,ARMOR,6,14
+17,LeatherLightArmor,common,Boots for slaves,50,4,8,./assets/Items/Transparent/Armor/Boots/LeatherLightArmor.png,Warrior,ARMOR,8,13
+18,LeatherRivetedArmor,common,Boots for low level,50,4,8,./assets/Items/Transparent/Armor/Boots/LeatherLightArmor.png,Warrior,ARMOR,5,16
+19,Militiaman,rare,Boots for amaters,50,4,8,./assets/Items/Transparent/Armor/Boots/Militiaman.png,Warrior,ARMOR,10,14
+20,PrasantClothing,common,Boots for legends,50,4,8,./assets/Items/Transparent/Armor/Boots/PeasantClothing.png,Wizard,ARMOR,13,16
+21,Robe,rare,Boots for low level,50,4,8,./assets/Items/Transparent/Armor/Boots/Robe.png,Wizard,ARMOR,7,19
+22,Scout,legendary,Boots for slaves,50,4,8,./assets/Items/Transparent/Armor/Boots/Scout_Paint.png,Warrior,ARMOR,9,15
+23,Slave,common,Boots for slaves,50,4,8,./assets/Items/Transparent/Armor/Boots/Slave.png,Warrior,ARMOR,11,19
+24,WaterAdept,legendary,Boots for amaters,50,4,8,./assets/Items/Transparent/Armor/Boots/WaterAdept.png,Warrior,ARMOR,6,17
+25,BowmanHat,common,Helmet for slaves,50,1,0,./assets/Items/Transparent/Armor/Helmets/BowmanHat_Paint.png, Hunter,ARMOR,14,12
+26,ClericHood,common,helmet for amateur ,50,1,0,./assets/Items/Transparent/Armor/Helmets/ClericHood_Paint.png,Warrior,ARMOR,12,10
+27,ExpertBowmanHat,rare,helmet for professionals,50,1,0,./assets/Items/Transparent/Armor/Helmets/ExpertBowmanHat.png,Wizard,ARMOR,13,13
+28,ExpertHunterHat,common,helmet for legends,50,1,0,./assets/Items/Transparent/Armor/Helmets/ExpertHunterHat.png,Wizard,ARMOR,13,19
+29,HermitHat,legendary,helmet for professionals,50,1,0,./assets/Items/Transparent/Armor/Helmets/HermitHat.png, Hunter,ARMOR,11,19
+30,HunterHat1,mythic,I don't want to ,50,1,0,./assets/Items/Transparent/Armor/Helmets/HunterHat1.png,Wizard,ARMOR,12,12
+31,HunterHat2,legendary,helmet for hunters,50,1,0,./assets/Items/Transparent/Armor/Helmets/HunterHat2.png,Wizard,ARMOR,7,12
+32,HunterHelm,common,helmet for hunters,50,1,0,./assets/Items/Transparent/Armor/Helmets/HunterHelm_Paint.png,Wizard,ARMOR,9,17
+33,LeatherCap,uncommon,helmet contains leather,50,1,0,./assets/Items/Transparent/Armor/Helmets/LeatherCap.png, Hunter,ARMOR,10,10
+34,LeatherHelm,rare,helmet contains leather,50,1,0,./assets/Items/Transparent/Armor/Helmets/LeatherHelm.png,Warrior,ARMOR,6,18
+35,MilitiamanHelmet1,common,helmet for assasiners,50,1,0,./assets/Items/Transparent/Armor/Helmets/MilitiamanHelmet1_Paint.png,Warrior,ARMOR,11,19
+36,MilitiamanHelmet2,common,helmet for assasiners,50,1,0,./assets/Items/Transparent/Armor/Helmets/MilitiamanHelmet2_Paint.png, Hunter,ARMOR,13,18
+37,PeasantCap,rare,Cap for amaters,50,1,0,./assets/Items/Transparent/Armor/Helmets/PeasantCap.png, Hunter,ARMOR,13,17
+38,ScoutHelm,common,helmet for hunters,50,1,0,./assets/Items/Transparent/Armor/Helmets/ScoutHelm.png,Warrior,ARMOR,5,12
+39,SlaveHeadband,common,helmet for slaves,50,1,0,./assets/Items/Transparent/Armor/Helmets/SlaveHeadband.png,Warrior,ARMOR,7,16
+40,SteelHelm,common,helmet of power,50,1,0,./assets/Items/Transparent/Armor/Helmets/SteelHelm_Paint.png,Warrior,ARMOR,12,13
+41,StrawHat,legendary,Helmet for slaves,50,1,0,./assets/Items/Transparent/Armor/Helmets/StrawHat.png, Hunter,ARMOR,11,14
+42,Ariel Dress,uncommon,Plate for amaters,50,3,5,./assets/Items/Transparent/Armor/Plate/ArielDress_Paint.png,Warrior,ARMOR,9,20
+43,BranditArmor,common,Plate for legends,50,3,5,./assets/Items/Transparent/Armor/Plate/BanditLightArmor_Paint.png,Warrior,ARMOR,5,11
+44,ChainmailLightArmor,rare,Plate for killers,50,3,5,./assets/Items/Transparent/Armor/Plate/ChainmailLightArmor_Paint.png,Wizard,ARMOR,15,10
+45,Cleric,common,Plate for hunters,50,3,5,./assets/Items/Transparent/Armor/Plate/Cleric_Paint.png,Warrior,ARMOR,8,14
+46,CrusaderChainmail,common,Plate for legends,50,3,5,./assets/Items/Transparent/Armor/Plate/CrusaderChainmail_Paint.png,Warrior,ARMOR,10,16
+47,Deserter,common,Plate for hunters,50,3,5,./assets/Items/Transparent/Armor/Plate/Deserter.png, Hunter,ARMOR,5,19
+48,EliteGuardArmor,rare,Plate for amaters,50,3,5,./assets/Items/Transparent/Armor/Plate/EliteGuardArmor_Paint.png,Warrior,ARMOR,11,11
+49,FlaconLightArmor,mythic,Plate for killers,50,3,5,./assets/Items/Transparent/Armor/Plate/FalconLightArmor.png,Wizard,ARMOR,15,14
+50,FireAdept,legendary,Plate for hunters,50,3,5,./assets/Items/Transparent/Armor/Plate/FireAdept.png, Hunter,ARMOR,15,13
+51,GuardArmor,common,Plate for killers,50,3,5,./assets/Items/Transparent/Armor/Plate/GuardArmor_Paint.png, Hunter,ARMOR,13,16
+52,Hermit,rare,Plate for amaters,50,3,5,./assets/Items/Transparent/Armor/Plate/Hermit.png, Hunter,ARMOR,11,20
+53,Hunter,common,Plate for hunters,50,3,5,./assets/Items/Transparent/Armor/Plate/Hunter.png,Warrior,ARMOR,12,12
+54,HunterLightArmor,legendary,Plate for hunters,50,3,5,./assets/Items/Transparent/Armor/Plate/HunterLightArmor.png, Hunter,ARMOR,9,12
+55,HunterTunic,legendary,Plate for hunters,50,3,5,./assets/Items/Transparent/Armor/Plate/HunterTunic.png,Wizard,ARMOR,8,17
+56,IronArmor,rare,Plate for amaters,50,3,5,./assets/Items/Transparent/Armor/Plate/IronArmor_Paint.png,Wizard,ARMOR,14,14
+57,KnightArmor,common,Plate for legends,50,3,5,./assets/Items/Transparent/Armor/Plate/KnightArmor.png,Warrior,ARMOR,6,15
+58,LeatherJacket,legendary,Plate for killers,50,3,5,./assets/Items/Transparent/Armor/Plate/LeatherJacket.png,Warrior,ARMOR,12,13
+59,LeatherLightArmor,uncommon,Plate for legends,50,3,5,./assets/Items/Transparent/Armor/Plate/LeatherLightArmor.png, Hunter,ARMOR,14,19
+60,LeatherRivetedArmor,common,Plate for legends,50,3,5,./assets/Items/Transparent/Armor/Plate/LeatherRivetedArmor.png,Warrior,ARMOR,12,18
+61,Militiaman,common,Plate for killers,50,3,5,./assets/Items/Transparent/Armor/Plate/Militiaman.png,Wizard,ARMOR,6,18
+62,PrasantClothing,rare,Plate for slaves,50,3,5,./assets/Items/Transparent/Armor/Plate/PeasantClothing.png,Warrior,ARMOR,12,17
+63,Robe,common,Plate for slaves,50,3,5,./assets/Items/Transparent/Armor/Plate/Robe.png, Hunter,ARMOR,9,13
+64,Scout,legendary,Plate for slaves,50,3,5,./assets/Items/Transparent/Armor/Plate/Scout_Paint.png,Warrior,ARMOR,11,14
+65,Slave,common,Plate for slaves,50,3,5,./assets/Items/Transparent/Armor/Plate/Slave.png,Wizard,ARMOR,14,16
+66,WaterAdept,rare,Plate for slaves,50,3,5,./assets/Items/Transparent/Armor/Plate/WaterAdept.png,Wizard,ARMOR,6,15
+67,Ariel Dress,common,Rachel's Dress,50,2,4,./assets/Items/Transparent/Armor/Gloves/ArielDress_Paint.png, Hunter,ARMOR,15,19
+68,BranditArmor,uncommon,Gloves for killers,50,2,4,./assets/Items/Transparent/Armor/Gloves/BanditLightArmor_Paint.png, Hunter,ARMOR,14,11
+69,ChainmailLightArmor,common,Gloves for hunters,50,2,4,./assets/Items/Transparent/Armor/Gloves/ChainmailLightArmor_Paint.png,Wizard,ARMOR,12,10
+70,Cleric,rare,Gloves for legends,50,2,4,./assets/Items/Transparent/Armor/Gloves/Cleric_Paint.png,Warrior,ARMOR,15,16
+71,CrusaderChainmail,common,Gloves for amaters,50,2,4,./assets/Items/Transparent/Armor/Gloves/CrusaderChainmail_Paint.png,Wizard,ARMOR,15,17
+72,Deserter,common,Gloves for amaters,50,2,4,./assets/Items/Transparent/Armor/Gloves/Deserter.png, Hunter,ARMOR,10,10
+73,EliteGuardArmor,legendary,Gloves for legends,50,2,4,./assets/Items/Transparent/Armor/Gloves/EliteGuardArmor_Paint.png,Wizard,ARMOR,15,13
+74,FlaconLightArmor,common,Gloves for killers,50,2,4,./assets/Items/Transparent/Armor/Gloves/FalconLightArmor.png,Warrior,ARMOR,14,12
+75,GuardArmor,rare,Gloves for killers,50,2,4,./assets/Items/Transparent/Armor/Gloves/GuardArmor_Paint.png,Wizard,ARMOR,5,19
+76,Hermit,legendary,Gloves for amaters,50,2,4,./assets/Items/Transparent/Armor/Gloves/Hermit.png,Wizard,ARMOR,15,18
+77,Hunter,legendary,Gloves for hunters,50,2,4,./assets/Items/Transparent/Armor/Gloves/Hunter.png, Hunter,ARMOR,15,16
+78,HunterLightArmor,mythic,Gloves for hunters,50,2,4,./assets/Items/Transparent/Armor/Gloves/HunterLightArmor.png, Hunter,ARMOR,5,14
+79,HunterTunic,legendary,Gloves for hunters,50,2,4,./assets/Items/Transparent/Armor/Gloves/HunterTunic.png,Wizard,ARMOR,5,11
+80,IronArmor,common,Gloves for amaters,50,2,4,./assets/Items/Transparent/Armor/Gloves/IronArmor_Paint.png,Wizard,ARMOR,11,17
+81,KnightArmor,common,Gloves for killers,50,2,4,./assets/Items/Transparent/Armor/Gloves/KnightArmor.png,Warrior,ARMOR,8,16
+82,LeatherJacket,uncommon,Gloves for legends,50,2,4,./assets/Items/Transparent/Armor/Gloves/LeatherJacket.png,Wizard,ARMOR,5,13
+83,LeatherLightArmor,common,Gloves for amaters,50,2,4,./assets/Items/Transparent/Armor/Gloves/LeatherLightArmor.png, Hunter,ARMOR,15,18
+84,LeatherRivetedArmor,rare,Gloves for killers,50,2,4,./assets/Items/Transparent/Armor/Gloves/LeatherRivetedArmor.png,Warrior,ARMOR,10,10
+85,Militiaman,uncommon,Gloves for legends,50,2,4,./assets/Items/Transparent/Armor/Gloves/Militiaman.png,Wizard,ARMOR,6,13
+86,PrasantClothing,common,Gloves for amaters,50,2,4,./assets/Items/Transparent/Armor/Gloves/PeasantClothing.png, Hunter,ARMOR,13,10
+87,Robe,rare,Gloves for amaters,50,2,4,./assets/Items/Transparent/Armor/Gloves/Robe.png, Hunter,ARMOR,12,14
+88,Scout,common,Gloves for amaters,50,2,4,./assets/Items/Transparent/Armor/Gloves/Scout_Paint.png, Hunter,ARMOR,8,16
+89,Slave,uncommon,Gloves for slaves,50,2,4,./assets/Items/Transparent/Armor/Gloves/Slave.png,Warrior,ARMOR,5,20
+90,BattleBow,common,Arrow for slave,50,7,4,./assets/Items/Transparent/Weapon/Arrows/BattleBow.png,Wizard,WEAPON,8,10
+91,FamilyBow,rare,arrow for legends,50,7,4,./assets/Items/Transparent/Weapon/Arrows/FamilyBow.png, Hunter,WEAPON,13,18
+92,HunterBow,common,arrow for low level,50,7,6,./assets/Items/Transparent/Weapon/Arrows/HunterBow.png,Warrior,WEAPON,8,14
+93,HunterShortBow,common,arrow for slave,50,7,6,./assets/Items/Transparent/Weapon/Arrows/HunterShortBow.png, Hunter,WEAPON,14,12
+94,ScoutShortBow,legendary,arrow for legends,50,7,6,./assets/Items/Transparent/Weapon/Arrows/ScoutShortBow.png, Hunter,WEAPON,11,19
+95,BattleBow,common,Bow for low level,50,7,4,./assets/Items/Transparent/Weapon/Bows/BattleBow.png,Warrior,WEAPON,7,10
+96,FamilyBow,common,Bow for slave,50,7,6,./assets/Items/Transparent/Weapon/Bows/FamilyBow.png,Warrior,WEAPON,5,17
+97,HunterBow,rare,Bow for professionals,50,7,4,./assets/Items/Transparent/Weapon/Bows/HunterBow.png,Wizard,WEAPON,12,14
+98,HunterShortBow,legendary,Bow for legends,50,7,6,./assets/Items/Transparent/Weapon/Bows/HunterShortBow.png,Warrior,WEAPON,5,15
+99,scoutShortBow,legendary,Bow for legends,50,7,4,./assets/Items/Transparent/Weapon/Bows/ScoutShortBow.png,Wizard,WEAPON,10,16
+100,ClericWand1,uncommon,weapon for low level,50,13,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/ClericWand1.png, Hunter,WEAPON,14,13
+101,ClericWand2,common,weapon for low level,50,13,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/ClericWand2.png, Hunter,WEAPON,14,11
+102,FamilySword,legendary,weapon for legends,50,10,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/FamilySword.png, Hunter,WEAPON,8,10
+103,FireAddeptWand1,rare,weapon for professionals,50,13,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/FireAdeptWand1.png,Warrior,WEAPON,7,11
+104,FireAddeptWand2,common,weapons for slaves,50,13,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/FireAdeptWand2.png,Wizard,WEAPON,8,19
+105,HardwoodWand,rare,weapon for legends,50,13,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/HardwoodWand.png, Hunter,WEAPON,7,10
+106,HermitWand,legendary,weapon for professionals,50,13,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/HermitWand.png,Wizard,WEAPON,15,13
+107,HunterKnife,rare,weapon for professionals,50,10,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/HunterKnife_Paint.png, Hunter,WEAPON,8,10
+108,Machete,legendary,weapon for legends,50,10,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/Machete_Paint.png,Wizard,WEAPON,14,11
+109,MagicSword,common,weapon for low level,50,10,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/MagicSword_Paint.png, Hunter,WEAPON,7,17
+110,MilitiamanShortSword,uncommon,weapons for slaves,50,10,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/MilitiamanShortSword_Paint.png,Wizard,WEAPON,7,13
+111,RustySword,common,weapon for low level,50,10,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/RustySword.png,Warrior,WEAPON,13,17
+112,ShortDagger,rare,weapon for professionals,50,9,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortDagger_Paint.png,Warrior,WEAPON,15,10
+113,ShortIronKatana,common,weapon for low level,50,10,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortIronKatana_Paint.png,Warrior,WEAPON,14,10
+114,ShortSword,common,weapons for slaves,50,10,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortSword_Paint.png,Wizard,WEAPON,8,10
+115,SlaveSword,rare,weapon for professionals,50,10,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/SlaveSword_Paint.png,Warrior,WEAPON,6,13
+116,SmallAxe,legendary,weapon for legends,50,14,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/SmallAxe.png, Hunter,WEAPON,5,15
+117,TrainingSword,legendary,weapon for legends,50,10,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/TrainingSword_Paint.png,Warrior,WEAPON,15,20
+118,WarHammer,uncommon,weapon for low level,50,16,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/WarHammer.png,Wizard,WEAPON,5,12
+119,WaterAdeptWand1,rare,weapon for professionals,50,13,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/WaterAdeptWand1.png,Wizard,WEAPON,13,18
+120,WaterAdeptWand2,common,weapon for low level,50,13,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/WaterAdeptWand2.png,Warrior,WEAPON,10,14
+121,WoodcutterAxe,legendary,weapon for professionals,50,14,6,./assets/Items/Transparent/Weapon/MeleeWeapon1H/WoodcutterAxe.png,Wizard,WEAPON,13,14
+122,WoodenMace,common,weapon for low level,50,15,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/WoodenMace.png, Hunter,WEAPON,9,19
+123,WoodenSpikedClub,rare,weapon for legends,50,15,4,./assets/Items/Transparent/Weapon/MeleeWeapon1H/WoodenSpikedClub.png, Hunter,WEAPON,14,19
+124,BroadSword,common,weapon for low level,50,11,4,./assets/Items/Transparent/Weapon/MeleeWeapon2H/BroadSword.png,Warrior,WEAPON,7,19
+125,OldPoleaxe,uncommon,weapons for slaves,50,17,6,./assets/Items/Transparent/Weapon/MeleeWeapon2H/OldPoleaxe.png,Wizard,WEAPON,10,17
+126,SteelAxe,common,weapons for slaves,50,17,6,./assets/Items/Transparent/Weapon/MeleeWeapon2H/SteelAxe.png,Wizard,WEAPON,13,10
+127,WoodcutterPoleaxe,legendary,weapon for professionals,50,17,4,./assets/Items/Transparent/Weapon/MeleeWeapon2H/WoodcutterPoleaxe.png, Hunter,WEAPON,13,15
+128,WoodenMace,rare,weapon for legends,50,12,6,./assets/Items/Transparent/Weapon/MeleeWeapon2H/WoodenMace.png,Warrior,WEAPON,6,17
+129,HermitLamp,common,shield for low level,50,8,4,./assets/Items/Transparent/Weapon/Shields/HermitLamp.png,Warrior,WEAPON,7,11
+130,MilitiamanShield,rare,shield for legends,50,8,4,./assets/Items/Transparent/Weapon/Shields/MilitiamanShield.png,Wizard,WEAPON,6,11
+131,SteelTowerShield,common,shield for low level,50,8,6,./assets/Items/Transparent/Weapon/Shields/SteelTowerShield.png,Warrior,WEAPON,7,14
+132,WoodenBuckler,legendary,shield for professionals,50,8,6,./assets/Items/Transparent/Weapon/Shields/WoodenBuckler.png, Hunter,WEAPON,6,18
+133,WoodenShield,rare,shield for legends,50,8,6,./assets/Items/Transparent/Weapon/Shields/WoodenShield.png,Wizard,WEAPON,11,18
+134,Flying Eye wing,uncommon,A loot from a Flying Eye,50,-1,-1,./assets/world_textures/ennemy/Skeleton/loot/skull.png,,OTHER,0,5
+135,Goblin teeth,uncommon,A loot from a Goblin,50,-1,-1,./assets/world_textures/ennemy/Goblin/loot/teeth.png,,OTHER,0,5
+136,Mushroom skin,uncommon,A loot from a Mushroom,50,-1,-1,./assets/world_textures/ennemy/Mushroom/loot/skin.png,,OTHER,0,5
+137,Skeleton Skull,uncommon,A loot from a Skeleton ,50,-1,-1,./assets/world_textures/ennemy/Skeleton/loot/skull.png,,OTHER,0,5

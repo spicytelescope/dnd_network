@@ -1,0 +1,152 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "/home/spicytelescope/DATA/PERSO/Computer_science/Projects/dnd/src/assets/world_textures/buildings/shop/Seller.tmx",
+    "expandedProjectPaths": [
+        "/home/spicytelescope/DATA/PERSO/Computer_science/Projects/dnd/src/assets/world_textures/buildings/shop",
+        "PNJHouse001",
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/seller"
+    ],
+    "exportAsImage.drawObjectLabels": false,
+    "exportAsImage.drawTileGrid": false,
+    "exportAsImage.useCurrentScale": false,
+    "fileStates": {
+        "/home/spicytelescope/DATA/PERSO/Computer_science/Projects/dnd/src/assets/world_textures/buildings/shop/Seller.tmx": {
+            "scale": 3,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 504.5,
+                "y": 461.3333333333333
+            }
+        },
+        "/home/spicytelescope/DATA/PERSO/Computer_science/Projects/dnd/src/assets/world_textures/buildings/tiledSets/Interior.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/spicytelescope/DATA/PERSO/Computer_science/Projects/dnd/src/assets/world_textures/buildings/tiledSets/Wall.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "/home/spicytelescope/DATA/PERSO/Computer_science/Projects/dnd/src/assets/world_textures/buildings/tiledSets/interior_2.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/spicytelescope/DATA/PERSO/Computer_science/Projects/dnd/src/assets/world_textures/buildings/tiledSets/interior_seller.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/seller/Seller.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 515,
+                "y": 620.6666666666667
+            }
+        },
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/seller/interior_seller.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/seller/seller.tmx": {
+            "scale": 0.8841308593749999,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 496.53283260617445,
+                "y": 511.23653835533224
+            }
+        },
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/tiledSets/Interior.tsx": {
+            "scaleInDock": 1
+        },
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/tiledSets/Wall.tsx": {
+            "scaleInDock": 1
+        },
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/tiledSets/interior_2.tsx": {
+            "scaleInDock": 0.5
+        },
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/tiledSets/interior_seller.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/tiledSets/map.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 714,
+                "y": 638
+            }
+        },
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/tiledSets/map.tmx#Interior": {
+            "scaleInDock": 1
+        },
+        "PNJHouse001/House001.tmx": {
+            "scale": 3,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 512,
+                "y": 511.66666666666663
+            }
+        },
+        "PNJHouse001/House_Tileset.tsx": {
+            "scaleInDock": 1
+        },
+        "PNJHouse001/PNJHouse1.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 369.3333333333333,
+                "y": 284
+            }
+        },
+        "PNJHouse001/wall.tsx": {
+            "scaleInDock": 1
+        },
+        "Wall.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tiledSets/Interior.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tiledSets/Wall.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tiledSets/interior_2.tsx": {
+            "scaleInDock": 0.5,
+            "scaleInEditor": 1
+        }
+    },
+    "map.height": 32,
+    "map.lastUsedExportFilter": "CSV files (*.csv)",
+    "map.lastUsedFormat": "tmx",
+    "map.width": 32,
+    "openFiles": [
+        "PNJHouse001/House001.tmx",
+        "/home/spicytelescope/DATA/PERSO/Computer_science/Projects/dnd/src/assets/world_textures/buildings/shop/Seller.tmx"
+    ],
+    "project": "House.tiled-project",
+    "recentFiles": [
+        "PNJHouse001/House001.tmx",
+        "/home/spicytelescope/DATA/PERSO/Computer_science/Projects/dnd/src/assets/world_textures/buildings/shop/Seller.tmx",
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/tiledSets/interior_seller.tsx",
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/seller/Seller.tmx",
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/seller/interior_seller.tsx",
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/tiledSets/map.tmx",
+        "D:/PERSO/Computer_science/Projects/dnd/assets/world_textures/buildings/seller/seller.tmx",
+        "tiledSets/Interior.tsx",
+        "tiledSets/Wall.tsx",
+        "tiledSets/interior_2.tsx",
+        "PNJHouse001/PNJHouse1.tmx",
+        "Wall.tsx"
+    ],
+    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 60,
+        "width": 60
+    },
+    "tileset.type": 1
+}

@@ -1,0 +1,21 @@
+SPELL ID,NAME,DESC,EFFECTS,DMG,DMGRANGE,ANIM TIME,ANIM DIR PATH,ICON PATH,LVL,CLASS,WEAPONS,TYPE
+0,Medium blow,"Bonk, a basic auto attack",,2,2,1,./assets/Spells/Warrior/Sword/Medium,./assets/Spells/spellIcons/attack.png,1,Hunter,,line
+1,Medium blow,"Bonk, a basic auto attack",,1,1,1,./assets/Spells/Warrior/Sword/Medium,./assets/Spells/spellIcons/attack.png,1,Wizard,,line
+2,Medium blow,"Bonk, a basic auto attack",,3,1,1,./assets/Spells/Warrior/Sword/Medium,./assets/Spells/spellIcons/attack.png,1,Warrior,,line
+3,Weak fire,Attacking with a weak fire,,3,1,1,./assets/Spells/Mage/fire/weak,./assets/Spells/spellIcons/Wizard/fire/weak/icon.png,1,Wizard,,square
+4,Medium fire,Attacking with a medium fire,,2,2,2,./assets/Spells/Mage/fire/medium,./assets/Spells/spellIcons/Wizard/fire/medium/icon.png,2,Wizard,,square
+5,Strong fire,Attacking with a strong fire,,2,3,3,./assets/Spells/Mage/fire/strong,./assets/Spells/spellIcons/Wizard/fire/strong/icon.png,3,Wizard,,square
+6,Weak ice,Attacking with a weak ice block,,4,1,1,./assets/Spells/Mage/ice/weak,./assets/Spells/spellIcons/Wizard/ice/weak/icon.png,1,Wizard,,square
+7,Medium ice,Attacking with a medium ice block,,1,2,2,./assets/Spells/Mage/ice/medium,./assets/Spells/spellIcons/Wizard/ice/medium/icon.png,2,Wizard,,square
+8,Strong ice,Attacking with a strong ice block,,5,3,3,./assets/Spells/Mage/ice/strong,./assets/Spells/spellIcons/Wizard/ice/strong/icon.png,3,Wizard,,square
+9,Weak wind,Attacking with a weak wind,,2,1,1,./assets/Spells/Mage/wind/weak,./assets/Spells/spellIcons/Wizard/wind/weak/icon.png,1,Wizard,,square
+10,Medium wind,Attacking with a medium wind,,2,2,2,./assets/Spells/Mage/wind/medium,./assets/Spells/spellIcons/Wizard/wind/medium/icon.png,2,Wizard,,square
+11,Strong wind,Attacking with a strong wind,,4,3,3,./assets/Spells/Mage/wind/strong,./assets/Spells/spellIcons/Wizard/wind/strong/icon.png,3,Wizard,,square
+12,Weak rock,Attacking with a weak rock,,3,1,1,./assets/Spells/Mage/earth/weak,./assets/Spells/spellIcons/Wizard/earth/weak/icon.png,1,Wizard,,square
+13,Medium rock,Attacking with a medium rock,,1,2,2,./assets/Spells/Mage/earth/medium,./assets/Spells/spellIcons/Wizard/earth/medium/icon.png,2,Wizard,,square
+14,Strong rock,Attacking with a strong rock,,3,3,3,./assets/Spells/Mage/earth/strong,./assets/Spells/spellIcons/Wizard/earth/strong/icon.png,3,Wizard,,square
+15,Vital strike ,Attacking and focus on vital point  ,,3,2,3,./assets/Spells/Hunter/Dagger/Claw,./assets/Spells/spellIcons/Hunter/Dagger/Claw/icon.png,3,Hunter,Dagger,line
+16,Fire arrow,Attacking with a fire arrow  ,,1,4,1,./assets/Spells/Hunter/Bow/FireArrow,./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png,1,Hunter,Bow,line
+17,Ice arrow,Attacking with a ice arrow  ,,2,4,2,./assets/Spells/Hunter/Bow/IceArrow,./assets/Spells/spellIcons/Hunter/Bow/IceArrow/icon.png,2,Hunter,Bow,line
+18,Shield’s blow,Attacking with a shield,,2,3,1,./assets/Spells/Warrior/Buff/Shield,./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png,1,Warrior,,line
+19,Slash,Doing 2 slashs on the target,,4,2,2,./assets/Spells/Warrior/Sword/slash,./assets/Spells/spellIcons/Warrior/Sword/slash/icon.png,2,Warrior,,square

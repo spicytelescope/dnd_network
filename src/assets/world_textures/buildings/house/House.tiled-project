@@ -1,0 +1,11 @@
+{
+    "automappingRulesFile": "",
+    "commands": [
+    ],
+    "extensionsPath": "extensions",
+    "folders": [
+        "PNJHouse001",
+        "../shop"
+    ],
+    "objectTypesFile": ""
+}
