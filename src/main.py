@@ -11,7 +11,7 @@ from pygame.locals import *
 from config.playerConf import MAX_TEAM_LENGH, TIME_OUT_REST
 
 pygame.init()
-pygame.mixer.init()
+# pygame.mixer.init()
 
 # Clear console for Xserver wsl2 conflicts
 import os

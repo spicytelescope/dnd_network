@@ -66,14 +66,14 @@ INFO:PHYM_LOGGER:LOADING ITEM RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to ItemDBLoading : 20 
 INFO:PHYM_LOGGER:LOADING SPELL RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to spellDBLoading : 20 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/KnightArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/EliteGuardArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/IronArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon2H/BroadSword.png
-INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/ArielDress_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/HunterTunic.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Deserter.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ClericWand1.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/PeasantClothing.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [0, 16]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png
 INFO:PHYM_LOGGER:LOADING OPEN WORLD RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to biomeTextures : 10 
 INFO:PHYM_LOGGER:LOADING MINIMAP RESSOURCES
@@ -87,30 +87,21 @@ DEBUG:PHYM_LOGGER:ADDING to chunk_7 : 1
 DEBUG:PHYM_LOGGER:ADDING to chunk_8 : 1 
 DEBUG:PHYM_LOGGER:ADDING to chunk_9 : 1 
 INFO:PHYM_LOGGER:Generating Init_Zone
+INFO:PHYM_LOGGER:LOADING ./assets/world_textures/ennemy/Skeleton/loot/skull.png
 DEBUG:PHYM_LOGGER:ADDING to worldElements : 15 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/KnightArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/EliteGuardArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/IronArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon2H/BroadSword.png
-INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/ArielDress_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/HunterTunic.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Deserter.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ClericWand1.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/PeasantClothing.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [0, 16]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/KnightArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/EliteGuardArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/IronArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon2H/BroadSword.png
-INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/ArielDress_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/HunterTunic.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Deserter.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ClericWand1.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/PeasantClothing.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [0, 16]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
-INFO:PHYM_LOGGER:LOADING OPEN WORLD RESSOURCES
-INFO:PHYM_LOGGER:HEALING aaaa DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING bb DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING ccc DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING aaaa DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING bb DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING ccc DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING aaaa DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING bb DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING ccc DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png

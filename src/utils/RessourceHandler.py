@@ -37,10 +37,10 @@ NoContact = lambda: None
 def loadMusicRessources():
 
     logger.info("LOADING MUSIC RESSOURCES")
-    musicConf.SOUNDS_BANK = {
-        songName: pygame.mixer.Sound(songPath)
-        for songName, songPath in musicConf.SOUNDS_PATH.items()
-    }
+    # musicConf.SOUNDS_BANK = {
+    #     songName: pygame.mixer.Sound(songPath)
+    #     for songName, songPath in musicConf.SOUNDS_PATH.items()
+    # }
 
 
 def loadItemRessources():
