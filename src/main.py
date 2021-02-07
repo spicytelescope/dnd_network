@@ -2,11 +2,13 @@
 #!coding:utf-8
 
 import threading
+import multiprocessing
 import time
 from pickle import load
 
 import pygame
 from pygame.locals import *
+from config.UIConf import POP_UP_ACTIONS
 
 from config.playerConf import MAX_TEAM_LENGH, TIME_OUT_REST
 
@@ -29,6 +31,8 @@ from Map.MapClass import OpenWorldMap
 from Player.Character import Character
 from saves.savesController import *
 from UI.menuClass import LoadingMenu, MainMenu, OptionMenu, PauseMenu, SelectMenu
+from network.NetworkController import NetworkController
+from UI.ContextMenu import NonBlockingPopupMenu
 
 RessourceHandler.loadMusicRessources()
 
@@ -50,14 +54,22 @@ World_Map = OpenWorldMap(WORLD_MAP_CONFIG, Game)
 Hero_group = [Character(Game, Player_Map, genOrder=i) for i in range(MAX_TEAM_LENGH)]
 Game.heroesGroup += Hero_group
 
+# ------------------ NETWORKING -------------- #
 
-# ------------------- MENUS ----------------------- #
+ContextMenu = NonBlockingPopupMenu(POP_UP_ACTIONS, Game)
+NetworkController = NetworkController(Game, Player_Map, Hero_group[0], ContextMenu)
+
+# ------------------- MENUS -------------------- #
 
 MainMenu = MainMenu(Game, Player_Map)
 OptionMenu = OptionMenu(Game, Player_Map, Hero_group)
 SelectMenu = SelectMenu(Game, Player_Map, Hero_group)
-PauseMenu = PauseMenu(Game, Player_Map, Hero_group, SaveController, Game.heroesGroup)
+PauseMenu = PauseMenu(
+    Game, Player_Map, Hero_group, SaveController, Game.heroesGroup, NetworkController
+)
 LoadingMenu = LoadingMenu(Game, Player_Map)
+
+# ------------------ SAVES -------------------- #
 
 SaveController.gameClasses = [
     # Game,
@@ -70,6 +82,7 @@ SaveController.gameClasses = [
     # PauseMenu,
     # LoadingMenu,
 ]
+
 
 while Game.currentState != "quit":
 
@@ -90,8 +103,7 @@ while Game.currentState != "quit":
         OptionMenu.show()
 
     if Game.currentState == "loadingNewGame":
-        pygame.key.set_repeat()
-
+        pygame.key.set_repeat()  # To reset the name's choice
         Hero = Hero_group[0]
 
         def loadMap():
@@ -100,12 +112,13 @@ while Game.currentState != "quit":
                 Player_Map.loadPlayerdMap(Player_Map.maxChunkGen, Hero)
 
         loadingThread = threading.Thread(target=loadMap)
-
         loadingThread.start()
+        # loadingProcess = multiprocessing.Process(target=loadMap)
+        # loadingProcess.start()
+        # loadingProcess.join()
 
         while Game.currentState == "loadingNewGame":
             LoadingMenu.show()
-
         Player_Map.miniMap.WorldMap = World_Map
         Player_Map.miniMap.WorldMap.mapSeed = Player_Map.mapSeed
 
@@ -133,6 +146,8 @@ while Game.currentState != "quit":
         Player_Map.show(Leader)
 
         for event in pygame.event.get():
+            if NetworkController.players != {}:
+                NetworkController.handleInteractions(event)
 
             if event.type == pygame.KEYDOWN:
 
@@ -153,9 +168,9 @@ while Game.currentState != "quit":
 
                 elif (
                     event.key == Game.KeyBindings["Toggle Inventory"]["value"]
-                    and Leader.Inventory.open == False
+                    and Hero.Inventory.open == False
                 ):
-                    Leader.Inventory.show()
+                    Hero.Inventory.show()
                     break
                 elif event.key == Game.KeyBindings["Toggle Spell Book"]["value"]:
                     Hero.SpellBook.show()
@@ -165,10 +180,17 @@ while Game.currentState != "quit":
 
                 elif event.key == Game.KeyBindings["Toggle Minimap"]["value"]:
                     Player_Map.miniMap.showExtendedMap()
-                elif len(Hero_group) > 1 and event.key == Game.KeyBindings["Switch heroes"]["value"]:
+                elif (
+                    len(Hero_group) > 1
+                    and event.key == Game.KeyBindings["Switch heroes"]["value"]
+                ):
                     Game.heroIndex = (Game.heroIndex + 1) % MAX_TEAM_LENGH
 
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+            if (
+                event.type == pygame.MOUSEBUTTONDOWN
+                and event.button == 3
+                and not ContextMenu._show
+            ):
                 Leader.updateClickPoint()
 
             if event.type == ANIMATE_WATER_EVENT_ID and Player_Map.enableWaterAnimation:
@@ -193,7 +215,10 @@ while Game.currentState != "quit":
 
             Player_Map.miniMap.show()
             Hero.CharBar.show()
+            NetworkController.showConnectedPlayers()
             Hero.show()
+            ContextMenu.draw()
+
             Game.show()
 
             Game.spaceTransition("Pyhm World")

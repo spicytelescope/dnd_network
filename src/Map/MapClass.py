@@ -17,6 +17,7 @@ from HUD.miniMap import MiniMap
 from pygame.locals import *
 from tqdm import tqdm
 from utils.utils import logger
+from multiprocessing import Process
 
 
 class OpenWorldMap:
@@ -108,7 +109,9 @@ class OpenWorldMap:
                 min(self.Game.WINDOW_SIZE) // self.stepGeneration
             )
             self.renderDistance = 1
-            self.maxChunkGen = (self.renderDistance + 2) ** 2
+            self.maxChunkGen = (1 + self.renderDistance * 2) ** 2
+            self.reGenChunkFlag = False
+            self.reGenProcessHandler = None
 
             # By default, the chunk where the player spawns will be considered at 0,0
             # This system of coordonates follows the direction and the axis of the one of pygame !
@@ -138,12 +141,9 @@ class OpenWorldMap:
             self.envHandler = EnvHandler(self.Game, self)
             self.envGenerator = self.envHandler.envGenerator
 
-    def generateMainChunk(self, nChunks):
-        """Creating nChunks chunks (too much chunks ya) around the one at the coordonates of self.chunkData["currentChunkPos"], and then turning it into 1 big picture"""
-
-        assert (
-            self.id == 1
-        ), f"<ERROR> : the generateMainChunk method can only be call for the PLAYER_MAP"
+    def genChunkStructures(self):
+        """ Adding each chunks structure, the bliting will be handled by parallelism
+        """
 
         for j in range(-self.renderDistance, self.renderDistance + 1):
             for i in range(-self.renderDistance, self.renderDistance + 1):
@@ -156,27 +156,16 @@ class OpenWorldMap:
 
                 # Checking if a chunk is not already generated, otherwise we don't generate it
                 if chunkCoor not in self.chunkData.keys():
-
-                    self.chunkGenerationCounter += 1
-                    self.loadingMenu.updateProgressBar(
-                        f"chunk_{self.chunkGenerationCounter}", "map"
-                    )
-
-                    # Handling progress bar
-                    self.progressBar = tqdm(
-                        total=(self.Game.resolution // self.stepGeneration) ** 2,
-                        desc=f"Generating chunks {self.chunkGenerationCounter}/{nChunks}",
-                        ncols=TQDM_MAP_GENERATION_WIDTH,
-                    )
-
                     # Adding a chunk entry in the chunkData dict
                     self.chunkData[
                         str(i + self.chunkData["currentChunkPos"][0])
                         + ";"
                         + str(j + self.chunkData["currentChunkPos"][1])
                     ] = {
+                        "initialised": False,
                         "textureTab": [
-                            ["" for i in range(self.currentChunkSubdivision)]
+                            [{"color": None}
+                                for i in range(self.currentChunkSubdivision)]
                             for j in range(self.currentChunkSubdivision)
                         ],
                         "elementTab": [
@@ -185,7 +174,8 @@ class OpenWorldMap:
                                     "type": None,
                                     "value": None,
                                     "name": None,
-                                    "surfIndex": -1, # Parameters for some landscapes elements that have random textures, fix the textures.
+                                    # Parameters for some landscapes elements that have random textures, fix the textures.
+                                    "surfIndex": -1,
                                     "structure": {
                                         "name": None,
                                         "surf": None,
@@ -203,6 +193,40 @@ class OpenWorldMap:
                             (self.Game.resolution, self.Game.resolution)
                         ),
                     }
+
+    def generateMainChunk(self, nChunks):
+        """Creating nChunks chunks (too much chunks ya) around the one at the coordonates of self.chunkData["currentChunkPos"], and then turning it into 1 big picture"""
+
+        assert (
+            self.id == 1
+        ), f"<ERROR> : the generateMainChunk method can only be call for the PLAYER_MAP"
+
+        for j in range(-self.renderDistance, self.renderDistance + 1):
+            for i in range(-self.renderDistance, self.renderDistance + 1):
+
+                chunkCoor = (
+                    str(i + self.chunkData["currentChunkPos"][0])
+                    + ";"
+                    + str(j + self.chunkData["currentChunkPos"][1])
+                )
+
+                # Checking if a chunk is not already generated, otherwise we don't generate it
+                if chunkCoor not in self.chunkData.keys() or not self.chunkData[chunkCoor]["initialised"]:
+
+                    self.chunkData[chunkCoor]["initialised"] = True
+
+                    self.chunkGenerationCounter += 1
+                    self.loadingMenu.updateProgressBar(
+                        f"chunk_{self.chunkGenerationCounter}", "map"
+                    )
+                    # Handling progress bar
+                    self.progressBar = tqdm(
+                        total=(self.Game.resolution //
+                               self.stepGeneration) ** 2,
+                        desc=f"Generating chunks {self.chunkGenerationCounter}/{nChunks}",
+                        ncols=TQDM_MAP_GENERATION_WIDTH,
+                    )
+
                     # We multiply by '-i' or '-j as the direction is the opposite of    the    scrolling offset
 
                     self.posOffset = [
@@ -342,6 +366,90 @@ class OpenWorldMap:
                     ),
                 )
 
+    def chunkController(self):
+        """
+        Update the self.chunkData["currentChunkPos"] array by keeping tracks of where the player
+        is regarding of the chunks.
+
+        If the player goes on a bordered chunks (a chunk that didn't generated other chunks yet),
+        it will call the generateMainChunk method with the following way :
+
+        XXX                                       XXXY
+        XXX => (player goes on the right side) => XXXY (Y are the new chunks)
+        XXX                                       XXXY
+        """
+
+        if abs(self.Hero.blitOffset[0]) >= self.CHUNK_SIZE / 2:
+
+            # We need to re compute the coordonates as we redefine a new center for the big chunkss
+            if self.Hero.blitOffset[0] < 0:  # Go to the right chunk
+                self.chunkData["currentChunkPos"][0] += 1
+                self.Hero.blitOffset[0] = self.CHUNK_SIZE + \
+                    self.Hero.blitOffset[0]
+                self.Hero.mainChunkPosX = self.Hero.initChunkPosX + \
+                    self.Hero.blitOffset[0]
+
+            else:
+                self.chunkData["currentChunkPos"][0] -= 1
+                self.Hero.blitOffset[0] = - \
+                    (self.CHUNK_SIZE - self.Hero.blitOffset[0])
+                self.Hero.mainChunkPosX = self.Hero.initChunkPosX + \
+                    self.Hero.blitOffset[0]
+            self.reGenChunkFlag = True
+
+        if abs(self.Hero.blitOffset[1]) >= self.CHUNK_SIZE / 2:
+            if self.Hero.blitOffset[1] < 0:  # Go to the down chunk
+                self.chunkData["currentChunkPos"][1] += 1
+                self.Hero.blitOffset[1] = self.CHUNK_SIZE + \
+                    self.Hero.blitOffset[1]
+                self.Hero.mainChunkPosY = self.Hero.initChunkPosY + \
+                    self.Hero.blitOffset[1]
+
+            else:
+                self.chunkData["currentChunkPos"][1] -= 1
+                self.Hero.blitOffset[1] = - \
+                    (self.CHUNK_SIZE - self.Hero.blitOffset[1])
+                self.Hero.mainChunkPosY = self.Hero.initChunkPosY + \
+                    self.Hero.blitOffset[1]
+            self.reGenChunkFlag = True
+
+        # If there is a change of chunk, we need to regenerate if needed some chunks, and reset the flag system
+        if self.reGenChunkFlag:
+
+            self.Hero.posMainChunkCenter = [
+                int(
+                    self.chunkData["mainChunk"].get_width(
+                    ) / 2 - self.Hero.blitOffset[0]
+                ),
+                int(
+                    self.chunkData["mainChunk"].get_height() / 2
+                    - self.Hero.blitOffset[1]
+                ),
+            ]
+
+            chunkCoorsRegen = [
+                (
+                    self.chunkData["currentChunkPos"][0] + i,
+                    self.chunkData["currentChunkPos"][1] + j,
+                )
+                for i in range(-self.renderDistance, self.renderDistance + 1)
+                for j in range(-self.renderDistance, self.renderDistance + 1)
+                if f"{self.chunkData['currentChunkPos'][0]+i};{self.chunkData['currentChunkPos'][1] + j}"
+                not in self.chunkData.keys()
+            ]
+            # Check if the chunk supposely needed for regen are already generated or not
+            # if len(chunkCoorsRegen) != 0:
+            #     loadingIconThread = Thread(
+            #         target=self.Map.loadingMenu.blitLoadingIcon, args=(self,)
+            #     )
+            #     loadingIconThread.start()
+
+            self.genChunkStructures()
+            self.reGenProcessHandler = Process(
+                target=self.generateMainChunk, args=(len(chunkCoorsRegen), ))
+            self.reGenProcessHandler.run()
+            self.reGenChunkFlag = False
+
     def showTabMap(self):
         logger.debug(self.worldMapTab)
 
@@ -400,9 +508,11 @@ class OpenWorldMap:
                                         self.waterAnimationCount
                                     ],
                                     (
-                                        self.CHUNK_SIZE * (i + self.renderDistance)
+                                        self.CHUNK_SIZE *
+                                        (i + self.renderDistance)
                                         + (l * self.stepGeneration),
-                                        self.CHUNK_SIZE * (j + self.renderDistance)
+                                        self.CHUNK_SIZE *
+                                        (j + self.renderDistance)
                                         + (k * self.stepGeneration),
                                     ),
                                 )
@@ -434,7 +544,6 @@ class OpenWorldMap:
         self.octaves -= 1 if mode == "down" and self.octaves != MIN_BIOMES else 0
 
     def loadPlayerdMap(self, nChunks: int, Hero) -> None:
-
         """Generate the player Map by loading the chunk textures and generating the first chunks
 
         Arguments:
@@ -453,6 +562,7 @@ class OpenWorldMap:
             self.loadingMenu.confirmLoading("biomeTextures")
             RessourceHandler.loadMiniMapRessources()
             self.miniMap = MiniMap(self.Game, self, Hero)
+            self.genChunkStructures()
             self.generateMainChunk(nChunks)
 
     def initWorldMap(self):

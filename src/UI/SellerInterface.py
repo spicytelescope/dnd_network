@@ -326,7 +326,9 @@ class SellerInterface(Chest):
                 self.Game.screen.blit(self.surf, self.rect)
 
                 # HANDLING INVENTORY
-                self.Hero.Inventory.nestedShow()
+                self.Hero.Inventory.nestedShow(
+                    [int(self.Game.resolution * 0.65), self.Game.resolution // 2]
+                )
                 self.Game.show()
 
     def buyItem(self):

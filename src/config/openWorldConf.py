@@ -17,7 +17,6 @@ DUNGEON_FOG = 5  # In tiles
 
 
 def createChunkCoorListFromRadius(center: Tuple[int, int], radius: int):
-
     """Return a list of chunkCoors within a circle determined by a center and a radius"""
 
     return [
@@ -40,20 +39,14 @@ BEACH = (238, 214, 175)
 SNOW = (255, 250, 250)
 MOUNTAIN = (139, 137, 137)
 
-BIOME_COLORS = {"snow": SNOW, "plains": GREEN, "mountain": MOUNTAIN, "sand": BEACH}
+BIOME_COLORS = {"snow": SNOW, "plains": GREEN,
+                "mountain": MOUNTAIN, "sand": BEACH}
 
 # ------------------ RANDOM GENERATION ------------------- #
 # Link probability to spawn at each rendering
 
 BUILDING_NAMES_RANDOM_GEN = {"Building": {"Temple": 0.25, "Shop_Caravan": 0.1}}
-
-#  ZONES SETTINGS
-
-DANGER_ZONE = {
-    "Village": 1,
-    "Orc_Village": 1,
-    "chunkCoorList": [(2, 5), (27, 8)],
-}
+STRUCTS_NAMES_RANDOM_GEN = {"Village": 0.5}
 
 # ----------------- DETERMINISTIC GENERATION ----------------- #
 
@@ -68,6 +61,20 @@ DEPART_ZONE = {
     },
     "structures": {"Village": 1},
     "chunkCoorList": createChunkCoorListFromRadius((0, 0), 1),
+}
+
+
+DANGER_ZONE = {
+    "elements": {
+        # "NPC": {"Seller": 1},
+        "Ennemy": {
+            "Skeleton": 0
+        }
+        # "Building": {"PNJHouse": 2},
+        # "GameObject": {"Chest": 1},
+    },
+    "structures": {},
+    "chunkCoorList": createChunkCoorListFromRadius((0, -1), 1),
 }
 
 ZONE_1 = {

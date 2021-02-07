@@ -18,10 +18,11 @@ from HUD.CharBar import CharBar
 from HUD.Inventory import Inventory
 from HUD.spellBook import SpellBook
 from HUD.QuestController import QuestController
+from multiprocessing import Process
 
 
 class Character:
-    def __init__(self, gameController, Map, genOrder=0) -> None:
+    def __init__(self, gameController, Map, genOrder=-1) -> None:
 
         self.genOrder = genOrder
 
@@ -102,8 +103,6 @@ class Character:
 
         # ------------------ CHUNKS HANDLING (OPEN WORLD) -------- #
 
-        self.reGenChunkFlag = False
-
         self.initChunkPosX = (
             -self.Map.chunkData["mainChunk"].get_width() / 2 + self.pos[0]
         )
@@ -122,7 +121,7 @@ class Character:
             "down": {"name": pygame.K_DOWN, "value": [0, -1]},
         }
 
-        self.playerPosMainChunkCenter = [
+        self.posMainChunkCenter = [
             int(self.Map.chunkData["mainChunk"].get_width() / 2 - self.blitOffset[0]),
             int(self.Map.chunkData["mainChunk"].get_height() / 2 - self.blitOffset[1]),
         ]
@@ -210,41 +209,45 @@ class Character:
         self._fightId = id
         self._fightName = self.name
 
-    def createFight(self):
+    def createFight(self, preConfig = []):
 
-        entitieOnContact = [
-            Hero for Hero in self.Game.heroesGroup if Hero.stats["HP"] > 0
-        ]
-        if len(entitieOnContact) == 0:
-            logger.error("All heroes are dead, can't start fight")
-        else:
-            if self.currentPlace == "openWorld":
-                for i, ennemy in enumerate(self.Map.envGenerator.ennemies):
-                    if (
-                        math.sqrt(
-                            (ennemy["value"]["entity"].pos[0] - self.pos[0]) ** 2
-                            + (ennemy["value"]["entity"].pos[1] - self.pos[1]) ** 2
-                        )
-                        // self.Map.stepGeneration
-                        <= ENNEMY_DETECTION_RANGE
-                    ):
-                        entitieOnContact.append(
-                            self.Map.envGenerator.ennemies.pop(i)["value"]["entity"]
-                        )
+        if preConfig !=  []:
+            self.Game.fightMode.initFight(preConfig)
 
-            elif self.currentPlace == "building":
-                for i, ennemy in enumerate(self.currentBuilding.ennemies):
-                    if (
-                        math.sqrt(
-                            (ennemy.pos[0] - self.pos[0]) ** 2
-                            + (ennemy.pos[1] - self.pos[1]) ** 2
-                        )
-                        // self.Map.stepGeneration
-                        <= ENNEMY_DETECTION_RANGE
-                    ):
-                        entitieOnContact.append(self.currentBuilding.ennemies.pop(i))
+        else :
+            entitieOnContact = [
+                Hero for Hero in self.Game.heroesGroup if Hero.stats["HP"] > 0
+            ]
+            if len(entitieOnContact) == 0:
+                logger.error("All heroes are dead, can't start fight")
+            else:
+                if self.currentPlace == "openWorld":
+                    for i, ennemy in enumerate(self.Map.envGenerator.ennemies):
+                        if (
+                            math.sqrt(
+                                (ennemy["value"]["entity"].pos[0] - self.pos[0]) ** 2
+                                + (ennemy["value"]["entity"].pos[1] - self.pos[1]) ** 2
+                            )
+                            // self.Map.stepGeneration
+                            <= ENNEMY_DETECTION_RANGE
+                        ):
+                            entitieOnContact.append(
+                                self.Map.envGenerator.ennemies.pop(i)["value"]["entity"]
+                            )
 
-            self.Game.fightMode.initFight([*entitieOnContact])
+                elif self.currentPlace == "building":
+                    for i, ennemy in enumerate(self.currentBuilding.ennemies):
+                        if (
+                            math.sqrt(
+                                (ennemy.pos[0] - self.pos[0]) ** 2
+                                + (ennemy.pos[1] - self.pos[1]) ** 2
+                            )
+                            // self.Map.stepGeneration
+                            <= ENNEMY_DETECTION_RANGE
+                        ):
+                            entitieOnContact.append(self.currentBuilding.ennemies.pop(i))
+
+                self.Game.fightMode.initFight(entitieOnContact)
 
     def __str__(self) -> str:
 
@@ -252,8 +255,7 @@ class Character:
 
     # ---------------------- GRPAPHIC METHOD ------------------ #
 
-    def initHUD(self, LoadingMenu) -> None:
-
+    def initHUD(self, LoadingMenu=None) -> None:
         """
         Initialise the Hero HUD except the minimap which is instancied by the Map object and update the flag on the Loading Menu passed in.
 
@@ -334,7 +336,7 @@ class Character:
                     # Checking collision with the open world
                     if not self.Map.envGenerator.isColliding(
                         self.imageState["image"].get_rect(
-                            center=self.playerPosMainChunkCenter
+                            center=self.posMainChunkCenter
                         ),
                         self.direction,
                     ):
@@ -381,7 +383,7 @@ class Character:
 
             # First checking collision with the open world then computing and updating character pos
             if not envGenerator.isColliding(
-                self.imageState["image"].get_rect(center=self.playerPosMainChunkCenter),
+                self.imageState["image"].get_rect(center=self.posMainChunkCenter),
                 self.direction,
             ):
 
@@ -420,7 +422,7 @@ class Character:
                     self.blitOffset[0] += DELTA_X
                     self.blitOffset[1] += DELTA_Y
 
-                    self.playerPosMainChunkCenter = [
+                    self.posMainChunkCenter = [
                         int(
                             self.Map.chunkData["mainChunk"].get_width() / 2
                             - self.blitOffset[0]
@@ -432,14 +434,7 @@ class Character:
                     ]
 
                     for ennemy in envGenerator.ennemies:
-                        ennemy["value"]["entity"].setPos(
-                            [
-                                coor + offset
-                                for coor, offset in zip(
-                                    ennemy["value"]["entity"].pos, (DELTA_X, DELTA_Y)
-                                )
-                            ]
-                        )
+                        ennemy["value"]["entity"].setPos((DELTA_X, DELTA_Y))
 
                     # if self.Game.debug_mode:
                     #     logger.debug(
@@ -474,78 +469,6 @@ class Character:
         self.XDistanceToTarget = self.targetPos[0] - self.pos[0]
         self.YDistanceToTarget = self.targetPos[1] - self.pos[1]
 
-    def chunkController(self):
-        """
-        Update the self.chunkData["currentChunkPos"] array by keeping tracks of where the player
-        is regarding of the chunks.
-
-        If the player goes on a bordered chunks (a chunk that didn't generated other chunks yet),
-        it will call the generateMainChunk method with the following way :
-
-        XXX                                       XXXY
-        XXX => (player goes on the right side) => XXXY (Y are the new chunks)
-        XXX                                       XXXY
-        """
-
-        if abs(self.blitOffset[0]) >= self.Map.CHUNK_SIZE / 2:
-
-            # We need to re compute the coordonates as we redefine a new center for the big chunkss
-            if self.blitOffset[0] < 0:  # Go to the right chunk
-                self.Map.chunkData["currentChunkPos"][0] += 1
-                self.blitOffset[0] = self.Map.CHUNK_SIZE + self.blitOffset[0]
-                self.mainChunkPosX = self.initChunkPosX + self.blitOffset[0]
-
-            else:
-                self.Map.chunkData["currentChunkPos"][0] -= 1
-                self.blitOffset[0] = -(self.Map.CHUNK_SIZE - self.blitOffset[0])
-                self.mainChunkPosX = self.initChunkPosX + self.blitOffset[0]
-            self.reGenChunkFlag = True
-
-        if abs(self.blitOffset[1]) >= self.Map.CHUNK_SIZE / 2:
-            if self.blitOffset[1] < 0:  # Go to the down chunk
-                self.Map.chunkData["currentChunkPos"][1] += 1
-                self.blitOffset[1] = self.Map.CHUNK_SIZE + self.blitOffset[1]
-                self.mainChunkPosY = self.initChunkPosY + self.blitOffset[1]
-
-            else:
-                self.Map.chunkData["currentChunkPos"][1] -= 1
-                self.blitOffset[1] = -(self.Map.CHUNK_SIZE - self.blitOffset[1])
-                self.mainChunkPosY = self.initChunkPosY + self.blitOffset[1]
-            self.reGenChunkFlag = True
-
-        # If there is a change of chunk, we need to regenerate if needed some chunks, and reset the flag system
-        if self.reGenChunkFlag:
-
-            self.playerPosMainChunkCenter = [
-                int(
-                    self.Map.chunkData["mainChunk"].get_width() / 2 - self.blitOffset[0]
-                ),
-                int(
-                    self.Map.chunkData["mainChunk"].get_height() / 2
-                    - self.blitOffset[1]
-                ),
-            ]
-
-            chunkCoorsRegen = [
-                (
-                    self.Map.chunkData["currentChunkPos"][0] + i,
-                    self.Map.chunkData["currentChunkPos"][1] + j,
-                )
-                for i in range(-self.Map.renderDistance, self.Map.renderDistance + 1)
-                for j in range(-self.Map.renderDistance, self.Map.renderDistance + 1)
-                if f"{self.Map.chunkData['currentChunkPos'][0]+i};{self.Map.chunkData['currentChunkPos'][1] + j}"
-                not in self.Map.chunkData.keys()
-            ]
-            # Check if the chunk supposely needed for regen are already generated or not
-            if len(chunkCoorsRegen) != 0:
-                loadingIconThread = Thread(
-                    target=self.Map.loadingMenu.blitLoadingIcon, args=(self,)
-                )
-                loadingIconThread.start()
-
-            self.Map.generateMainChunk(len(chunkCoorsRegen))
-            self.reGenChunkFlag = False
-
     def handleMovements(self, mapName):
         """Function updating pos and bliting it to the game screen every delta_t period of time"""
 
@@ -553,7 +476,7 @@ class Character:
 
             if mapName == "openWorld":
                 # Checking chunks
-                self.chunkController()
+                self.Map.chunkController()
 
                 # Updating pos
                 self.moveByClick(self.Map.envGenerator, mapName)

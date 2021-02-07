@@ -86,6 +86,10 @@ class Ennemy:
         self.pos = None  # topleft !
         self.chunkPos = None
         self.initPos = None
+        self.offset = [
+            0,
+            0,
+        ]  # Take into account the successives movements of the players so when passing chunks, the ennemy will be reblitted on the right pos !
 
         self.lastRenderedTime = time.time()
         self.velocity = {"Walk": 100, "Chase": 300}  # Pixels/s
@@ -142,10 +146,13 @@ class Ennemy:
     def init(self, pos, boss=False):
 
         # Translating the coor normally blitted in the mainChunk to the game Screen and relatively to the player
+        logger.info(f"Bliting on case : '{[pos//64 for pos in pos]}")
         self.pos = [
-            coor - self.Game.resolution
-            for coor, playerOffset in zip(pos, self.Hero.blitOffset)
+            coor - self.Game.resolution + offset
+            for coor, offset in zip(pos, self.offset)
         ]
+        # self.pos = list(pos)
+        logger.info(f"Bliting at {self.pos[0]}")
 
         # As the self.rect is the rect to blit according to the Game screen, we need to project one on the mainChunk to compare it to other elements
         self.chunkPos = list(pos)
@@ -237,7 +244,7 @@ class Ennemy:
 
     def targetPlayer(self):
         self.targetPos = (
-            [coor - 32 for coor in self.Hero.playerPosMainChunkCenter]
+            [coor - 32 for coor in self.Hero.posMainChunkCenter]
             if self.place == "openWorld"
             else [self.Hero.buildingPosX - 32, self.Hero.buildingPosY - 32]
         )
@@ -270,7 +277,7 @@ class Ennemy:
         self.bubbleSurf = pygame.Surface(self.bubbleRect.size, SRCALPHA)
 
         self.detectPlayer(
-            self.Hero.playerPosMainChunkCenter
+            self.Hero.posMainChunkCenter
         ) if self.place == "openWorld" else self.detectPlayer(
             [self.Hero.buildingPosX, self.Hero.buildingPosY]
         )
@@ -279,7 +286,9 @@ class Ennemy:
             self.moveByClick()
 
         # Updating the rect according to the possible movements
-        self.rect.topleft = self.pos
+        heroDist = [pos1 - pos2 for pos1, pos2 in zip(self.chunkPos, self.Hero.posMainChunkCenter)]
+        # Bliting the ennemy relatively to the player pos
+        self.rect.topleft = [self.Game.resolution//2 + distCoor for distCoor in heroDist]
         self.rectChunk.topleft = self.chunkPos
 
         self._updateAnim()
@@ -289,12 +298,18 @@ class Ennemy:
         self.surf.blit(
             self.animationFrames[self.state][self.AnimIndex[self.state]], (0, 0)
         )
+
         self.parentSurface.blit(self.surf, self.rect)
         self.parentSurface.blit(self.bubbleSurf, self.bubbleRect)
 
-    def setPos(self, pos):
+    def setPos(self, offset):
 
-        self.pos = list(pos)  # Need to be a topleft
+        # Need to be a topleft
+        self.offset = [
+            currentOffset + offsetCoor
+            for currentOffset, offsetCoor in zip(self.pos, offset)
+        ]
+        self.pos = [coor + offset for coor, offset in zip(self.pos, offset)]
 
     def moveByClick(self):
 

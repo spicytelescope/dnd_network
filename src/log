@@ -1,8 +1,8 @@
+INFO:PHYM_LOGGER:Loading UI Conf
 INFO:PHYM_LOGGER:Loading playerConf
 INFO:PHYM_LOGGER:Loading itemConf
 INFO:PHYM_LOGGER:Loading eventConf
 INFO:PHYM_LOGGER:Loading mapConf
-INFO:PHYM_LOGGER:Loading UI Conf
 INFO:PHYM_LOGGER:Loading musicConf
 INFO:PHYM_LOGGER:Loading menuConf
 INFO:PHYM_LOGGER:Loading spellConf
@@ -55,53 +55,62 @@ DEBUG:PHYM_LOGGER:Loading ressource for : Mountain_rock
 DEBUG:PHYM_LOGGER:Loading ressource for : Mountain_random_wood
 DEBUG:PHYM_LOGGER:Loading ressource for : Mountain_flower
 INFO:PHYM_LOGGER:Addded zone Init_Zone on chunks : [(-1, 0), (0, -1), (0, 0), (0, 1), (1, 0)] with elements : {} and structures {'Village': 1}
-DEBUG:PHYM_LOGGER:0 and 0
-DEBUG:PHYM_LOGGER:1 and 0
-DEBUG:PHYM_LOGGER:1 and 1
-DEBUG:PHYM_LOGGER:1 and 2
-DEBUG:PHYM_LOGGER:2 and 2
+INFO:PHYM_LOGGER:Addded zone Danger Zone on chunks : [(-1, -1), (0, -2), (0, -1), (0, 0), (1, -1)] with elements : {'Ennemy': {'Skeleton': 0}} and structures {}
 INFO:PHYM_LOGGER:LOADING HUD RESSOURCES
-DEBUG:PHYM_LOGGER:ADDING to HUDLoading : 6 
+DEBUG:PHYM_LOGGER:ADDING to HUDLoading : 20 
 INFO:PHYM_LOGGER:LOADING ITEM RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to ItemDBLoading : 20 
 INFO:PHYM_LOGGER:LOADING SPELL RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to spellDBLoading : 20 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/ArielDress_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/HunterTunic.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Deserter.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ClericWand1.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/PeasantClothing.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/HunterLightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/MilitiamanHelmet2_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Hermit.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/GuardArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Robe.png
 INFO:PHYM_LOGGER:Current player's spell's ID : [0, 16]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png
 INFO:PHYM_LOGGER:LOADING OPEN WORLD RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to biomeTextures : 10 
 INFO:PHYM_LOGGER:LOADING MINIMAP RESSOURCES
-DEBUG:PHYM_LOGGER:ADDING to chunk_1 : 1 
-DEBUG:PHYM_LOGGER:ADDING to chunk_2 : 1 
-DEBUG:PHYM_LOGGER:ADDING to chunk_3 : 1 
-DEBUG:PHYM_LOGGER:ADDING to chunk_4 : 1 
-DEBUG:PHYM_LOGGER:ADDING to chunk_5 : 1 
-DEBUG:PHYM_LOGGER:ADDING to chunk_6 : 1 
-DEBUG:PHYM_LOGGER:ADDING to chunk_7 : 1 
-DEBUG:PHYM_LOGGER:ADDING to chunk_8 : 1 
-DEBUG:PHYM_LOGGER:ADDING to chunk_9 : 1 
+DEBUG:PHYM_LOGGER:ADDING to chunk_1 : 1.67 
+DEBUG:PHYM_LOGGER:ADDING to chunk_2 : 1.67 
+DEBUG:PHYM_LOGGER:ADDING to chunk_3 : 1.67 
+DEBUG:PHYM_LOGGER:ADDING to chunk_4 : 1.67 
+DEBUG:PHYM_LOGGER:ADDING to chunk_5 : 1.67 
+DEBUG:PHYM_LOGGER:ADDING to chunk_6 : 1.67 
+DEBUG:PHYM_LOGGER:ADDING to chunk_7 : 1.67 
+DEBUG:PHYM_LOGGER:ADDING to chunk_8 : 1.67 
+DEBUG:PHYM_LOGGER:ADDING to chunk_9 : 1.67 
 INFO:PHYM_LOGGER:Generating Init_Zone
+INFO:PHYM_LOGGER:BLITED AT CHUNK : [(0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)]
 INFO:PHYM_LOGGER:LOADING ./assets/world_textures/ennemy/Skeleton/loot/skull.png
+INFO:PHYM_LOGGER:Generating Danger Zone
+INFO:PHYM_LOGGER:Bliting on case : '[28, 24]
+INFO:PHYM_LOGGER:Bliting at 768
 DEBUG:PHYM_LOGGER:ADDING to worldElements : 15 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/ArielDress_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/HunterTunic.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Deserter.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ClericWand1.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/PeasantClothing.png
-INFO:PHYM_LOGGER:Current player's spell's ID : [0, 16]
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/WaterAdeptWand2.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/KnightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/ArielDress_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/BattleBow.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/LeatherHelm.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/ArielDress_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/HunterTunic.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Deserter.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ClericWand1.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/PeasantClothing.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/WaterAdeptWand2.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/KnightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/ArielDress_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/BattleBow.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/LeatherHelm.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
+INFO:PHYM_LOGGER:Test Player 1 (#fdaf82c2-e3eb-4d7e-a626-8f3e300055de) connected to the server !
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/HunterLightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/MilitiamanHelmet2_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Hermit.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/GuardArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Robe.png
 INFO:PHYM_LOGGER:Current player's spell's ID : [0, 16]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png

@@ -33,7 +33,6 @@ from utils.utils import logger
 
 NoContact = lambda: None
 
-
 def loadMusicRessources():
 
     logger.info("LOADING MUSIC RESSOURCES")

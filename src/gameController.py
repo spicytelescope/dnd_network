@@ -28,7 +28,7 @@ class GameController:
             "fight",
             "building",
         ]
-        self.currentState = "mainMenu"
+        self.currentState = "loadingNewGame"
         self.id = 0  # Depends of the save, 0 = new game, 1 to 3 are ids to the game
         self.heroesGroup = []
         self.heroIndex = 0
@@ -77,6 +77,7 @@ class GameController:
             "Pick up items": {"value": pygame.K_e, "key": "E"},
             "Open quest's Journal": {"value": pygame.K_j, "key": "J"},
             "Switch heroes": {"value": pygame.K_TAB, "key": "TAB"},
+            "Cancel trade": {"value": pygame.K_ESCAPE, "key": "ESC"},
         }
 
         self.cursor = Cursor(self)

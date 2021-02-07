@@ -8,7 +8,6 @@ import pygame, random, time
 from .Item import Item
 import copy
 
-
 class Chest:
 
     """

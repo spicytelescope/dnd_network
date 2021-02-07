@@ -152,11 +152,13 @@ class EnvGenerator:
                         (x, y)
                         for x in range(
                             (i + self.Map.renderDistance) * MIN_CHUNK_SUBDIVISON,
-                            (i + self.Map.renderDistance + 1) * (MIN_CHUNK_SUBDIVISON),
+                            (i + self.Map.renderDistance + 1) *
+                            (MIN_CHUNK_SUBDIVISON),
                         )
                         for y in range(
                             (j + self.Map.renderDistance) * MIN_CHUNK_SUBDIVISON,
-                            (j + self.Map.renderDistance + 1) * MIN_CHUNK_SUBDIVISON,
+                            (j + self.Map.renderDistance + 1) *
+                            MIN_CHUNK_SUBDIVISON,
                         )
                     ]
 
@@ -166,7 +168,8 @@ class EnvGenerator:
                 for k in range(self.Map.currentChunkSubdivision):
 
                     self.mainChunkTextureTab[
-                        (j + self.Map.renderDistance) * self.Map.currentChunkSubdivision
+                        (j + self.Map.renderDistance) *
+                        self.Map.currentChunkSubdivision
                         + k
                     ] += chunkTextureTab[k]
 
@@ -228,7 +231,6 @@ class EnvGenerator:
         structureName: str = None,
         specificChunksCoor: List[Tuple[int, int]] = [],
     ) -> int:
-
         """Generate <limit> times an element identified by his type and his name in the chunks newly discovered by the player (that have not been in the envGenerator yet).
         The element might be generated into a structure.
 
@@ -281,7 +283,8 @@ class EnvGenerator:
                     )
                 ]
 
-            possiblePos = [coor for coor in possiblePos if coor in specificValues]
+            possiblePos = [
+                coor for coor in possiblePos if coor in specificValues]
 
         while len(possiblePos) != 0:
             i, j = possiblePos.pop(random.randrange(len(possiblePos)))
@@ -312,10 +315,10 @@ class EnvGenerator:
                     and (j + y, i + x)
                     not in [
                         (
-                            self.Hero.playerPosMainChunkCenter[0]
+                            self.Hero.posMainChunkCenter[0]
                             // self.Map.stepGeneration
                             + k,
-                            self.Hero.playerPosMainChunkCenter[1]
+                            self.Hero.posMainChunkCenter[1]
                             // self.Map.stepGeneration
                             + l,
                         )
@@ -382,7 +385,8 @@ class EnvGenerator:
 
                     # We need to randomly select on scopeGrid and not ScopeGridFiltered as the index need to remain the same e.g the grid need to be (spawnRange)x(spawnRange)
 
-                    caseSelectedPosY = random.choice(list(enumerate(scopeGridFiltered)))
+                    caseSelectedPosY = random.choice(
+                        list(enumerate(scopeGridFiltered)))
                     caseSelectedPosX = random.choice(
                         list(enumerate(caseSelectedPosY[1]))
                     )
@@ -393,7 +397,8 @@ class EnvGenerator:
                     # Let's not forget that caseSelectedPosY[0] and caseSelectedPosX[0] are integers in range(len(scopeGrid)). Meed to scale them up in the tab with i and j and then rescale to get the pos in the textureTab
 
                     while not (
-                        scopeGridFiltered[caseSelectedPosY[0]][caseSelectedPosX[0]]
+                        scopeGridFiltered[caseSelectedPosY[0]
+                                          ][caseSelectedPosX[0]]
                         != None
                     ):
                         caseSelectedPosY = random.choice(
@@ -423,7 +428,8 @@ class EnvGenerator:
                         scopeGridFiltered[caseSelectedPosY][caseSelectedPosX][
                             "surfIndex"
                         ] = random.randrange(
-                            0, len(textureConf.WORLD_ELEMENTS[type][name]["surf"])
+                            0, len(
+                                textureConf.WORLD_ELEMENTS[type][name]["surf"])
                         )
 
                     # ------------------ AFFECTING ENTITY ----------------- #
@@ -556,7 +562,8 @@ class EnvGenerator:
             len(self.mainChunkElementsTab) - structTemplate["spawnRange"][1]
         ):
             for i in range(
-                len(self.mainChunkElementsTab) - structTemplate["spawnRange"][0]
+                len(self.mainChunkElementsTab) -
+                    structTemplate["spawnRange"][0]
             ):
 
                 scopeGrid = [
@@ -596,10 +603,12 @@ class EnvGenerator:
                 ]
 
                 spawnTileCount = sum(
-                    [len(scopeGridFiltered[x]) for x in range(len(scopeGridFiltered))]
+                    [len(scopeGridFiltered[x])
+                     for x in range(len(scopeGridFiltered))]
                 )
 
                 if spawnTileCount >= structTemplate["spawnTreshold"] and count < number:
+                    logger.info(f"BLITED AT CHUNK : {specificChunksCoor}")
                     borderCoor = [
                         (x, y)
                         for y in range(len(scopeGrid))
@@ -852,7 +861,8 @@ class EnvGenerator:
                     if (
                         elt["type"] == "Landscape"
                         and type(
-                            textureConf.WORLD_ELEMENTS[elt["type"]][elt["name"]]["surf"]
+                            textureConf.WORLD_ELEMENTS[elt["type"]
+                                                       ][elt["name"]]["surf"]
                         )
                         == list
                     ):
@@ -892,7 +902,8 @@ class EnvGenerator:
                         )
                     )
                     self.Map.chunkData["mainChunk"].blit(
-                        textureConf.WORLD_ELEMENTS[elt["type"]][elt["name"]]["surf"],
+                        textureConf.WORLD_ELEMENTS[elt["type"]
+                                                   ][elt["name"]]["surf"],
                         elt["value"]["rect"],
                     )
 
@@ -936,7 +947,6 @@ class EnvGenerator:
             and event.key == self.Game.KeyBindings["Interact with an element"]["value"]
         ):
             self.lastCheckEntity["value"]["onContact"]()
-            logger.info(f"setting last checked entity !")
 
     def showNpc(self):
 
@@ -985,9 +995,9 @@ class EnvHandler:
         self.loadZones()
 
     def loadZones(self):
-
         """Load the deterministic generated elements."""
         self.addZone("Init_Zone", DEPART_ZONE)
+        self.addZone("Danger Zone", DANGER_ZONE)
         # self.addZone("Init_Zone", ZONE_1)
         # self.addZone("Init_Zone", ZONE_2)
 
@@ -1048,14 +1058,15 @@ class EnvHandler:
                 f.write(f"{line}\n")
 
     def genLandscapesElements(self):
-
         """Generate elements that can appears at each chunk rendering"""
 
         for biomeName in BIOME_NAMES:
             for biomeElt in BIOME_LANDSCAPE_NAME:
                 elementEntry = f"{biomeName[0].upper() + biomeName[1:]}_{biomeElt}"
-                self.envGenerator.generateElement("Landscape", elementEntry, -1)
-                self.envGenerator.generateElement("Landscape", elementEntry, -1)
+                self.envGenerator.generateElement(
+                    "Landscape", elementEntry, -1)
+                self.envGenerator.generateElement(
+                    "Landscape", elementEntry, -1)
 
     def genRareElements(self):
 
@@ -1064,8 +1075,11 @@ class EnvHandler:
                 if random.uniform(0.0, 1.0) <= genTreshhold:
                     self.envGenerator.generateElement(eltType, eltName, 1)
 
-    def zoneChecker(self):
+        for structName, genTreshhold in STRUCTS_NAMES_RANDOM_GEN.items():
+                if random.uniform(0.0, 1.0) <= genTreshhold:
+                    self.envGenerator.generateStructure(structName, 1)
 
+    def zoneChecker(self):
         """Keeps track of what has been generated and on which chunks, generate then the elements or structure."""
 
         mainChunkCoors = [

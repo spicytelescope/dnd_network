@@ -94,7 +94,7 @@ class Inventory:
                         )
                     )
 
-        self.equipment = EQUIPMENT_TEMPLATE
+        self.equipment = deepcopy(EQUIPMENT_TEMPLATE)
         self.twoHandedWeaponEquiped = False
 
         self.draggedItemCoor = None  # List
@@ -192,6 +192,25 @@ class Inventory:
                 ):
                     Seller.sellItem()
 
+    def checkTradeItem(self, event, TradeUI):
+
+        mousePosTranslated = [
+            coor - self.rect.topleft[i]
+            for coor, i in zip(pygame.mouse.get_pos(), [0, 1])
+        ]
+        for j in range(INVENTORY_STORAGE_HEIGHT):
+            for i in range(INVENTORY_STORAGE_WIDTH):
+
+                if (
+                    self.storage["tab"][j][i] != None
+                    and self.storage["tab"][j][i].rect.collidepoint(mousePosTranslated)
+                    and event.type == MOUSEBUTTONDOWN
+                    and event.button == 3
+                ):
+                    TradeUI.inventory_to_trade((i,j))
+
+
+
     def show(self):
 
         clock = pygame.time.Clock()
@@ -233,7 +252,7 @@ class Inventory:
 
             self.Game.show()
 
-    def nestedShow(self):
+    def nestedShow(self, pos):
         """
         Method used when the inventory is nested into another UI,
         using a non-blocking way
@@ -244,9 +263,7 @@ class Inventory:
 
         if not self.open:
 
-            self.setRectPos(
-                [int(self.Game.resolution * 0.65), self.Game.resolution // 2]
-            )
+            self.setRectPos(pos)
             self.rect.topleft = [self.rect.topleft[0], 0]
             self.open = True
 

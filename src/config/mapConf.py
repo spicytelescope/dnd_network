@@ -41,7 +41,7 @@ PLAYER_CONFIG = {
     "STEP_GENERATION": 64,
     "CIRCULAR_MAP": False,
     "ANIMATE_WATER": {
-        "enabled": True,
+        "enabled": False,
         "eventId": ANIMATE_WATER_EVENT_ID,
         "animation_delay": 1000,  # ms
     },
