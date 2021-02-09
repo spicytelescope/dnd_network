@@ -61,7 +61,11 @@ class Inventory:
         # ----------------- ANIMATIONS -------------- #
 
         self.open = False
+        self._show = False
         self.animations = pygame.sprite.Group()
+        self.clock = pygame.time.Clock()
+        self.time_delta = self.clock.tick(self.Game.refresh_rate)
+
 
         # ---------------- ITEMS ------------------- #
 
@@ -123,12 +127,13 @@ class Inventory:
 
     def openInventory(self):
 
-        self.background = self.Game.screen.copy()
+        # self.background = self.Game.screen.copy()
         self.inventoryAni = Animation(y=0, duration=INVENTORY_ANIMATION_TIME)
 
         self.animations.add(self.inventoryAni)
         self.inventoryAni.start(self.rect)
-        self.open = True
+        self.open = False
+        self._show = True
 
     def close(self):
 
@@ -148,32 +153,30 @@ class Inventory:
         )
         self.rect.topleft = (self.rect.topleft[0], -self.surf.get_height())
 
-        self.open = False
+        self._show = False
         self.resetInventoryActions()
-        self.Game.backToGame()
+        # self.Game.backToGame()
 
         remove_animations_of(self.rect, self.animations)
 
-    def checkActions(self):
+    def checkActions(self, event):
 
-        for event in pygame.event.get():
+        # ------------ ITEMS ACTION CHECKING --------- #
 
-            # ------------ ITEMS ACTION CHECKING --------- #
+        self._checkItemSelection(event)
+        self._handleDragSpot(event)
 
-            self._checkItemSelection(event)
-            self._handleDragSpot(event)
+        # ---------- EXIT HANDLING ----------- #
 
-            # ---------- EXIT HANDLING ----------- #
+        if (
+            event.type == pygame.KEYDOWN
+            and event.key == self.Game.KeyBindings["Toggle Inventory"]["value"]
+        ):
+            self.close()
 
-            if (
-                event.type == pygame.KEYDOWN
-                and event.key == self.Game.KeyBindings["Toggle Inventory"]["value"]
-            ):
-                self.close()
-
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
 
     def checkSellItem(self, event, Seller):
 
@@ -207,25 +210,19 @@ class Inventory:
                     and event.type == MOUSEBUTTONDOWN
                     and event.button == 3
                 ):
-                    TradeUI.inventory_to_trade((i,j))
+                    TradeUI.inventory_to_trade((i, j))
 
+    def draw(self):
 
-
-    def show(self):
-
-        clock = pygame.time.Clock()
-        time_delta = clock.tick(self.Game.refresh_rate)
-        self.animations.update(time_delta)
-
-        if not self.open:
+        if self.open: # Act as a first time opening
+            self.time_delta = self.clock.tick(self.Game.refresh_rate)
+            self.animations.update(self.time_delta)
             self.openInventory()
 
-        while self.open:
+        if self._show:
 
-            time_delta = clock.tick(self.Game.refresh_rate)
-            self.animations.update(time_delta)
-
-            self.checkActions()
+            self.time_delta = self.clock.tick(self.Game.refresh_rate)
+            self.animations.update(self.time_delta)
 
             # ------------ RESOLUTION CHECKING ------------- #
 
@@ -238,7 +235,7 @@ class Inventory:
             # ------------ BLITING TEXTURES AND UI STUFF ------ #
 
             self.surf = self.inventorySurf.copy()
-            self.Game.screen.blit(self.background, (0, 0))
+            # self.Game.screen.blit(self.background, (0, 0))
 
             # -------------- BLITING ITEMS AND PLAYER'S STATS --- #
 
@@ -249,8 +246,6 @@ class Inventory:
 
             self.Game.screen.blit(self.surf, self.rect)
             self._showDraggedItem()
-
-            self.Game.show()
 
     def nestedShow(self, pos):
         """
@@ -292,8 +287,6 @@ class Inventory:
 
             self.Game.screen.blit(self.surf, self.rect)
             self._showDraggedItem()
-
-            self.Game.show()
 
     def _showItems(self):
         """method bliting the item on the inventory surf"""

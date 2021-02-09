@@ -25,6 +25,7 @@ class MiniMap:
         self.Game = gameController
         self.Map = Map
         self.Hero = Hero
+        self._show = False
 
         # ---------- MINIMAP DISPLAY ---------- #
 
@@ -202,6 +203,59 @@ class MiniMap:
         self.dist_x = 0
         self.dist_y = 0
 
+    def checkActions(self, event):
+
+        if (
+            event.type == KEYDOWN
+            and event.key == self.Game.KeyBindings["Toggle Minimap"]["value"]
+        ):
+            self._show = False
+
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+
+        if event.type == MOUSEBUTTONDOWN:
+
+            for i, rect in enumerate(self.toolButtonsRects):
+                if rect.collidepoint(pygame.mouse.get_pos()):
+                    self.buttonIndex = i
+                    continue
+
+            # ------------- ZOOM HANDLING ----------- #
+
+            # zoom in
+            if event.button == 4 and self.extendedRect.collidepoint(
+                pygame.mouse.get_pos()
+            ):
+
+                self.dist_x = (
+                    pygame.mouse.get_pos()[0]
+                    - self.chunkRect.center[0]
+                    - self.TOPLEFT_CHUNK_BLIT[0]
+                )
+                self.dist_y = (
+                    pygame.mouse.get_pos()[1]
+                    - self.chunkRect.center[1]
+                    - self.TOPLEFT_CHUNK_BLIT[1]
+                )
+
+                self.zoomValue = [
+                    dim + self.ZOOM_SAMPLE[i]
+                    for i, dim in enumerate(self.zoomValue)
+                ]
+            elif (
+                event.button == 5
+            ):  # zoom out, if it doesn't mean to zoom out more than the original size
+                if (
+                    self.zoomValue[0] > self.offsetZoom[0]
+                    and self.zoomValue[1] > self.offsetZoom[1]
+                ):
+                    self.zoomValue = [
+                        dim - self.ZOOM_SAMPLE[i]
+                        for i, dim in enumerate(self.zoomValue)
+                    ]
+
     def show(self):
 
         # update the map with the move of the player
@@ -226,77 +280,15 @@ class MiniMap:
         if not self.Game.screen.get_locked():
             self.Game.screen.blit(self.layout, self.layoutRect)
 
-    def showExtendedMap(self):
-        showMap = True
-        chunkCoor = (
-            str(self.Map.chunkData["currentChunkPos"][0])
-            + ";"
-            + str(self.Map.chunkData["currentChunkPos"][1])
-        )
+    def drawExtendedMap(self):
 
         self.Map.show(self.Hero)
-        self.bg = self.Game.screen.copy()
-        while showMap:
+        if self._show:
 
-            self.Game.screen.blit(self.bg, (0, 0))
             self.extendedSurf = pygame.transform.scale(
                 mapConf.EXTENDED_MINIMAP_BG,
                 (int(self.Game.resolution * 0.75), int(self.Game.resolution * 0.75)),
             )
-
-            for event in pygame.event.get():
-                if (
-                    event.type == KEYDOWN
-                    and event.key == self.Game.KeyBindings["Toggle Minimap"]["value"]
-                ):
-                    showMap = False
-
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-
-                if event.type == MOUSEBUTTONDOWN:
-
-                    for i, rect in enumerate(self.toolButtonsRects):
-                        if rect.collidepoint(pygame.mouse.get_pos()):
-                            self.buttonIndex = i
-                            continue
-
-                    # ------------- ZOOM HANDLING ----------- #
-
-                    # zoom in
-                    if event.button == 4 and self.extendedRect.collidepoint(
-                        pygame.mouse.get_pos()
-                    ):
-
-                        self.dist_x = (
-                            pygame.mouse.get_pos()[0]
-                            - self.chunkRect.center[0]
-                            - self.TOPLEFT_CHUNK_BLIT[0]
-                        )
-                        self.dist_y = (
-                            pygame.mouse.get_pos()[1]
-                            - self.chunkRect.center[1]
-                            - self.TOPLEFT_CHUNK_BLIT[1]
-                        )
-
-                        self.zoomValue = [
-                            dim + self.ZOOM_SAMPLE[i]
-                            for i, dim in enumerate(self.zoomValue)
-                        ]
-                    elif (
-                        event.button == 5
-                    ):  # zoom out, if it doesn't mean to zoom out more than the original size
-                        if (
-                            self.zoomValue[0] > self.offsetZoom[0]
-                            and self.zoomValue[1] > self.offsetZoom[1]
-                        ):
-                            self.zoomValue = [
-                                dim - self.ZOOM_SAMPLE[i]
-                                for i, dim in enumerate(self.zoomValue)
-                            ]
-                    else:
-                        continue
 
             if self.buttonIndex == 0:
 

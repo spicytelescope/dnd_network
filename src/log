@@ -1,11 +1,11 @@
 INFO:PHYM_LOGGER:Loading UI Conf
-INFO:PHYM_LOGGER:Loading playerConf
-INFO:PHYM_LOGGER:Loading itemConf
 INFO:PHYM_LOGGER:Loading eventConf
 INFO:PHYM_LOGGER:Loading mapConf
 INFO:PHYM_LOGGER:Loading musicConf
-INFO:PHYM_LOGGER:Loading menuConf
+INFO:PHYM_LOGGER:Loading itemConf
 INFO:PHYM_LOGGER:Loading spellConf
+INFO:PHYM_LOGGER:Loading playerConf
+INFO:PHYM_LOGGER:Loading menuConf
 INFO:PHYM_LOGGER:Loading textureConf
 DEBUG:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
 DEBUG:PIL.PngImagePlugin:STREAM b'bKGD' 41 6
@@ -62,14 +62,14 @@ INFO:PHYM_LOGGER:LOADING ITEM RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to ItemDBLoading : 20 
 INFO:PHYM_LOGGER:LOADING SPELL RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to spellDBLoading : 20 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/HunterLightArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/MilitiamanHelmet2_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Hermit.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/GuardArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Robe.png
-INFO:PHYM_LOGGER:Current player's spell's ID : [0, 16]
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/CrusaderChainmail_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/LeatherLightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/KnightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/LeatherRivetedArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Hunter.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
 INFO:PHYM_LOGGER:LOADING OPEN WORLD RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to biomeTextures : 10 
 INFO:PHYM_LOGGER:LOADING MINIMAP RESSOURCES
@@ -86,31 +86,42 @@ INFO:PHYM_LOGGER:Generating Init_Zone
 INFO:PHYM_LOGGER:BLITED AT CHUNK : [(0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)]
 INFO:PHYM_LOGGER:LOADING ./assets/world_textures/ennemy/Skeleton/loot/skull.png
 INFO:PHYM_LOGGER:Generating Danger Zone
-INFO:PHYM_LOGGER:Bliting on case : '[28, 24]
-INFO:PHYM_LOGGER:Bliting at 768
+INFO:PHYM_LOGGER:Bliting on case : '[21, 24]
+INFO:PHYM_LOGGER:Bliting at 320
 DEBUG:PHYM_LOGGER:ADDING to worldElements : 15 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/WaterAdeptWand2.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/KnightArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/ArielDress_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/BattleBow.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/LeatherHelm.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/CrusaderChainmail_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/LeatherLightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/KnightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/LeatherRivetedArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Hunter.png
 INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/WaterAdeptWand2.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/KnightArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/ArielDress_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/BattleBow.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/LeatherHelm.png
-INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
-INFO:PHYM_LOGGER:Test Player 1 (#fdaf82c2-e3eb-4d7e-a626-8f3e300055de) connected to the server !
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/HunterLightArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/MilitiamanHelmet2_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Hermit.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/GuardArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Robe.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ClericWand1.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Arrows/HunterShortBow.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/PeasantCap.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/HermitHat.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/WoodenMace.png
 INFO:PHYM_LOGGER:Current player's spell's ID : [0, 16]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png
+DEBUG:PHYM_LOGGER:operations: 4, path length: 4
+DEBUG:PHYM_LOGGER:Aozkm's turn until rest : 1
+DEBUG:PHYM_LOGGER:Vd's turn until rest : 1
+DEBUG:PHYM_LOGGER:Srs's turn until rest : 1
+DEBUG:PHYM_LOGGER:operations: 2, path length: 2
+DEBUG:PHYM_LOGGER:Vd's turn until rest : 1
+DEBUG:PHYM_LOGGER:Srs's turn until rest : 1
+DEBUG:PHYM_LOGGER:Aozkm's turn until rest : 1
+DEBUG:PHYM_LOGGER:operations: 8, path length: 8
+DEBUG:PHYM_LOGGER:Srs's turn until rest : 1
+DEBUG:PHYM_LOGGER:Aozkm's turn until rest : 1
+DEBUG:PHYM_LOGGER:Vd's turn until rest : 1
+DEBUG:PHYM_LOGGER:operations: 20, path length: 9
+DEBUG:PHYM_LOGGER:Aozkm's turn until rest : 1
+DEBUG:PHYM_LOGGER:Vd's turn until rest : 1
+DEBUG:PHYM_LOGGER:Srs's turn until rest : 1
+DEBUG:PHYM_LOGGER:operations: 3, path length: 3
+DEBUG:PHYM_LOGGER:Aozkm's turn until rest : 1
+DEBUG:PHYM_LOGGER:Vd's turn until rest : 1
+DEBUG:PHYM_LOGGER:Srs's turn until rest : 2

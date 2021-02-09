@@ -29,7 +29,7 @@ class OpenWorldMap:
     and therefor given the value, render a biome (which is a rgb code for now)
     """
 
-    def __init__(self, config, gameController) -> None:
+    def __init__(self, config, gameController, debug=False) -> None:
 
         # ---------- State ----------- #
         self._stateSaved = False
@@ -137,7 +137,7 @@ class OpenWorldMap:
 
         # ------------------- CREATING OPEN WORLD HANDLER -------------- #
 
-        if self.id == 1:
+        if self.id == 1 and not debug:
             self.envHandler = EnvHandler(self.Game, self)
             self.envGenerator = self.envHandler.envGenerator
 

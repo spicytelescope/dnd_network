@@ -469,7 +469,7 @@ def loadLandscapeRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                     )
 
 
-def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION"]):
+def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION"], debug = False):
 
     logger.info("LOADING OPEN WORLD RESSOURCES")
 
@@ -553,6 +553,8 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
         if isfile(join("./assets/world_textures/buildings/dungeon/transition/", f))
     ]
 
+    if debug:
+        textureConf.WORLD_ELEMENTS = {}
     textureConf.WORLD_ELEMENTS = {
         **textureConf.WORLD_ELEMENTS,  # Adding landscapes
         "Building": {

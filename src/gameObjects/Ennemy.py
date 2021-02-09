@@ -14,7 +14,6 @@ from os.path import *
 
 
 class Ennemy:
-
     """Meta class representing an ennemy"""
 
     def __init__(

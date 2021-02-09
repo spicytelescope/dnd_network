@@ -1,5 +1,5 @@
 import math
-from time import *
+import time
 
 import pygame
 from config import playerConf
@@ -20,12 +20,18 @@ class SpellBook:
         self.Hero = Hero
 
         self.open = False
+        self._show = False
 
         self.MAX_PAGE = None
         self.MAX_PAGE_INDEX = None
         self.pageIndex = 0  # is an index so starts at one
 
+        self.combatMode = False
+
         # ANIMATIONS
+        self.transitionFlag = None
+        self.transIndex = 0
+        self.lastTransTime = time.time()
 
         self.openAnimFrames = [
             pygame.transform.scale(img, (self.Game.resolution, self.Game.resolution))
@@ -45,8 +51,6 @@ class SpellBook:
         ]
 
         # STATIC SURF
-
-        self.bg = None
 
         self.blankPage = pygame.transform.scale(
             spellsConf.SPELLBOOK_MAIN_SURF, (self.Game.resolution, self.Game.resolution)
@@ -192,137 +196,129 @@ class SpellBook:
 
             count = (count + 1) % 3
 
-    def transition(self, name, frames, time):
+    def transition(self, name, frames, trans_time):
 
-        print(self.bg)
-        if name == "open":
-            self.open = True
-        elif name == "close":
-            self.open = False
-        elif name == "next":
-            self.pageIndex += 1 if self.pageIndex != self.MAX_PAGE_INDEX else 0
-        elif name == "back":
-            self.pageIndex -= 1 if self.pageIndex != 0 else 0
+        self.Game.screen.blit(
+            frames[self.transIndex],
+            self.rect,
+        )
 
-        for frame in frames:
-            self.Game.screen.blit(self.bg, (0, 0))
-            self.Game.screen.blit(frame, self.rect)
-            self.Game.show(combatMode=False)
-            sleep(time / len(frames))
+        if (time.time() - self.lastTransTime) >= (trans_time / len(frames)):
+            self.transIndex += 1
+            self.lastTransTime = time.time()
 
-    def setBackground(self):
-        self.bg = self.Game.screen.copy()
+        if self.transIndex == len(frames):
+            self.transitionFlag = None
+            self.transIndex = 0
+            if name == "open":
+                self.open = False
+                self._show = True
+            elif name == "close":
+                self._show = False
+            elif name == "next":
+                self.pageIndex += 1 if self.pageIndex != self.MAX_PAGE_INDEX else 0
+            elif name == "back":
+                self.pageIndex -= 1 if self.pageIndex != 0 else 0
 
-    def show(self, combatMode=False):
+    def checkActions(self, event):
 
-        self.setBackground()
-        if not self.open:
-            self.transition("open", self.openAnimFrames, OPEN_ANIM_TIME)
+        if (
+            event.type == pygame.KEYDOWN
+            and event.key == self.Game.KeyBindings["Toggle Spell Book"]["value"]
+            and not self.combatMode
+        ):
+            self.transitionFlag = "close"
 
-        while self.open:
+        # ---------- FIGHT MODE ---------- #
 
-            for event in pygame.event.get():
+        if self.combatMode and event.type == pygame.MOUSEBUTTONUP:
 
+            for i, spellRect in enumerate(self.spellsRectInfos):
                 if (
-                    event.type == pygame.KEYDOWN
-                    and event.key == self.Game.KeyBindings["Toggle Spell Book"]["value"]
-                    and not combatMode
+                    spellRect.collidepoint(
+                        [
+                            coor - offset
+                            for coor, offset in zip(
+                                pygame.mouse.get_pos(), self.rect.topleft
+                            )
+                        ]
+                    )
+                    and self.pageIndex * 3 <= i < self.pageIndex * 3 + 3
+                    and i < len(self.Hero.spellsID)
                 ):
-                    self.transition("close", self.closeAnimFrames, CLOSE_ANIM_TIME)
-
-                # ---------- FIGHT MODE ---------- #
-
-                if combatMode and event.type == pygame.MOUSEBUTTONDOWN:
-
-                    for i, spellRect in enumerate(self.spellsRectInfos):
-                        if (
-                            spellRect.collidepoint(
-                                [
-                                    coor - offset
-                                    for coor, offset in zip(
-                                        pygame.mouse.get_pos(), self.rect.topleft
-                                    )
-                                ]
-                            )
-                            and self.pageIndex * 3 <= i < self.pageIndex * 3 + 3
-                            and i < len(self.Hero.spellsID)
-                        ):
-                            logger.debug(f"casting {self.spells[i].name}")
-                            self.transition(
-                                "close", self.closeAnimFrames, CLOSE_ANIM_TIME
-                            )
-                            if self.pageIndex == 0 and i == 0:  # Auto attack case
-                                self.Game.fightMode.makeSpell(
-                                    self.spells[i], autoattack=True
-                                )
-                            else:
-                                self.Game.fightMode.makeSpell(self.spells[i])
-
-                # --------- PAGE SELECTION ------------ #
-
-                for button in self.buttons:
-
-                    if button == "next" and self.pageIndex == self.MAX_PAGE_INDEX:
-                        continue
-                    elif button == "back" and self.pageIndex == 0:
-                        continue
-
-                    if self.buttons[button]["rect"].collidepoint(
-                        pygame.mouse.get_pos()
-                    ):
-
-                        self.mainSurf.blit(
-                            self.buttons[button]["surfClicked"],
-                            self.buttons[button]["rect"],
-                        )
-
-                        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-
-                            if button == "next":
-                                self.transition(
-                                    "next", self.nextAnimFrames, NEXT_ANIM_TIME
-                                )
-                            else:
-                                self.transition(
-                                    "back", self.backAnimFrames, BACK_ANIM_TIME
-                                )
-
+                    logger.debug(f"casting {self.spells[i].name}")
+                    self.transitionFlag = "close"
+                    if self.pageIndex == 0 and i == 0:  # Auto attack case
+                        self.Game.fightMode.makeSpell(self.spells[i], autoattack=True)
                     else:
-                        self.mainSurf.blit(
-                            self.buttons[button]["surf"], self.buttons[button]["rect"]
-                        )
+                        self.Game.fightMode.makeSpell(self.spells[i])
 
-            if self.open:
-                self.Game.screen = self.bg.copy()
-                self.Game.screen.blit(self.mainSurf, self.rect)
+        # --------- PAGE SELECTION ------------ #
 
-                pygame.draw.lines(
-                    self.Game.screen, (0, 0, 0), True, SPELL_DESC_SLOT_POINTS, 4
+        for button in self.buttons:
+
+            if button == "next" and self.pageIndex == self.MAX_PAGE_INDEX:
+                continue
+            elif button == "back" and self.pageIndex == 0:
+                continue
+
+            if self.buttons[button]["rect"].collidepoint(pygame.mouse.get_pos()):
+
+                self.mainSurf.blit(
+                    self.buttons[button]["surfClicked"],
+                    self.buttons[button]["rect"],
                 )
-                self.Game.screen.blit(self.classNameTitle, self.classNameTitleRect)
-                self.Game.screen.blit(self.animTitle, self.animTitleRect)
 
-                for i in range(self.pageIndex * 3, self.pageIndex * 3 + 3):
-                    if i < len(self.Hero.spellsID):
-                        # ----------- SPELL HOOVERING / ANIMATION -------------- #
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    self.transitionFlag = "next" if button == "next" else "back"
 
-                        # Bliting desc on spellSurfInfo hoovering
-                        if self.spellsRectInfos[i].collidepoint(pygame.mouse.get_pos()):
+            else:
+                self.mainSurf.blit(
+                    self.buttons[button]["surf"], self.buttons[button]["rect"]
+                )
 
-                            self.spellsDesc[i].update()
-                            self.Game.screen.blit(self.descSlot, self.descSlotRect)
+    def draw(self, combatMode=False):
 
-                            # Launching animation
-                            self.spellAnims[i].show()
-                        else:
-                            self.spellAnims[i].hide()
+        self.combatMode = combatMode
 
-                        self.Game.screen.blit(
-                            self.spellsSurfInfos[i], self.spellsRectInfos[i]
-                        )
-                        self.spellAnims[i].mainLoop()
+        if self.open:
+            self.transition("open", self.openAnimFrames, OPEN_ANIM_TIME)
+        elif self.transitionFlag == "close":
+            self.transition("close", self.closeAnimFrames, CLOSE_ANIM_TIME)
+        elif self.transitionFlag == "next":
+            self.transition("next", self.nextAnimFrames, NEXT_ANIM_TIME)
+        elif self.transitionFlag == "back":
+            self.transition("back", self.backAnimFrames, BACK_ANIM_TIME)
+        elif self._show:
 
-                self.Game.show(combatMode=False)
+            self.Game.screen.blit(self.mainSurf, self.rect)
+
+            pygame.draw.lines(
+                self.Game.screen, (0, 0, 0), True, SPELL_DESC_SLOT_POINTS, 4
+            )
+            self.Game.screen.blit(self.classNameTitle, self.classNameTitleRect)
+            self.Game.screen.blit(self.animTitle, self.animTitleRect)
+
+            for i in range(self.pageIndex * 3, self.pageIndex * 3 + 3):
+                if i < len(self.Hero.spellsID):
+
+                    # ----------- SPELL HOOVERING / ANIMATION -------------- #
+
+                    # Bliting desc on spellSurfInfo hoovering
+                    if self.spellsRectInfos[i].collidepoint(pygame.mouse.get_pos()):
+
+                        self.spellsDesc[i].update()
+                        self.Game.screen.blit(self.descSlot, self.descSlotRect)
+
+                        # Launching animation
+                        self.spellAnims[i].show()
+                    else:
+                        self.spellAnims[i].hide()
+
+                    self.Game.screen.blit(
+                        self.spellsSurfInfos[i], self.spellsRectInfos[i]
+                    )
+                    self.spellAnims[i].mainLoop()
 
     # def __getstate__(self):
 

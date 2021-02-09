@@ -8,6 +8,8 @@ from pickle import load
 
 import pygame
 from pygame.locals import *
+from HUD.QuestController import QuestController
+from HUD.miniMap import MiniMap
 from config.UIConf import POP_UP_ACTIONS
 
 from config.playerConf import MAX_TEAM_LENGH, TIME_OUT_REST
@@ -52,6 +54,7 @@ RessourceHandler.loadLandscapeRessources()
 Player_Map = OpenWorldMap(PLAYER_CONFIG, Game)
 World_Map = OpenWorldMap(WORLD_MAP_CONFIG, Game)
 Hero_group = [Character(Game, Player_Map, genOrder=i) for i in range(MAX_TEAM_LENGH)]
+Leader = Hero_group[0] # The one with self.genOrder set to 0
 Game.heroesGroup += Hero_group
 
 # ------------------ NETWORKING -------------- #
@@ -141,26 +144,37 @@ while Game.currentState != "quit":
     while Game.currentState == "openWorld":
 
         Hero = Hero_group[Game.heroIndex]
-        Leader = Hero_group[0]
-
-        Player_Map.show(Leader)
+        if (time.time() - Hero.lastTimeoutHealed) > TIME_OUT_REST:
+            for H in Hero_group:
+                H.modifyHP(2)
+                logger.info(f"HEALING {H.name} DUE TO REST MECHANICS")
+                H.lastTimeoutHealed = time.time()
 
         for event in pygame.event.get():
+
+            # ------------------- NETWORK HANDLING ----------------- #
             if NetworkController.players != {}:
                 NetworkController.handleInteractions(event)
 
+            # ------------------ HUD Handling --------------------- #
+
+            if Hero.Inventory._show:
+                Hero.Inventory.checkActions(event)
+            if Hero.QuestJournal._show:
+                Hero.QuestJournal.checkActions(event)
+            if Hero.SpellBook._show:
+                Hero.SpellBook.checkActions(event)
+
+            # -------------------- KEY BINDING HANDLING ----------- #
             if event.type == pygame.KEYDOWN:
 
                 Player_Map.envGenerator.checkInteractableEntities(event)
-
-                if event.key == K_SPACE:
-                    Hero.lvlUp()
 
                 if event.key == Game.KeyBindings["Pick up items"]["value"]:
                     for i, item in enumerate(Player_Map.envGenerator.items):
                         item.lootHandler(Hero, Player_Map.envGenerator, i)
 
-                if event.key == Game.KeyBindings["Pause the game"]["value"]:
+                elif event.key == Game.KeyBindings["Pause the game"]["value"]:
                     PauseMenu.captureBackground()
                     PauseMenu.initPauseMenu()
                     PauseMenu.mainLoop()
@@ -168,24 +182,40 @@ while Game.currentState != "quit":
 
                 elif (
                     event.key == Game.KeyBindings["Toggle Inventory"]["value"]
-                    and Hero.Inventory.open == False
+                    and not Hero.Inventory._show
+                    and not Hero.Inventory.open
                 ):
-                    Hero.Inventory.show()
+                    Hero.Inventory.open = True
                     break
-                elif event.key == Game.KeyBindings["Toggle Spell Book"]["value"]:
-                    Hero.SpellBook.show()
 
-                elif event.key == Game.KeyBindings["Open quest's Journal"]["value"]:
-                    Hero.QuestJournal.show()
+                elif (
+                    event.key == Game.KeyBindings["Toggle Spell Book"]["value"]
+                    and not Hero.SpellBook._show
+                    and not Hero.SpellBook.open
+                ):
+                    Hero.SpellBook.open = True
+                    break
+
+                elif (
+                    event.key == Game.KeyBindings["Open quest's Journal"]["value"]
+                    and not Hero.QuestJournal._show
+                    and not Hero.QuestJournal.open
+                ):
+                    Hero.QuestJournal.open = True
 
                 elif event.key == Game.KeyBindings["Toggle Minimap"]["value"]:
-                    Player_Map.miniMap.showExtendedMap()
+                    Player_Map.miniMap._show = True
+
                 elif (
                     len(Hero_group) > 1
                     and event.key == Game.KeyBindings["Switch heroes"]["value"]
                 ):
                     Game.heroIndex = (Game.heroIndex + 1) % MAX_TEAM_LENGH
 
+                if event.key == K_SPACE:
+                    Hero.lvlUp()
+
+            # ------------------ MOVEMENTS --------------- #
             if (
                 event.type == pygame.MOUSEBUTTONDOWN
                 and event.button == 3
@@ -193,6 +223,7 @@ while Game.currentState != "quit":
             ):
                 Leader.updateClickPoint()
 
+            # ---------------- WATER ANIM ------------------- #
             if event.type == ANIMATE_WATER_EVENT_ID and Player_Map.enableWaterAnimation:
                 Player_Map.updateWaterAnimation()
 
@@ -202,39 +233,42 @@ while Game.currentState != "quit":
 
         Leader.handleMovements("openWorld")
 
+        # ------------------------------ DRAWING ------------------------------- #
         if (
             Game.currentState == "openWorld"
             and not Game.screen.get_locked()
             and not Player_Map.chunkData["mainChunk"].get_locked()
         ):
 
+            # -------------- MAP HANDLING ------------- #
+
+            Player_Map.show(Leader)
             Player_Map.envGenerator.showInfoTipElt()
             Player_Map.envGenerator.showNpc()
             Player_Map.envGenerator.showEnnemies()
             Player_Map.envGenerator.showItems()
 
-            Player_Map.miniMap.show()
-            Hero.CharBar.show()
+            # -------------- PLAYERS HANDLING ----------- #
             NetworkController.showConnectedPlayers()
             Hero.show()
+
+            # ------------------- HUD HANDLING ----------- #
+
+            Hero.CharBar.show()
+            Player_Map.miniMap.show()
+            Hero.Inventory.draw()
+            Hero.QuestJournal.draw()
+            Hero.SpellBook.draw()
+            # Player_Map.miniMap.drawExtendedMap()
             ContextMenu.draw()
 
             Game.show()
-
             Game.spaceTransition("Pyhm World")
-
-            if (time.time() - Hero.lastTimeoutHealed) > TIME_OUT_REST:
-                for H in Hero_group:
-                    H.modifyHP(2)
-                    logger.info(f"HEALING {H.name} DUE TO REST MECHANICS")
-                    H.lastTimeoutHealed = time.time()
 
         if Game.debug_mode:
 
             pygame.display.set_caption(
                 f"Pyhm World - {str(int(Game_Clock.get_fps()))} fps"
             )
-        Game_Clock.tick(Game.refresh_rate)
 
-pygame.quit()
-exit()
+        Game_Clock.tick(Game.refresh_rate)

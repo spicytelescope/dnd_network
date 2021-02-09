@@ -225,8 +225,8 @@ class Character:
                     for i, ennemy in enumerate(self.Map.envGenerator.ennemies):
                         if (
                             math.sqrt(
-                                (ennemy["value"]["entity"].pos[0] - self.pos[0]) ** 2
-                                + (ennemy["value"]["entity"].pos[1] - self.pos[1]) ** 2
+                                (ennemy["value"]["entity"].chunkPos[0] - self.posMainChunkCenter[0]) ** 2
+                                + (ennemy["value"]["entity"].chunkPos[1] - self.posMainChunkCenter[1]) ** 2
                             )
                             // self.Map.stepGeneration
                             <= ENNEMY_DETECTION_RANGE
@@ -366,6 +366,35 @@ class Character:
 
     def moveByClick(self, envGenerator, mapName):
 
+        # if self.genOrder >0:
+
+        #     if not (
+        #     abs(self.Game.heroesGroup[0].XDistanceToTarget) < self.normalizedDistance
+        #     and abs(self.Game.heroesGroup[0].YDistanceToTarget) < self.normalizedDistance
+        # ):
+        #         self.prevDir = self.direction
+
+        #         if abs(self.Game.heroesGroup[0].XDistanceToTarget) >= abs(self.Game.heroesGroup[0].YDistanceToTarget):
+
+        #             self.direction = "right" if self.Game.heroesGroup[0].XDistanceToTarget > 0 else "left"
+
+        #         else:
+        #             self.direction = "down" if self.Game.heroesGroup[0].YDistanceToTarget > 0 else "up"
+
+        #         # Updating running animation
+        #         if (
+        #             self.prevDir == self.direction
+        #             and (time.time() - self.lastTimePlayerAnimated)
+        #             > self.animationMinTimeRendering
+        #         ):
+        #             self.lastTimePlayerAnimated = time.time()
+        #             self.imageState["imagePos"] = (
+        #                 0
+        #                 if self.imageState["imagePos"]
+        #                 == PLAYER_ANIMATION_FRAME_LENGTH - 1
+        #                 else self.imageState["imagePos"] + 1
+        #             )
+        # else:
         # Computing the direction to get
         if not (
             abs(self.XDistanceToTarget) < self.normalizedDistance
@@ -490,7 +519,9 @@ class Character:
             self.lastRenderedTime = time.time()
 
     def show(self):
-
+        if self.genOrder >0:
+            self.direction = self.Game.heroesGroup[0].direction
+            self.imageState["imagePos"] = self.Game.heroesGroup[0].imageState["imagePos"]
         # Changing animation
         self.imageState["image"] = playerConf.CLASSES[self.classId]["directions"][
             self.direction
