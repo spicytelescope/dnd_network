@@ -754,7 +754,12 @@ class EnvGenerator:
             for i in range(len(self.mainChunkElementsTab)):
 
                 elt = self.mainChunkElementsTab[j][i]
-
+                x = (j + i) * (self.Map.stepGeneration * sqrt(2)) // 2
+                y = (
+                    (j - i) * (self.Map.stepGeneration * sqrt(2)) // 4
+                    + self.Map.chunkData["mainChunk"].get_height() // 2
+                    - self.Map.stepGeneration * sqrt(2) // 2
+                )
                 # Case with a tile of a structure
                 if (
                     elt["structure"]["name"] != None
@@ -765,22 +770,17 @@ class EnvGenerator:
                 ):
 
                     self.Map.chunkData["mainChunk"].blit(
+                        elt["structure"]["borderSurf"], (x, y)
+                    )
+                    self.Map.chunkData["mainChunk"].blit(
                         textureConf.WORLD_ELEMENTS_STRUCTURE[elt["structure"]["name"]][
                             "surf"
                         ],
-                        (
-                            i * self.scaleFactor * self.Map.stepGeneration,
-                            j * self.scaleFactor * self.Map.stepGeneration,
-                        ),
+                        (x, y),
                     )
                 if elt["structure"]["isBorder"]:
 
-                    fenceRect = elt["structure"]["borderSurf"].get_rect(
-                        topleft=(
-                            i * self.scaleFactor * self.Map.stepGeneration,
-                            j * self.scaleFactor * self.Map.stepGeneration,
-                        )
-                    )
+                    fenceRect = elt["structure"]["borderSurf"].get_rect(topleft=(x, y))
                     self.structObstacleList.append(
                         {
                             "name": "Struct Border",
@@ -790,10 +790,7 @@ class EnvGenerator:
 
                     self.Map.chunkData["mainChunk"].blit(
                         elt["structure"]["borderSurf"],
-                        (
-                            i * self.scaleFactor * self.Map.stepGeneration,
-                            j * self.scaleFactor * self.Map.stepGeneration,
-                        ),
+                        (x, y),
                     )
 
     def displayWorldElements(self):
@@ -814,6 +811,22 @@ class EnvGenerator:
         for j in range(len(self.mainChunkElementsTab)):
             for i in range(len(self.mainChunkElementsTab)):
 
+                def standard_vec_into_iso(x, y):
+                    x_iso = x + y
+                    y_iso = -0.5 * x + 0.5 * y
+                    return (x_iso, y_iso)
+
+                x = (j + i) * (self.Map.stepGeneration * sqrt(2)) // 2
+                y = (
+                    (j - i) * (self.Map.stepGeneration * sqrt(2)) // 4
+                    + self.Map.chunkData["mainChunk"].get_height() // 2
+                    - self.Map.stepGeneration * sqrt(2) // 2
+                )
+                # x = (j - i) * self.Map.stepGeneration * sqrt(
+                #     2
+                # )
+                # y = ((j + i) * self.Map.stepGeneration * sqrt(2)) // 4 - self.Map.chunkData["mainChunk"].get_height() // 2 - self.Map.stepGeneration * sqrt(2) / 2
+
                 elt = self.mainChunkElementsTab[j][i]
 
                 if elt["type"] != None:
@@ -822,22 +835,12 @@ class EnvGenerator:
                         # The NPC got a special treatment as they are world elements that needs to be animated
                         if elt["type"] == "NPC" or elt["type"] == "Ennemy":
 
-                            elt["value"]["entity"].init(
-                                (
-                                    i * self.scaleFactor * self.Map.stepGeneration,
-                                    j * self.scaleFactor * self.Map.stepGeneration,
-                                )
-                            )
+                            elt["value"]["entity"].init((x, y))
                             if elt["type"] == "NPC":
 
                                 elt["value"]["rect"] = elt["value"][
                                     "entity"
-                                ].surf.get_rect(
-                                    topleft=(
-                                        i * self.scaleFactor * self.Map.stepGeneration,
-                                        j * self.scaleFactor * self.Map.stepGeneration,
-                                    )
-                                )
+                                ].surf.get_rect(topleft=(x, y))
                                 self.npc.append(elt)
                                 self.obstaclesList.append(elt)
                             else:
@@ -870,6 +873,9 @@ class EnvGenerator:
                                                 "value"
                                             ]["placeholder"]["flag"] = True
 
+                    #         x = (j * tile_width / 2) + (i * tile_width / 2)
+                    # y = (i * tile_height / 2) - (j * tile_height / 2)
+
                     if (
                         elt["type"] == "Landscape"
                         and type(
@@ -889,12 +895,7 @@ class EnvGenerator:
                                 elt["name"]
                             ]["surf"][elt["surfIndex"]]
 
-                            elt["value"]["rect"] = surfToBlit.get_rect(
-                                topleft=(
-                                    i * self.scaleFactor * self.Map.stepGeneration,
-                                    j * self.scaleFactor * self.Map.stepGeneration,
-                                )
-                            )
+                            elt["value"]["rect"] = surfToBlit.get_rect(topleft=(x, y))
                             self.Map.chunkData["mainChunk"].blit(
                                 surfToBlit,
                                 elt["value"]["rect"],
@@ -906,12 +907,7 @@ class EnvGenerator:
 
                     elt["value"]["rect"] = textureConf.WORLD_ELEMENTS[elt["type"]][
                         elt["name"]
-                    ]["surf"].get_rect(
-                        topleft=(
-                            i * self.scaleFactor * self.Map.stepGeneration,
-                            j * self.scaleFactor * self.Map.stepGeneration,
-                        )
-                    )
+                    ]["surf"].get_rect(topleft=(x, y))
                     self.Map.chunkData["mainChunk"].blit(
                         textureConf.WORLD_ELEMENTS[elt["type"]][elt["name"]]["surf"],
                         elt["value"]["rect"],
@@ -1075,6 +1071,11 @@ class EnvHandler:
                 elementEntry = f"{biomeName[0].upper() + biomeName[1:]}_{biomeElt}"
                 self.envGenerator.generateElement("Landscape", elementEntry, -1)
                 self.envGenerator.generateElement("Landscape", elementEntry, -1)
+
+        # elt = textureConf.WORLD_ELEMENTS["Landscape"]["Sand_tree"].copy()
+        # self.envGenerator.mainChunkElementsTab[0][0]["value"] = elt.copy()
+        # self.envGenerator.mainChunkElementsTab[0][0]["type"] = "Landscape"
+        # self.envGenerator.mainChunkElementsTab[0][0]["name"] = "Sand_tree"
 
     def genRareElements(self):
 

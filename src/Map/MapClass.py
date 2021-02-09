@@ -286,12 +286,25 @@ class OpenWorldMap:
         if self.chunkGenerationCounter == nChunks:
 
             # After bliting the primary texture, we generate the trees and stuff like that
+
+            # Applying isometric
+            self.chunkData["mainChunk"] = pygame.transform.rotate(
+                self.chunkData["mainChunk"], 45
+            )
+            self.chunkData["mainChunk"] = pygame.transform.scale(
+                self.chunkData["mainChunk"],
+                (
+                    self.chunkData["mainChunk"].get_width(),
+                    self.chunkData["mainChunk"].get_height() // 2,
+                ),
+            )
+
             self.loadingMenu.updateProgressBar("worldElements")
             self.envHandler.generateWorldElements(fastGen=(nChunks == 0))
             self.loadingMenu.confirmLoading("worldElements")
-            self.miniMap.update()
+            # self.miniMap.update()
 
-            # pygame.image.save(self.chunkData["mainChunk"], "mainChunk.png")
+            pygame.image.save(self.chunkData["mainChunk"], "mainChunk.png")
 
             # We reset the progress bar chunk countee
             self.chunkGenerationCounter = 0
@@ -542,7 +555,10 @@ class OpenWorldMap:
         ):
             self.Game.screen.blit(
                 self.chunkData["mainChunk"],
-                (Hero.mainChunkPosX, Hero.mainChunkPosY),
+                (
+                    Hero.mainChunkPosX + Hero.mainChunkPosY,
+                    Hero.mainChunkPosY - Hero.mainChunkPosX // 2,
+                ),
             )
 
     def updateMapSeed(self, mode):
