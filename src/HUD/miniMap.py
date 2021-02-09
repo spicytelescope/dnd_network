@@ -219,7 +219,7 @@ class MiniMap:
 
         if (
             event.type == KEYDOWN
-            and event.key == self.Game.KeyBindings["Center Map Exploration"]["value"]
+            and event.key == self.Game.KeyBindings["Center the Map's view"]["value"]
         ):
             self.chunkRectPos = self.initChunkRectCenter[::]
 
@@ -324,6 +324,8 @@ class MiniMap:
             elif self.buttonIndex == 1:
 
                 self.extendedChunkMap = self.chunkMapRaw.copy()
+
+                # ------------- PLAYERS BLITING ---------------- #
                 self.extendedChunkMap.blit(
                     pygame.transform.scale2x(self.playerIcon),
                     (
@@ -333,6 +335,21 @@ class MiniMap:
                         ),
                     ),
                 )
+
+                for player in self.Game.NetworkController.players.values():
+                    self.extendedChunkMap.blit(
+                        pygame.transform.scale2x(playerConf.CLASSES[player.classId]["icon"]),
+                        (
+                            int(
+                                self.chunkMapRaw.get_width() / 2
+                                - player.blitOffset[0]
+                            ),
+                            int(
+                                self.chunkMapRaw.get_height() / 2
+                                - player.blitOffset[1]
+                            ),
+                        ),
+                    )
 
                 # self.chunkRect.center = (
                 #     self.extendedRect[0] + self.dist_x, self.extendedRect[1] + self.dist_y)

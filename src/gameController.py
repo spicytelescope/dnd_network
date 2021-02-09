@@ -89,6 +89,10 @@ class GameController:
         self.combatLog = None
         self.fightMode = None
 
+        # ---------- NETWORK ------------ #
+
+        self.NetworkController = None
+
     def selectGame(self):
         self.currentState = "selectGame"
 
