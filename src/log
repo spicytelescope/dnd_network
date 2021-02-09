@@ -62,14 +62,14 @@ INFO:PHYM_LOGGER:LOADING ITEM RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to ItemDBLoading : 20 
 INFO:PHYM_LOGGER:LOADING SPELL RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to spellDBLoading : 20 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Robe.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/GuardArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/WoodenSpikedClub.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/StrawHat.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Arrows/ScoutShortBow.png
-INFO:PHYM_LOGGER:Current player's spell's ID : [0, 16]
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/MilitiamanHelmet1_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/IronArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/BanditArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Slave.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/FamilyBow.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
 INFO:PHYM_LOGGER:LOADING OPEN WORLD RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to biomeTextures : 10 
 INFO:PHYM_LOGGER:LOADING MINIMAP RESSOURCES
@@ -86,34 +86,1016 @@ INFO:PHYM_LOGGER:Generating Init_Zone
 INFO:PHYM_LOGGER:BLITED AT CHUNK : [(0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)]
 INFO:PHYM_LOGGER:LOADING ./assets/world_textures/ennemy/Skeleton/loot/skull.png
 INFO:PHYM_LOGGER:Generating Danger Zone
-INFO:PHYM_LOGGER:Bliting on case : '[25, 13]
-INFO:PHYM_LOGGER:Bliting at 576
+INFO:PHYM_LOGGER:Bliting on case : '[28, 18]
+INFO:PHYM_LOGGER:Bliting at 768
 DEBUG:PHYM_LOGGER:ADDING to worldElements : 15 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortDagger_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/LeatherRivetedArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Cleric_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/FamilyBow.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/LeatherLightArmor.png
-INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortDagger_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/LeatherRivetedArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Cleric_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/FamilyBow.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/LeatherLightArmor.png
-INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
-INFO:PHYM_LOGGER:Test Player 1 (#42204ac2-3213-4c4b-b0b9-228a2848317e) connected to the server !
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/ChainmailLightArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Arrows/BattleBow.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/HunterTunic.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/HunterHat2.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/PeasantClothing.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/LeatherJacket.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Hermit.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortSword_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/LeatherJacket.png
 INFO:PHYM_LOGGER:Current player's spell's ID : [1, 3, 6, 9, 12]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/fire/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/ice/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/wind/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/earth/weak/icon.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/MilitiamanHelmet1_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/IronArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/BanditArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Slave.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/FamilyBow.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##      sxxe###                 |
+|                     #      # ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##         s###                 |
+|                     #    xx# ##       #        |
+|              # ##  ######x#### #  #      #     |
+|                ##  ## xxxx           #         |
+|              #    #   e              # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##     exxxx###                 |
+|                     #     s# ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##  xxx     ###                 |
+|                   ex#xxxxxs# ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##     exxxx###                 |
+|                     #     s# ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##     exxxx###                 |
+|                     #     s# ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##     exxxx###                 |
+|                     #     s# ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ### e       #    #  #   #     |
+|                ##    xxxxxx###                 |
+|                     #     s# ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###  e      #          #      |
+|               ## ###  x      #    #  #   #     |
+|                ##     x    ###                 |
+|                     # xxxxs# ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##    exxxxx###                 |
+|                     #     s# ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##          ###                 |
+|                     # exxs # ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##          ###                 |
+|                     # exxs # ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##          ###                 |
+|                     # exxx # ##       #        |
+|              # ##  ######s#### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##          ###                 |
+|                     # exxx # ##       #        |
+|              # ##  ######x#### #  #      #     |
+|                ##  ##    s           #         |
+|              #    #                  # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ##e         #    #  #   #     |
+|                ##          ###                 |
+|                     #      # ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #      s           # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###     xxe #    #  #   #     |
+|                ##        x ###                 |
+|                     #    x # ##       #        |
+|              # ##  ######x#### #  #      #     |
+|                ##  ##    x           #         |
+|              #    #  sxxxx           # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               #e ###         #    #  #   #     |
+|                ##          ###                 |
+|                     #      # ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #       s          # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       ### # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##        e ###                 |
+|                     #    x # ##       #        |
+|              # ##  ######x#### #  #      #     |
+|                ##  ##    x           #         |
+|              #    #sxxxxxx           # ##      |
+|             # ##          #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+DEBUG:PHYM_LOGGER:
++------------------------------------------------+
+|               #  #                #            |
+|             ##      #                   ##     |
+|          #       #                    # #      |
+|#         ##  #       #       ###    #   #      |
+|#             #  #          #    #  #           |
+|##                #    #  #     # #  #   ##     |
+|               #    # #        #      #         |
+|                               #        ##      |
+|    #         #  #          # #        #        |
+|       #     #              # #                 |
+|#                            # # #  #     #     |
+|               ##      #  ##    #               |
+|                ###############    #            |
+|               ##             ##  #   #         |
+|                #           # #       #         |
+|               ###       # ####                 |
+|                #    #  #  #### #               |
+|                #          ######     #         |
+|                #       e## # #       #         |
+|                #       ###   # # #             |
+|                #       ###   ###               |
+|                #####         # ##              |
+|                # ###         #          #      |
+|               ## ###         #    #  #   #     |
+|                ##          ###                 |
+|                     #      # ##       #        |
+|              # ##  ###### #### #  #      #     |
+|                ##  ##                #         |
+|              #    #                  # ##      |
+|             # ##     s    #                    |
+|             #  #  #                            |
+|                 ###      # ##                  |
+|            #     #    #      #   # # #         |
+|               #            ###  #       #      |
+|             #    ##                            |
+|             # ## #     # #       # #     #     |
+|               #   #     #                      |
+|             ##           #            #        |
+|             #   ##    #         #       #      |
+|              #        #                #       |
+|             ##   #          #   #              |
+|                         #  #     #   #  #      |
+|        #   ## # #                              |
+|             #                             #    |
+|                                                |
+|                                                |
+|                                                |
+|                                                |
++------------------------------------------------+
+
+INFO:PHYM_LOGGER:HEALING Ihlpcbus DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Nfm DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Uzbroocax DUE TO REST MECHANICS

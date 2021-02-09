@@ -152,13 +152,11 @@ class EnvGenerator:
                         (x, y)
                         for x in range(
                             (i + self.Map.renderDistance) * MIN_CHUNK_SUBDIVISON,
-                            (i + self.Map.renderDistance + 1) *
-                            (MIN_CHUNK_SUBDIVISON),
+                            (i + self.Map.renderDistance + 1) * (MIN_CHUNK_SUBDIVISON),
                         )
                         for y in range(
                             (j + self.Map.renderDistance) * MIN_CHUNK_SUBDIVISON,
-                            (j + self.Map.renderDistance + 1) *
-                            MIN_CHUNK_SUBDIVISON,
+                            (j + self.Map.renderDistance + 1) * MIN_CHUNK_SUBDIVISON,
                         )
                     ]
 
@@ -168,8 +166,7 @@ class EnvGenerator:
                 for k in range(self.Map.currentChunkSubdivision):
 
                     self.mainChunkTextureTab[
-                        (j + self.Map.renderDistance) *
-                        self.Map.currentChunkSubdivision
+                        (j + self.Map.renderDistance) * self.Map.currentChunkSubdivision
                         + k
                     ] += chunkTextureTab[k]
 
@@ -222,6 +219,29 @@ class EnvGenerator:
 
         # self.mainChunkElementsTab = self.mainChunkElementsTab = []
         self.alreadyGeneratedCoor = []
+
+    def saveToMatrix(self):
+
+        """Save the mainChunkElementTab to a matrix of 0 for obstacle and 1 for floor to walk in, makes the path finding possible"""
+        for j in range(len(self.mainChunkElementsTab)):
+            for i in range(len(self.mainChunkElementsTab)):
+                # print(self.mainChunkElementsTab[j][i])
+                self.Map.matrix[j][i] = (
+                    1
+                    if (
+                        type(self.mainChunkElementsTab[j][i]["name"]) == str
+                        and "flower" in self.mainChunkElementsTab[j][i]["name"]
+                    )
+                    or (
+                        self.mainChunkElementsTab[j][i]["type"] == None
+                        and not self.mainChunkElementsTab[j][i]["structure"]["isBorder"]
+                    )
+                    else 0
+                )
+        # with open("matrix.txt", "w") as f:
+        #     for j in range(len(self.Map.matrix)):
+        #         f.write(("").join(str(self.Map.matrix[j])))
+        #         f.write("\n")
 
     def generateElement(
         self,
@@ -283,8 +303,7 @@ class EnvGenerator:
                     )
                 ]
 
-            possiblePos = [
-                coor for coor in possiblePos if coor in specificValues]
+            possiblePos = [coor for coor in possiblePos if coor in specificValues]
 
         while len(possiblePos) != 0:
             i, j = possiblePos.pop(random.randrange(len(possiblePos)))
@@ -315,11 +334,9 @@ class EnvGenerator:
                     and (j + y, i + x)
                     not in [
                         (
-                            self.Hero.posMainChunkCenter[0]
-                            // self.Map.stepGeneration
+                            self.Hero.posMainChunkCenter[0] // self.Map.stepGeneration
                             + k,
-                            self.Hero.posMainChunkCenter[1]
-                            // self.Map.stepGeneration
+                            self.Hero.posMainChunkCenter[1] // self.Map.stepGeneration
                             + l,
                         )
                         for l in range(-SAFE_PLAYER_RANGE, SAFE_PLAYER_RANGE + 2)
@@ -385,8 +402,7 @@ class EnvGenerator:
 
                     # We need to randomly select on scopeGrid and not ScopeGridFiltered as the index need to remain the same e.g the grid need to be (spawnRange)x(spawnRange)
 
-                    caseSelectedPosY = random.choice(
-                        list(enumerate(scopeGridFiltered)))
+                    caseSelectedPosY = random.choice(list(enumerate(scopeGridFiltered)))
                     caseSelectedPosX = random.choice(
                         list(enumerate(caseSelectedPosY[1]))
                     )
@@ -397,8 +413,7 @@ class EnvGenerator:
                     # Let's not forget that caseSelectedPosY[0] and caseSelectedPosX[0] are integers in range(len(scopeGrid)). Meed to scale them up in the tab with i and j and then rescale to get the pos in the textureTab
 
                     while not (
-                        scopeGridFiltered[caseSelectedPosY[0]
-                                          ][caseSelectedPosX[0]]
+                        scopeGridFiltered[caseSelectedPosY[0]][caseSelectedPosX[0]]
                         != None
                     ):
                         caseSelectedPosY = random.choice(
@@ -428,8 +443,7 @@ class EnvGenerator:
                         scopeGridFiltered[caseSelectedPosY][caseSelectedPosX][
                             "surfIndex"
                         ] = random.randrange(
-                            0, len(
-                                textureConf.WORLD_ELEMENTS[type][name]["surf"])
+                            0, len(textureConf.WORLD_ELEMENTS[type][name]["surf"])
                         )
 
                     # ------------------ AFFECTING ENTITY ----------------- #
@@ -562,8 +576,7 @@ class EnvGenerator:
             len(self.mainChunkElementsTab) - structTemplate["spawnRange"][1]
         ):
             for i in range(
-                len(self.mainChunkElementsTab) -
-                    structTemplate["spawnRange"][0]
+                len(self.mainChunkElementsTab) - structTemplate["spawnRange"][0]
             ):
 
                 scopeGrid = [
@@ -603,8 +616,7 @@ class EnvGenerator:
                 ]
 
                 spawnTileCount = sum(
-                    [len(scopeGridFiltered[x])
-                     for x in range(len(scopeGridFiltered))]
+                    [len(scopeGridFiltered[x]) for x in range(len(scopeGridFiltered))]
                 )
 
                 if spawnTileCount >= structTemplate["spawnTreshold"] and count < number:
@@ -861,8 +873,7 @@ class EnvGenerator:
                     if (
                         elt["type"] == "Landscape"
                         and type(
-                            textureConf.WORLD_ELEMENTS[elt["type"]
-                                                       ][elt["name"]]["surf"]
+                            textureConf.WORLD_ELEMENTS[elt["type"]][elt["name"]]["surf"]
                         )
                         == list
                     ):
@@ -902,8 +913,7 @@ class EnvGenerator:
                         )
                     )
                     self.Map.chunkData["mainChunk"].blit(
-                        textureConf.WORLD_ELEMENTS[elt["type"]
-                                                   ][elt["name"]]["surf"],
+                        textureConf.WORLD_ELEMENTS[elt["type"]][elt["name"]]["surf"],
                         elt["value"]["rect"],
                     )
 
@@ -1063,10 +1073,8 @@ class EnvHandler:
         for biomeName in BIOME_NAMES:
             for biomeElt in BIOME_LANDSCAPE_NAME:
                 elementEntry = f"{biomeName[0].upper() + biomeName[1:]}_{biomeElt}"
-                self.envGenerator.generateElement(
-                    "Landscape", elementEntry, -1)
-                self.envGenerator.generateElement(
-                    "Landscape", elementEntry, -1)
+                self.envGenerator.generateElement("Landscape", elementEntry, -1)
+                self.envGenerator.generateElement("Landscape", elementEntry, -1)
 
     def genRareElements(self):
 
@@ -1076,8 +1084,8 @@ class EnvHandler:
                     self.envGenerator.generateElement(eltType, eltName, 1)
 
         for structName, genTreshhold in STRUCTS_NAMES_RANDOM_GEN.items():
-                if random.uniform(0.0, 1.0) <= genTreshhold:
-                    self.envGenerator.generateStructure(structName, 1)
+            if random.uniform(0.0, 1.0) <= genTreshhold:
+                self.envGenerator.generateStructure(structName, 1)
 
     def zoneChecker(self):
         """Keeps track of what has been generated and on which chunks, generate then the elements or structure."""
@@ -1144,4 +1152,6 @@ class EnvHandler:
 
         self.envGenerator.displayWorldStructs()
         self.envGenerator.displayWorldElements()
+
+        self.envGenerator.saveToMatrix()
         self.envGenerator.unloadMainChunkElementTab()

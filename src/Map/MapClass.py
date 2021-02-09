@@ -141,9 +141,21 @@ class OpenWorldMap:
             self.envHandler = EnvHandler(self.Game, self)
             self.envGenerator = self.envHandler.envGenerator
 
+            # Pathfinding purpose
+            self.matrix = [
+                [
+                    1
+                    for _ in range(
+                        self.currentChunkSubdivision * (self.renderDistance + 2)
+                    )
+                ]
+                for __ in range(
+                    self.currentChunkSubdivision * (self.renderDistance + 2)
+                )
+            ]
+
     def genChunkStructures(self):
-        """ Adding each chunks structure, the bliting will be handled by parallelism
-        """
+        """Adding each chunks structure, the bliting will be handled by parallelism"""
 
         for j in range(-self.renderDistance, self.renderDistance + 1):
             for i in range(-self.renderDistance, self.renderDistance + 1):
@@ -164,8 +176,10 @@ class OpenWorldMap:
                     ] = {
                         "initialised": False,
                         "textureTab": [
-                            [{"color": None}
-                                for i in range(self.currentChunkSubdivision)]
+                            [
+                                {"color": None}
+                                for i in range(self.currentChunkSubdivision)
+                            ]
                             for j in range(self.currentChunkSubdivision)
                         ],
                         "elementTab": [
@@ -211,7 +225,10 @@ class OpenWorldMap:
                 )
 
                 # Checking if a chunk is not already generated, otherwise we don't generate it
-                if chunkCoor not in self.chunkData.keys() or not self.chunkData[chunkCoor]["initialised"]:
+                if (
+                    chunkCoor not in self.chunkData.keys()
+                    or not self.chunkData[chunkCoor]["initialised"]
+                ):
 
                     self.chunkData[chunkCoor]["initialised"] = True
 
@@ -221,8 +238,7 @@ class OpenWorldMap:
                     )
                     # Handling progress bar
                     self.progressBar = tqdm(
-                        total=(self.Game.resolution //
-                               self.stepGeneration) ** 2,
+                        total=(self.Game.resolution // self.stepGeneration) ** 2,
                         desc=f"Generating chunks {self.chunkGenerationCounter}/{nChunks}",
                         ncols=TQDM_MAP_GENERATION_WIDTH,
                     )
@@ -384,33 +400,33 @@ class OpenWorldMap:
             # We need to re compute the coordonates as we redefine a new center for the big chunkss
             if self.Hero.blitOffset[0] < 0:  # Go to the right chunk
                 self.chunkData["currentChunkPos"][0] += 1
-                self.Hero.blitOffset[0] = self.CHUNK_SIZE + \
-                    self.Hero.blitOffset[0]
-                self.Hero.mainChunkPosX = self.Hero.initChunkPosX + \
-                    self.Hero.blitOffset[0]
+                self.Hero.blitOffset[0] = self.CHUNK_SIZE + self.Hero.blitOffset[0]
+                self.Hero.mainChunkPosX = (
+                    self.Hero.initChunkPosX + self.Hero.blitOffset[0]
+                )
 
             else:
                 self.chunkData["currentChunkPos"][0] -= 1
-                self.Hero.blitOffset[0] = - \
-                    (self.CHUNK_SIZE - self.Hero.blitOffset[0])
-                self.Hero.mainChunkPosX = self.Hero.initChunkPosX + \
-                    self.Hero.blitOffset[0]
+                self.Hero.blitOffset[0] = -(self.CHUNK_SIZE - self.Hero.blitOffset[0])
+                self.Hero.mainChunkPosX = (
+                    self.Hero.initChunkPosX + self.Hero.blitOffset[0]
+                )
             self.reGenChunkFlag = True
 
         if abs(self.Hero.blitOffset[1]) >= self.CHUNK_SIZE / 2:
             if self.Hero.blitOffset[1] < 0:  # Go to the down chunk
                 self.chunkData["currentChunkPos"][1] += 1
-                self.Hero.blitOffset[1] = self.CHUNK_SIZE + \
-                    self.Hero.blitOffset[1]
-                self.Hero.mainChunkPosY = self.Hero.initChunkPosY + \
-                    self.Hero.blitOffset[1]
+                self.Hero.blitOffset[1] = self.CHUNK_SIZE + self.Hero.blitOffset[1]
+                self.Hero.mainChunkPosY = (
+                    self.Hero.initChunkPosY + self.Hero.blitOffset[1]
+                )
 
             else:
                 self.chunkData["currentChunkPos"][1] -= 1
-                self.Hero.blitOffset[1] = - \
-                    (self.CHUNK_SIZE - self.Hero.blitOffset[1])
-                self.Hero.mainChunkPosY = self.Hero.initChunkPosY + \
-                    self.Hero.blitOffset[1]
+                self.Hero.blitOffset[1] = -(self.CHUNK_SIZE - self.Hero.blitOffset[1])
+                self.Hero.mainChunkPosY = (
+                    self.Hero.initChunkPosY + self.Hero.blitOffset[1]
+                )
             self.reGenChunkFlag = True
 
         # If there is a change of chunk, we need to regenerate if needed some chunks, and reset the flag system
@@ -418,8 +434,8 @@ class OpenWorldMap:
 
             self.Hero.posMainChunkCenter = [
                 int(
-                    self.chunkData["mainChunk"].get_width(
-                    ) / 2 - self.Hero.blitOffset[0]
+                    self.chunkData["mainChunk"].get_width() / 2
+                    - self.Hero.blitOffset[0]
                 ),
                 int(
                     self.chunkData["mainChunk"].get_height() / 2
@@ -446,7 +462,8 @@ class OpenWorldMap:
 
             self.genChunkStructures()
             self.reGenProcessHandler = Process(
-                target=self.generateMainChunk, args=(len(chunkCoorsRegen), ))
+                target=self.generateMainChunk, args=(len(chunkCoorsRegen),)
+            )
             self.reGenProcessHandler.run()
             self.reGenChunkFlag = False
 
@@ -508,11 +525,9 @@ class OpenWorldMap:
                                         self.waterAnimationCount
                                     ],
                                     (
-                                        self.CHUNK_SIZE *
-                                        (i + self.renderDistance)
+                                        self.CHUNK_SIZE * (i + self.renderDistance)
                                         + (l * self.stepGeneration),
-                                        self.CHUNK_SIZE *
-                                        (j + self.renderDistance)
+                                        self.CHUNK_SIZE * (j + self.renderDistance)
                                         + (k * self.stepGeneration),
                                     ),
                                 )
@@ -671,5 +686,5 @@ class OpenWorldMap:
 
     #     self.__dict__.update(state)
 
-        # if self.id == 1:
-        #     self.miniMap.__init__(self.Game, self, self.Hero)
+    # if self.id == 1:
+    #     self.miniMap.__init__(self.Game, self, self.Hero)

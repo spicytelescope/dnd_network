@@ -20,6 +20,9 @@ from HUD.spellBook import SpellBook
 from HUD.QuestController import QuestController
 from multiprocessing import Process
 
+from pathfinding.core.grid import Grid
+from pathfinding.finder.a_star import AStarFinder
+
 
 class Character:
     def __init__(self, gameController, Map, genOrder=-1) -> None:
@@ -209,12 +212,12 @@ class Character:
         self._fightId = id
         self._fightName = self.name
 
-    def createFight(self, preConfig = []):
+    def createFight(self, preConfig=[]):
 
-        if preConfig !=  []:
+        if preConfig != []:
             self.Game.fightMode.initFight(preConfig)
 
-        else :
+        else:
             entitieOnContact = [
                 Hero for Hero in self.Game.heroesGroup if Hero.stats["HP"] > 0
             ]
@@ -225,8 +228,16 @@ class Character:
                     for i, ennemy in enumerate(self.Map.envGenerator.ennemies):
                         if (
                             math.sqrt(
-                                (ennemy["value"]["entity"].chunkPos[0] - self.posMainChunkCenter[0]) ** 2
-                                + (ennemy["value"]["entity"].chunkPos[1] - self.posMainChunkCenter[1]) ** 2
+                                (
+                                    ennemy["value"]["entity"].chunkPos[0]
+                                    - self.posMainChunkCenter[0]
+                                )
+                                ** 2
+                                + (
+                                    ennemy["value"]["entity"].chunkPos[1]
+                                    - self.posMainChunkCenter[1]
+                                )
+                                ** 2
                             )
                             // self.Map.stepGeneration
                             <= ENNEMY_DETECTION_RANGE
@@ -245,7 +256,9 @@ class Character:
                             // self.Map.stepGeneration
                             <= ENNEMY_DETECTION_RANGE
                         ):
-                            entitieOnContact.append(self.currentBuilding.ennemies.pop(i))
+                            entitieOnContact.append(
+                                self.currentBuilding.ennemies.pop(i)
+                            )
 
                 self.Game.fightMode.initFight(entitieOnContact)
 
@@ -498,6 +511,27 @@ class Character:
         self.XDistanceToTarget = self.targetPos[0] - self.pos[0]
         self.YDistanceToTarget = self.targetPos[1] - self.pos[1]
 
+        self.targetChunkPos = [
+            coor + self.Map.CHUNK_SIZE * self.Map.renderDistance
+            for coor in self.targetPos
+        ]
+
+        # pathfinding
+        grid = Grid(matrix=self.Map.matrix)
+
+        start = grid.node(
+            *[pos // self.Map.stepGeneration for pos in self.posMainChunkCenter]
+        )
+        end = grid.node(
+            *[pos // self.Map.stepGeneration for pos in self.targetChunkPos]
+        )
+
+        finder = AStarFinder()
+        path, runs = finder.find_path(start, end, grid)
+
+        print("operations:", runs, "path length:", len(path), "path :", path)
+        logger.debug(f"\n{grid.grid_str(path=path, start=start, end=end)}\n")
+
     def handleMovements(self, mapName):
         """Function updating pos and bliting it to the game screen every delta_t period of time"""
 
@@ -519,9 +553,11 @@ class Character:
             self.lastRenderedTime = time.time()
 
     def show(self):
-        if self.genOrder >0:
+        if self.genOrder > 0:
             self.direction = self.Game.heroesGroup[0].direction
-            self.imageState["imagePos"] = self.Game.heroesGroup[0].imageState["imagePos"]
+            self.imageState["imagePos"] = self.Game.heroesGroup[0].imageState[
+                "imagePos"
+            ]
         # Changing animation
         self.imageState["image"] = playerConf.CLASSES[self.classId]["directions"][
             self.direction
