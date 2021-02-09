@@ -164,6 +164,8 @@ while Game.currentState != "quit":
                 Hero.QuestJournal.checkActions(event)
             if Hero.SpellBook._show:
                 Hero.SpellBook.checkActions(event)
+            if Player_Map.miniMap._show:
+                Player_Map.miniMap.checkActions(event)
 
             # -------------------- KEY BINDING HANDLING ----------- #
             if event.type == pygame.KEYDOWN:
@@ -204,7 +206,7 @@ while Game.currentState != "quit":
                     Hero.QuestJournal.open = True
 
                 elif event.key == Game.KeyBindings["Toggle Minimap"]["value"]:
-                    Player_Map.miniMap._show = True
+                    Player_Map.miniMap._show = not Player_Map.miniMap._show
 
                 elif (
                     len(Hero_group) > 1
@@ -239,7 +241,6 @@ while Game.currentState != "quit":
             and not Game.screen.get_locked()
             and not Player_Map.chunkData["mainChunk"].get_locked()
         ):
-
             # -------------- MAP HANDLING ------------- #
 
             Player_Map.show(Leader)
@@ -259,7 +260,7 @@ while Game.currentState != "quit":
             Hero.Inventory.draw()
             Hero.QuestJournal.draw()
             Hero.SpellBook.draw()
-            # Player_Map.miniMap.drawExtendedMap()
+            Player_Map.miniMap.drawExtendedMap()
             ContextMenu.draw()
 
             Game.show()

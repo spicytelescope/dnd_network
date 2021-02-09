@@ -78,6 +78,7 @@ class GameController:
             "Open quest's Journal": {"value": pygame.K_j, "key": "J"},
             "Switch heroes": {"value": pygame.K_TAB, "key": "TAB"},
             "Cancel trade": {"value": pygame.K_ESCAPE, "key": "ESC"},
+            "Center the Map's view": {"value": pygame.K_r, "key": "R"},
         }
 
         self.cursor = Cursor(self)

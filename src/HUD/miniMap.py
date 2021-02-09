@@ -91,8 +91,9 @@ class MiniMap:
             )
         )
 
-        # World Map Loading
+        # ------------- World Map Loading ------------------- #
 
+        self.worldMapGenThread = None
         self.flyingDragon = [
             pygame.transform.scale(
                 img, (self.Game.resolution // 5, self.Game.resolution // 5)
@@ -118,6 +119,15 @@ class MiniMap:
         self.dist_x = None
         self.dist_y = None
 
+        # ---------------------- MAP DRAGGING ------------ #
+
+        self.initChunkRectCenter = [
+            self.extendedSurf.get_width() // 2,
+            self.extendedSurf.get_height() // 2,
+        ]
+        self.chunkRectPos = self.initChunkRectCenter[::]
+        self.offset = [0, 0]
+
         # ------------------ MAPS UPDATING ----------------- #
         self.chunkMap = None
         self.extendedChunkMap = None
@@ -128,43 +138,41 @@ class MiniMap:
 
     def setWorldMap(self):
 
-        worldMapGenThread = Thread(target=self.WorldMap.initWorldMap)
-        worldMapGenThread.start()
+        if self.worldMapGenThread == None:
+            self.worldMapGenThread = Thread(target=self.WorldMap.initWorldMap)
+            self.worldMapGenThread.start()
 
-        while not self.WorldMap.WorldMapLoaded:
-            if (
-                time.time() - self.WalkingGuylastRenderedTime
-            ) > self.walkingGuyDeltaTime:
+        if (time.time() - self.WalkingGuylastRenderedTime) > self.walkingGuyDeltaTime:
 
-                self.WalkingGuylastRenderedTime = time.time()
-                self.walkingGuyIndex = (self.walkingGuyIndex + 1) % len(
-                    menuConf.WALKING_LOADING_GUY
-                )
-
-            loadingIcon = pygame.transform.scale(
-                self.flyingDragon[self.walkingGuyIndex],
-                (self.Game.resolution // 4, self.Game.resolution // 4),
+            self.WalkingGuylastRenderedTime = time.time()
+            self.walkingGuyIndex = (self.walkingGuyIndex + 1) % len(
+                menuConf.WALKING_LOADING_GUY
             )
 
-            loadingIconRect = loadingIcon.get_rect(
-                center=(
-                    self.extendedSurf.get_width() // 2,
-                    self.extendedSurf.get_height() // 2,
-                )
-            )
-            self.extendedSurf = pygame.transform.scale(
-                mapConf.EXTENDED_MINIMAP_BG,
-                (int(self.Game.resolution * 0.75), int(self.Game.resolution * 0.75)),
-            )
-            self.extendedSurf.blit(loadingIcon, loadingIconRect)
-            self.extendedSurf.blit(self.extendedMapLayout, (0, 0))
-            self.Game.screen.blit(self.extendedSurf, self.extendedRect)
-            self.Game.show()
-
-        self.worldMapSurf = pygame.transform.scale(
-            self.WorldMap.WorldMapSurf,
-            (int(self.Game.resolution * 0.70), int(self.Game.resolution * 0.70)),
+        loadingIcon = pygame.transform.scale(
+            self.flyingDragon[self.walkingGuyIndex],
+            (self.Game.resolution // 4, self.Game.resolution // 4),
         )
+
+        loadingIconRect = loadingIcon.get_rect(
+            center=(
+                self.extendedSurf.get_width() // 2,
+                self.extendedSurf.get_height() // 2,
+            )
+        )
+        self.extendedSurf = pygame.transform.scale(
+            mapConf.EXTENDED_MINIMAP_BG,
+            (int(self.Game.resolution * 0.75), int(self.Game.resolution * 0.75)),
+        )
+        self.extendedSurf.blit(loadingIcon, loadingIconRect)
+        self.extendedSurf.blit(self.extendedMapLayout, (0, 0))
+        self.Game.screen.blit(self.extendedSurf, self.extendedRect)
+
+        if self.WorldMap.WorldMapLoaded:
+            self.worldMapSurf = pygame.transform.scale(
+                self.WorldMap.WorldMapSurf,
+                (int(self.Game.resolution * 0.70), int(self.Game.resolution * 0.70)),
+            )
 
     def update(self):
 
@@ -205,15 +213,15 @@ class MiniMap:
 
     def checkActions(self, event):
 
-        if (
-            event.type == KEYDOWN
-            and event.key == self.Game.KeyBindings["Toggle Minimap"]["value"]
-        ):
-            self._show = False
-
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+
+        if (
+            event.type == KEYDOWN
+            and event.key == self.Game.KeyBindings["Center Map Exploration"]["value"]
+        ):
+            self.chunkRectPos = self.initChunkRectCenter[::]
 
         if event.type == MOUSEBUTTONDOWN:
 
@@ -229,20 +237,8 @@ class MiniMap:
                 pygame.mouse.get_pos()
             ):
 
-                self.dist_x = (
-                    pygame.mouse.get_pos()[0]
-                    - self.chunkRect.center[0]
-                    - self.TOPLEFT_CHUNK_BLIT[0]
-                )
-                self.dist_y = (
-                    pygame.mouse.get_pos()[1]
-                    - self.chunkRect.center[1]
-                    - self.TOPLEFT_CHUNK_BLIT[1]
-                )
-
                 self.zoomValue = [
-                    dim + self.ZOOM_SAMPLE[i]
-                    for i, dim in enumerate(self.zoomValue)
+                    dim + self.ZOOM_SAMPLE[i] for i, dim in enumerate(self.zoomValue)
                 ]
             elif (
                 event.button == 5
@@ -255,6 +251,23 @@ class MiniMap:
                         dim - self.ZOOM_SAMPLE[i]
                         for i, dim in enumerate(self.zoomValue)
                     ]
+
+            # ------------ DRAGGING HANDLING ---------------- #
+
+            if event.button in [1, 4, 5]:
+                self.offset = [
+                    (c1 - c2) - c3
+                    for c1, c2, c3 in zip(
+                        pygame.mouse.get_pos(),
+                        self.extendedRect.topleft,
+                        self.initChunkRectCenter,
+                    )
+                ]
+
+                self.chunkRectPos = [
+                    initCoor - offset
+                    for offset, initCoor in zip(self.offset, self.chunkRectPos)
+                ]
 
     def show(self):
 
@@ -282,7 +295,6 @@ class MiniMap:
 
     def drawExtendedMap(self):
 
-        self.Map.show(self.Hero)
         if self._show:
 
             self.extendedSurf = pygame.transform.scale(
@@ -295,18 +307,19 @@ class MiniMap:
                 if self.worldMapSurf == None:
                     self.setWorldMap()
 
-                self.worldMapSurf = pygame.transform.scale(
-                    self.worldMapSurf, self.zoomValue
-                )
-
-                self.chunkRect = self.worldMapSurf.get_rect(
-                    center=(
-                        self.extendedSurf.get_width() // 2,
-                        self.extendedSurf.get_height() // 2,
+                else:
+                    self.worldMapSurf = pygame.transform.scale(
+                        self.worldMapSurf, self.zoomValue
                     )
-                )
 
-                self.extendedSurf.blit(self.worldMapSurf, self.chunkRect)
+                    self.chunkRect = self.worldMapSurf.get_rect(
+                        center=(
+                            self.extendedSurf.get_width() // 2,
+                            self.extendedSurf.get_height() // 2,
+                        )
+                    )
+
+                    self.extendedSurf.blit(self.worldMapSurf, self.chunkRect)
 
             elif self.buttonIndex == 1:
 
@@ -328,10 +341,7 @@ class MiniMap:
                 )
 
                 self.chunkRect = self.extendedChunkMap.get_rect(
-                    center=(
-                        self.extendedSurf.get_width() // 2,
-                        self.extendedSurf.get_height() // 2,
-                    )
+                    center=self.chunkRectPos
                 )
 
                 self.extendedSurf.blit(self.extendedChunkMap, self.chunkRect)
@@ -346,8 +356,6 @@ class MiniMap:
             self.Game.screen.blit(
                 self.toolBarLayout[self.buttonIndex], self.toolBarLayoutRect
             )
-
-            self.Game.show()
 
     def __getstate__(self):
 

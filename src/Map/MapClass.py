@@ -69,8 +69,8 @@ class OpenWorldMap:
 
         if self.id == 0:
             self.worldMapTab = [
-                ["" for j in range(self.Game.resolution)]
-                for i in range(self.Game.resolution)
+                [{"color": None} for _ in range(self.Game.resolution)]
+                for __ in range(self.Game.resolution)
             ]
             self.WorldMapSurf = pygame.Surface(self.Game.WINDOW_SIZE)
             self.WorldMapLoaded = False
