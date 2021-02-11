@@ -211,6 +211,13 @@ class OpenWorldMap:
     def generateMainChunk(self, nChunks):
         """Creating nChunks chunks (too much chunks ya) around the one at the coordonates of self.chunkData["currentChunkPos"], and then turning it into 1 big picture"""
 
+        self.chunkData["mainChunk"] = pygame.Surface(
+            (
+                self.CHUNK_SIZE * (self.renderDistance + 2),
+                self.CHUNK_SIZE * (self.renderDistance + 2),
+            )
+        )
+
         assert (
             self.id == 1
         ), f"<ERROR> : the generateMainChunk method can only be call for the PLAYER_MAP"
@@ -288,6 +295,7 @@ class OpenWorldMap:
             # After bliting the primary texture, we generate the trees and stuff like that
 
             # Applying isometric
+
             self.chunkData["mainChunk"] = pygame.transform.rotate(
                 self.chunkData["mainChunk"], 45
             )
@@ -302,10 +310,10 @@ class OpenWorldMap:
             self.loadingMenu.updateProgressBar("worldElements")
             self.envHandler.generateWorldElements(fastGen=(nChunks == 0))
             self.loadingMenu.confirmLoading("worldElements")
-            # self.miniMap.update()
+            # pygame.image.save(self.chunkData["mainChunk"], "mainChunk.png")
 
-            pygame.image.save(self.chunkData["mainChunk"], "mainChunk.png")
-
+            # self.miniMap.update(pygame.transform.scale(pygame.transform.rotate(self.chunkData["mainChunk"], -45), )
+            self.miniMap.update()
             # We reset the progress bar chunk countee
             self.chunkGenerationCounter = 0
 
@@ -408,10 +416,12 @@ class OpenWorldMap:
         XXX                                       XXXY
         """
 
-        if abs(self.Hero.blitOffset[0]) >= self.CHUNK_SIZE / 2:
+        if abs(standard_vec_into_iso(*self.Hero.blitOffset)[0]) >= self.CHUNK_SIZE / 2:
 
             # We need to re compute the coordonates as we redefine a new center for the big chunkss
-            if self.Hero.blitOffset[0] < 0:  # Go to the right chunk
+            if (
+                standard_vec_into_iso(*self.Hero.blitOffset)[0] < 0
+            ):  # Go to the right chunk
                 self.chunkData["currentChunkPos"][0] += 1
                 self.Hero.blitOffset[0] = self.CHUNK_SIZE + self.Hero.blitOffset[0]
                 self.Hero.mainChunkPosX = (
@@ -426,8 +436,10 @@ class OpenWorldMap:
                 )
             self.reGenChunkFlag = True
 
-        if abs(self.Hero.blitOffset[1]) >= self.CHUNK_SIZE / 2:
-            if self.Hero.blitOffset[1] < 0:  # Go to the down chunk
+        if abs(standard_vec_into_iso(*self.Hero.blitOffset)[1]) >= self.CHUNK_SIZE / 2:
+            if (
+                standard_vec_into_iso(*self.Hero.blitOffset)[1] < 0
+            ):  # Go to the down chunk
                 self.chunkData["currentChunkPos"][1] += 1
                 self.Hero.blitOffset[1] = self.CHUNK_SIZE + self.Hero.blitOffset[1]
                 self.Hero.mainChunkPosY = (
@@ -556,8 +568,8 @@ class OpenWorldMap:
             self.Game.screen.blit(
                 self.chunkData["mainChunk"],
                 (
-                    Hero.mainChunkPosX + Hero.mainChunkPosY,
-                    Hero.mainChunkPosY - Hero.mainChunkPosX // 2,
+                    Hero.disp_mainChunkPosX,
+                    Hero.disp_mainChunkPosY,
                 ),
             )
 
@@ -595,6 +607,11 @@ class OpenWorldMap:
             self.miniMap = MiniMap(self.Game, self, Hero)
             self.genChunkStructures()
             self.generateMainChunk(nChunks)
+
+        Hero.initChunkPosX = -self.chunkData["mainChunk"].get_width() / 2 + Hero.pos[0]
+        Hero.initChunkPosY = -self.chunkData["mainChunk"].get_height() / 2 + Hero.pos[1]
+        Hero.disp_mainChunkPosX = Hero.initChunkPosX
+        Hero.disp_mainChunkPosY = Hero.initChunkPosY
 
     def initWorldMap(self):
 

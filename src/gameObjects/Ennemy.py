@@ -216,7 +216,7 @@ class Ennemy:
 
         # Updating info bubble
         self.bubbleRect = self.bubbleAnim[0].get_rect(
-            topleft=[self.pos[0], self.pos[1] - (self.bubbleAnim[1].get_height() + 5)]
+            topleft=[self.rect.center[0], self.rect.topleft[1] - (self.bubbleAnim[1].get_height() + 5)]
         )
 
         if (time.time() - self.lastRenderedNPCBubble) > self.BubbleDeltaTime:

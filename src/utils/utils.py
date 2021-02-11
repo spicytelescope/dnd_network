@@ -1,8 +1,20 @@
 import logging
 import matplotlib.pyplot as plt
-import time
+import time, math
 import pygame
 import webbrowser
+
+
+def standard_vec_into_iso(x, y, round_values=False):
+    x_iso = x - y
+    y_iso = 0.5 * (x + y)
+    return [x_iso, y_iso] if not round_values else [int(x_iso), int(y_iso)]
+
+
+def iso_vec_into_standard(x, y):
+    x_stand = 0.5 * x + y
+    y_stand = y - 0.5 * x
+    return [x_stand, y_stand]
 
 
 def openDoc():
@@ -12,6 +24,7 @@ def openDoc():
         webbrowser.open(url, new=2)
     except:
         logger.error("NO WEB BROWSER SET UP FOR DISPLAYING THE MKDOC STATIC SERV")
+
 
 def measureGenTime(Map, StepGen):
 

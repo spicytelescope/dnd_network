@@ -187,7 +187,7 @@ class MiniMap:
 
         cropRect.center = (
             self.chunkMapRaw.get_width() // 2,
-            self.chunkMapRaw.get_width() // 2,
+            self.chunkMapRaw.get_height() // 2,
         )
 
         # Minimap

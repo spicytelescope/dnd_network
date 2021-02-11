@@ -17,6 +17,7 @@ from gameObjects.Ennemy import Ennemy
 from gameObjects.NPC import NPC, Seller
 from Player.Character import Character
 from UI.UI_utils_text import InfoTip
+from utils.utils import standard_vec_into_iso
 
 
 class EnvGenerator:
@@ -674,29 +675,29 @@ class EnvGenerator:
         if direction == "right":
             tmpRect = pygame.Rect(
                 baseRect.topleft[0],
-                baseRect.topleft[1],
+                baseRect.topleft[1] - PADDING_CHECKER,
                 baseRect.size[0] + PADDING_CHECKER,
-                baseRect.size[1],
+                baseRect.size[1] + PADDING_CHECKER,
             )
         if direction == "left":
             tmpRect = pygame.Rect(
                 baseRect.topleft[0] - PADDING_CHECKER,
                 baseRect.topleft[1],
                 baseRect.size[0] + PADDING_CHECKER,
-                baseRect.size[1],
+                baseRect.size[1] + PADDING_CHECKER,
             )
         if direction == "up":
             tmpRect = pygame.Rect(
-                baseRect.topleft[0],
+                baseRect.topleft[0] - PADDING_CHECKER,
                 baseRect.topleft[1] - PADDING_CHECKER,
-                baseRect.size[0],
+                baseRect.size[0] + PADDING_CHECKER,
                 baseRect.size[1] + PADDING_CHECKER,
             )
         if direction == "down":
             tmpRect = pygame.Rect(
                 baseRect.topleft[0],
                 baseRect.topleft[1],
-                baseRect.size[0],
+                baseRect.size[0] + PADDING_CHECKER,
                 baseRect.size[1] + PADDING_CHECKER,
             )
 
@@ -811,22 +812,12 @@ class EnvGenerator:
         for j in range(len(self.mainChunkElementsTab)):
             for i in range(len(self.mainChunkElementsTab)):
 
-                def standard_vec_into_iso(x, y):
-                    x_iso = x + y
-                    y_iso = -0.5 * x + 0.5 * y
-                    return (x_iso, y_iso)
-
                 x = (j + i) * (self.Map.stepGeneration * sqrt(2)) // 2
                 y = (
                     (j - i) * (self.Map.stepGeneration * sqrt(2)) // 4
                     + self.Map.chunkData["mainChunk"].get_height() // 2
                     - self.Map.stepGeneration * sqrt(2) // 2
                 )
-                # x = (j - i) * self.Map.stepGeneration * sqrt(
-                #     2
-                # )
-                # y = ((j + i) * self.Map.stepGeneration * sqrt(2)) // 4 - self.Map.chunkData["mainChunk"].get_height() // 2 - self.Map.stepGeneration * sqrt(2) / 2
-
                 elt = self.mainChunkElementsTab[j][i]
 
                 if elt["type"] != None:
@@ -919,8 +910,13 @@ class EnvGenerator:
     def showInfoTipElt(self):
 
         mousePosTranslated = [
-            coor + (self.Map.renderDistance * self.Map.CHUNK_SIZE) - offset
-            for coor, offset in zip(pygame.mouse.get_pos(), self.Hero.blitOffset)
+            coor + mainChunkDim / 2 - heroPos - offset
+            for coor, offset, mainChunkDim, heroPos in zip(
+                pygame.mouse.get_pos(),
+                self.Hero.blitOffset,
+                self.Map.chunkData["mainChunk"].get_size(),
+                self.Hero.pos,
+            )
         ]
 
         mouseCollideElt = None
@@ -941,8 +937,13 @@ class EnvGenerator:
     def checkInteractableEntities(self, event):
 
         mousePosTranslated = [
-            coor + (self.Map.renderDistance * self.Map.CHUNK_SIZE)
-            for coor in pygame.mouse.get_pos()
+            coor + mainChunkDim / 2 - heroPos - offset
+            for coor, offset, mainChunkDim, heroPos in zip(
+                pygame.mouse.get_pos(),
+                self.Hero.blitOffset,
+                self.Map.chunkData["mainChunk"].get_size(),
+                self.Hero.pos,
+            )
         ]
 
         if (

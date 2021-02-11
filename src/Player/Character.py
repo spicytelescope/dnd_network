@@ -23,6 +23,8 @@ from multiprocessing import Process
 from pathfinding.core.grid import Grid
 from pathfinding.finder.a_star import AStarFinder
 
+from utils.utils import iso_vec_into_standard, standard_vec_into_iso
+
 
 class Character:
     def __init__(self, gameController, Map, genOrder=-1) -> None:
@@ -96,7 +98,6 @@ class Character:
         self.velocity = 400  # Pixels/s
         self.delta_T = 1 / self.Game.refresh_rate
         self.normalizedDistance = self.velocity * self.delta_T
-
         self.pos = self.charRect.center
 
         # Handling player target point
@@ -112,8 +113,12 @@ class Character:
         self.initChunkPosY = (
             -self.Map.chunkData["mainChunk"].get_height() / 2 + self.pos[1]
         )
+
         self.mainChunkPosX = self.initChunkPosX
         self.mainChunkPosY = self.initChunkPosY
+
+        self.disp_mainChunkPosX = self.mainChunkPosX
+        self.disp_mainChunkPosY = self.mainChunkPosY
 
         # Values tracking the movement of the player regarding of his position in the chunks, used mainly for the chunkController method
         self.blitOffset = [0, 0]
@@ -127,8 +132,9 @@ class Character:
         self.posMainChunkCenter = [
             int(self.Map.chunkData["mainChunk"].get_width() / 2 - self.blitOffset[0]),
             int(self.Map.chunkData["mainChunk"].get_height() / 2 - self.blitOffset[1]),
-        ]
+        ]  #  2D
 
+        self.iso_posMainChunkCenter = standard_vec_into_iso(*self.posMainChunkCenter)
         if self.genOrder == 0:
             self.Map.envHandler.Hero = self
             self.Map.envHandler.envGenerator.Hero = self
@@ -379,36 +385,6 @@ class Character:
 
     def moveByClick(self, envGenerator, mapName):
 
-        # if self.genOrder >0:
-
-        #     if not (
-        #     abs(self.Game.heroesGroup[0].XDistanceToTarget) < self.normalizedDistance
-        #     and abs(self.Game.heroesGroup[0].YDistanceToTarget) < self.normalizedDistance
-        # ):
-        #         self.prevDir = self.direction
-
-        #         if abs(self.Game.heroesGroup[0].XDistanceToTarget) >= abs(self.Game.heroesGroup[0].YDistanceToTarget):
-
-        #             self.direction = "right" if self.Game.heroesGroup[0].XDistanceToTarget > 0 else "left"
-
-        #         else:
-        #             self.direction = "down" if self.Game.heroesGroup[0].YDistanceToTarget > 0 else "up"
-
-        #         # Updating running animation
-        #         if (
-        #             self.prevDir == self.direction
-        #             and (time.time() - self.lastTimePlayerAnimated)
-        #             > self.animationMinTimeRendering
-        #         ):
-        #             self.lastTimePlayerAnimated = time.time()
-        #             self.imageState["imagePos"] = (
-        #                 0
-        #                 if self.imageState["imagePos"]
-        #                 == PLAYER_ANIMATION_FRAME_LENGTH - 1
-        #                 else self.imageState["imagePos"] + 1
-        #             )
-        # else:
-        # Computing the direction to get
         if not (
             abs(self.XDistanceToTarget) < self.normalizedDistance
             and abs(self.YDistanceToTarget) < self.normalizedDistance
@@ -427,7 +403,7 @@ class Character:
             if not envGenerator.isColliding(
                 self.imageState["image"].get_rect(center=self.posMainChunkCenter),
                 self.direction,
-            ):
+            ) or True:
 
                 # Updating running animation
                 if (
@@ -451,18 +427,30 @@ class Character:
                     self.keys[self.direction]["value"][1] * self.normalizedDistance
                 )
 
+                print("before :", (DELTA_X, DELTA_Y))
                 # Updating the distance between the target and the character
                 self.XDistanceToTarget += DELTA_X
                 self.YDistanceToTarget += DELTA_Y
 
+                print("after :", iso_vec_into_standard(DELTA_X, DELTA_Y))
                 if mapName == "openWorld":
                     self.mainChunkPosX += DELTA_X
                     self.mainChunkPosY += DELTA_Y
 
+                    self.disp_mainChunkPosX += iso_vec_into_standard(DELTA_X, DELTA_Y)[
+                        0
+                    ]
+                    self.disp_mainChunkPosY += iso_vec_into_standard(DELTA_X, DELTA_Y)[
+                        1
+                    ]
+
                     # These values are here to track the movement of the player regarding of the limits of the chunks
                     # It might be nested in the mainChunkPos computing, but it has been separated for code lisibility
-                    self.blitOffset[0] += DELTA_X
-                    self.blitOffset[1] += DELTA_Y
+                    # self.blitOffset[0] += DELTA_X
+                    # self.blitOffset[1] += DELTA_Y
+
+                    self.blitOffset[0] += iso_vec_into_standard(DELTA_X, DELTA_Y)[0]
+                    self.blitOffset[1] += iso_vec_into_standard(DELTA_X, DELTA_Y)[1]
 
                     self.posMainChunkCenter = [
                         int(
@@ -476,7 +464,9 @@ class Character:
                     ]
 
                     for ennemy in envGenerator.ennemies:
-                        ennemy["value"]["entity"].setPos((DELTA_X, DELTA_Y))
+                        ennemy["value"]["entity"].setPos(
+                            standard_vec_into_iso(*iso_vec_into_standard(DELTA_X, DELTA_Y))
+                        )
 
                     # if self.Game.debug_mode:
                     #     logger.debug(
@@ -507,30 +497,33 @@ class Character:
     def updateClickPoint(self):
 
         # Updated at each click, so the tuple is converted to be exploited
-        self.targetPos = list(pygame.mouse.get_pos())
+        self.targetPos = pygame.mouse.get_pos()
         self.XDistanceToTarget = self.targetPos[0] - self.pos[0]
         self.YDistanceToTarget = self.targetPos[1] - self.pos[1]
-
-        self.targetChunkPos = [
-            coor + self.Map.CHUNK_SIZE * self.Map.renderDistance
-            for coor in self.targetPos
-        ]
-
-        # pathfinding
-        grid = Grid(matrix=self.Map.matrix)
-
-        start = grid.node(
-            *[pos // self.Map.stepGeneration for pos in self.posMainChunkCenter]
-        )
-        end = grid.node(
-            *[pos // self.Map.stepGeneration for pos in self.targetChunkPos]
+        self.XDistanceToTarget, self.YDistanceToTarget = standard_vec_into_iso(
+            self.XDistanceToTarget, self.YDistanceToTarget
         )
 
-        finder = AStarFinder()
-        path, runs = finder.find_path(start, end, grid)
+        # self.targetChunkPos = [
+        #     coor + self.Map.CHUNK_SIZE * self.Map.renderDistance
+        #     for coor in self.targetPos
+        # ]
 
-        print("operations:", runs, "path length:", len(path), "path :", path)
-        logger.debug(f"\n{grid.grid_str(path=path, start=start, end=end)}\n")
+        # # pathfinding
+        # grid = Grid(matrix=self.Map.matrix)
+
+        # start = grid.node(
+        #     *[pos // self.Map.stepGeneration for pos in self.posMainChunkCenter]
+        # )
+        # end = grid.node(
+        #     *[pos // self.Map.stepGeneration for pos in self.targetChunkPos]
+        # )
+
+        # finder = AStarFinder()
+        # path, runs = finder.find_path(start, end, grid)
+
+        # print("operations:", runs, "path length:", len(path), "path :", path)
+        # logger.debug(f"\n{grid.grid_str(path=path, start=start, end=end)}\n")
 
     def handleMovements(self, mapName):
         """Function updating pos and bliting it to the game screen every delta_t period of time"""
