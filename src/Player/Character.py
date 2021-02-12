@@ -514,11 +514,11 @@ class Character:
     def updateClickPoint(self, subclick=[]):
 
         if subclick != []:
-            self.XDistanceToTarget = subclick[0] - self.posMainChunkCenter[0]
-            self.YDistanceToTarget = subclick[1] - self.posMainChunkCenter[1]
+            self.XDistanceToTarget,self.YDistanceToTarget = subclick
 
             print("vec : ", (self.XDistanceToTarget, self.YDistanceToTarget))
         else:
+            self.pathfinding_q.queue.clear()
             # Updated at each click, so the tuple is converted to be exploited
 
             # pathfinding
@@ -534,9 +534,14 @@ class Character:
             ]:
                 self.updateClickPoint(
                     subclick=[
-                        coor + self.Map.CHUNK_SIZE * self.Map.renderDistance - offset
-                        for coor, offset in zip(
-                            list(pygame.mouse.get_pos()), self.blitOffset
+                        coor
+                        + self.Map.CHUNK_SIZE * self.Map.renderDistance
+                        - offset
+                        - mainChunkPos
+                        for coor, offset, mainChunkPos in zip(
+                            list(pygame.mouse.get_pos()),
+                            self.blitOffset,
+                            self.posMainChunkCenter,
                         )
                     ]
                 )
@@ -556,7 +561,7 @@ class Character:
                             // self.Map.stepGeneration
                         )
                         for coor, offset in zip(
-                            list(pygame.mouse.get_pos()), self.blitOffset
+                            pygame.mouse.get_pos(), self.blitOffset
                         )
                     ]
                 )
@@ -565,23 +570,43 @@ class Character:
                 paths, runs = finder.find_path(start, end, grid)
 
                 self.pathfinding_q.queue.clear()
+                
                 if len(paths) > 0:
-                    for p in paths:
-                        self.pathfinding_q.put(
-                            [
-                                p_coor * self.Map.stepGeneration + PLAYER_SIZE // 2
-                                for p_coor in p
-                            ]
-                        )
-                    paths[-1] = [
-                        coor + self.Map.CHUNK_SIZE * self.Map.renderDistance - offset
-                        for coor, offset in zip(
-                            pygame.mouse.get_pos(), self.blitOffset
-                        )
-                    ]
-
-                    print("operations:", runs, "path length:", len(paths), "path :", paths)
-                    logger.debug(f"\n{grid.grid_str(path=paths, start=start, end=end)}\n")
+                    for i in range(len(paths)):
+                        if i == 0:
+                            self.pathfinding_q.put(
+                                [
+                                    p_coor * self.Map.stepGeneration
+                                    + PLAYER_SIZE // 2
+                                    - mainChunkPos
+                                    for p_coor, mainChunkPos in zip(
+                                        paths[i], self.posMainChunkCenter
+                                    )
+                                ]
+                            )
+                        # elif i == (len(paths)-1):
+                        #     self.pathfinding_q.put(
+                        #         [
+                        #             coor
+                        #             + self.Map.CHUNK_SIZE * self.Map.renderDistance
+                        #             - offset
+                        #             - prev_p * self.Map.stepGeneration
+                        #             for coor, offset, prev_p in zip(
+                        #                 pygame.mouse.get_pos(),
+                        #                 self.blitOffset,
+                        #                 paths[i - 1],
+                        #             )
+                        #         ]
+                        #     )
+                        else:
+                            self.pathfinding_q.put(
+                                [
+                                    (p_coor - prev_p_coor) * self.Map.stepGeneration
+                                    for p_coor, prev_p_coor in zip(
+                                        paths[i], paths[i - 1]
+                                    )
+                                ]
+                            )
 
     def handleMovements(self, mapName):
         """Function updating pos and bliting it to the game screen every delta_t period of time"""
