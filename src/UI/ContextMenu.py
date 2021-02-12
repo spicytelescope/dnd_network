@@ -332,9 +332,15 @@ class NonBlockingPopupMenu(PopupMenu):
                     self.hide()
                 elif e.name == "Character Options":
                     if e.text == "Show Inventory":
-                        self.Target.Inventory.show()
+                        if self.Target.Inventory._show:
+                            self.Target.Inventory.close()
+                        else:
+                            self.Target.Inventory.open = True
                     elif e.text == "Show Spellbook":
-                        self.Target.SpellBook.show()
+                        if self.Target.SpellBook._show:
+                            self.Target.SpellBook.transitionFlag = "close"
+                        else:
+                            self.Target.SpellBook.open = True
                     elif e.text == "Trade":
                         TradeUI(self.Game, self.Hero, self.Target).show()
                     elif e.text == "Fight":

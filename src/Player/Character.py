@@ -22,6 +22,7 @@ from multiprocessing import Process
 
 from pathfinding.core.grid import Grid
 from pathfinding.finder.a_star import AStarFinder
+from queue import Queue
 
 
 class Character:
@@ -138,6 +139,9 @@ class Character:
         # Keep tracks of the player pos in a closed map
         self.buildingPosX = 0
         self.buildingPosY = 0
+
+        # ----------------------- PATHFINDING -------------- #
+        self.pathfinding_q = Queue()
 
     def initSpells(self):
 
@@ -503,34 +507,81 @@ class Character:
                             for coor, offset in zip(item.pos, (DELTA_X, DELTA_Y))
                         ],
                     )
+        else:
+            if not self.pathfinding_q.empty():
+                self.updateClickPoint(subclick=self.pathfinding_q.get())
 
-    def updateClickPoint(self):
+    def updateClickPoint(self, subclick=[]):
 
-        # Updated at each click, so the tuple is converted to be exploited
-        self.targetPos = list(pygame.mouse.get_pos())
-        self.XDistanceToTarget = self.targetPos[0] - self.pos[0]
-        self.YDistanceToTarget = self.targetPos[1] - self.pos[1]
+        if subclick != []:
+            self.XDistanceToTarget = subclick[0] - self.posMainChunkCenter[0]
+            self.YDistanceToTarget = subclick[1] - self.posMainChunkCenter[1]
 
-        self.targetChunkPos = [
-            coor + self.Map.CHUNK_SIZE * self.Map.renderDistance
-            for coor in self.targetPos
-        ]
+            print("vec : ", (self.XDistanceToTarget, self.YDistanceToTarget))
+        else:
+            # Updated at each click, so the tuple is converted to be exploited
 
-        # pathfinding
-        grid = Grid(matrix=self.Map.matrix)
+            # pathfinding
+            grid = Grid(matrix=self.Map.matrix)
 
-        start = grid.node(
-            *[pos // self.Map.stepGeneration for pos in self.posMainChunkCenter]
-        )
-        end = grid.node(
-            *[pos // self.Map.stepGeneration for pos in self.targetChunkPos]
-        )
+            # Case - Movement within the tilee
+            if [pos // self.Map.stepGeneration for pos in self.posMainChunkCenter] == [
+                int(
+                    (coor + self.Map.CHUNK_SIZE * self.Map.renderDistance - offset)
+                    // self.Map.stepGeneration
+                )
+                for coor, offset in zip(list(pygame.mouse.get_pos()), self.blitOffset)
+            ]:
+                self.updateClickPoint(
+                    subclick=[
+                        coor + self.Map.CHUNK_SIZE * self.Map.renderDistance - offset
+                        for coor, offset in zip(
+                            list(pygame.mouse.get_pos()), self.blitOffset
+                        )
+                    ]
+                )
+            else:
 
-        finder = AStarFinder()
-        path, runs = finder.find_path(start, end, grid)
+                start = grid.node(
+                    *[pos // self.Map.stepGeneration for pos in self.posMainChunkCenter]
+                )
+                end = grid.node(
+                    *[
+                        int(
+                            (
+                                coor
+                                + self.Map.CHUNK_SIZE * self.Map.renderDistance
+                                - offset
+                            )
+                            // self.Map.stepGeneration
+                        )
+                        for coor, offset in zip(
+                            list(pygame.mouse.get_pos()), self.blitOffset
+                        )
+                    ]
+                )
 
-        print("operations:", runs, "path length:", len(path), "path :", path)
-        logger.debug(f"\n{grid.grid_str(path=path, start=start, end=end)}\n")
+                finder = AStarFinder()
+                paths, runs = finder.find_path(start, end, grid)
+
+                self.pathfinding_q.queue.clear()
+                if len(paths) > 0:
+                    for p in paths:
+                        self.pathfinding_q.put(
+                            [
+                                p_coor * self.Map.stepGeneration + PLAYER_SIZE // 2
+                                for p_coor in p
+                            ]
+                        )
+                    paths[-1] = [
+                        coor + self.Map.CHUNK_SIZE * self.Map.renderDistance - offset
+                        for coor, offset in zip(
+                            pygame.mouse.get_pos(), self.blitOffset
+                        )
+                    ]
+
+                    print("operations:", runs, "path length:", len(paths), "path :", paths)
+                    logger.debug(f"\n{grid.grid_str(path=paths, start=start, end=end)}\n")
 
     def handleMovements(self, mapName):
         """Function updating pos and bliting it to the game screen every delta_t period of time"""

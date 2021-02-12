@@ -35,6 +35,8 @@ class NetworkController:
 
         for player in self.players.values():
 
+            player.Inventory.draw()
+            player.SpellBook.draw()
             # Check wether the player and the other connected are on the same chunk or not
             if (
                 sqrt(

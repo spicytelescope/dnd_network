@@ -54,7 +54,7 @@ RessourceHandler.loadLandscapeRessources()
 Player_Map = OpenWorldMap(PLAYER_CONFIG, Game)
 World_Map = OpenWorldMap(WORLD_MAP_CONFIG, Game)
 Hero_group = [Character(Game, Player_Map, genOrder=i) for i in range(MAX_TEAM_LENGH)]
-Leader = Hero_group[0] # The one with self.genOrder set to 0
+Leader = Hero_group[0]  # The one with self.genOrder set to 0
 Game.heroesGroup += Hero_group
 
 # ------------------ NETWORKING -------------- #
@@ -269,6 +269,9 @@ while Game.currentState != "quit":
 
         if Game.debug_mode:
 
+            logger.debug(
+                f"current : {[pos // Player_Map.stepGeneration for pos in Hero.posMainChunkCenter]} and target : {[(coor + Player_Map.CHUNK_SIZE * Player_Map.renderDistance - offset )// Player_Map.stepGeneration for coor, offset in zip(list(pygame.mouse.get_pos()), Hero.blitOffset)]}"
+            )
             pygame.display.set_caption(
                 f"Pyhm World - {str(int(Game_Clock.get_fps()))} fps"
             )
