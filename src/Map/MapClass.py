@@ -16,7 +16,7 @@ from .envGenerator import *
 from HUD.miniMap import MiniMap
 from pygame.locals import *
 from tqdm import tqdm
-from utils.utils import logger
+from utils.utils import iso_vec_into_standard, logger
 from multiprocessing import Process
 
 
@@ -312,8 +312,19 @@ class OpenWorldMap:
             self.loadingMenu.confirmLoading("worldElements")
             # pygame.image.save(self.chunkData["mainChunk"], "mainChunk.png")
 
-            # self.miniMap.update(pygame.transform.scale(pygame.transform.rotate(self.chunkData["mainChunk"], -45), )
             self.miniMap.update()
+
+            self.Hero.posMainChunkCenter = [
+                int(
+                    self.chunkData["mainChunk"].get_width() / 2
+                    - self.Hero.blitOffset[0]
+                ),
+                int(
+                    self.chunkData["mainChunk"].get_height() / 2
+                    - self.Hero.blitOffset[1]
+                ),
+            ]
+
             # We reset the progress bar chunk countee
             self.chunkGenerationCounter = 0
 
@@ -416,46 +427,74 @@ class OpenWorldMap:
         XXX                                       XXXY
         """
 
-        if abs(standard_vec_into_iso(*self.Hero.blitOffset)[0]) >= self.CHUNK_SIZE / 2:
+        if (
+            abs(standard_vec_into_iso(*self.Hero.blitOffset)[0])
+            >= standard_vec_into_iso(self.CHUNK_SIZE / 2, 0)[0]
+        ):
 
             # We need to re compute the coordonates as we redefine a new center for the big chunkss
             if (
                 standard_vec_into_iso(*self.Hero.blitOffset)[0] < 0
             ):  # Go to the right chunk
                 self.chunkData["currentChunkPos"][0] += 1
-                self.Hero.blitOffset[0] = self.CHUNK_SIZE + self.Hero.blitOffset[0]
-                self.Hero.mainChunkPosX = (
+                print("offset : ", standard_vec_into_iso(*self.Hero.blitOffset))
+                logger.debug(
+                    f"{[standard_vec_into_iso(self.CHUNK_SIZE, 0)[0] + standard_vec_into_iso(*self.Hero.blitOffset)[0], standard_vec_into_iso(*self.Hero.blitOffset)[1]]}"
+                )
+                self.Hero.blitOffset = iso_vec_into_standard(
+                    standard_vec_into_iso(self.CHUNK_SIZE, 0)[0]
+                    + standard_vec_into_iso(*self.Hero.blitOffset)[0],
+                    0,
+                )
+                self.Hero.disp_mainChunkPosX = (
                     self.Hero.initChunkPosX + self.Hero.blitOffset[0]
                 )
 
             else:
                 self.chunkData["currentChunkPos"][0] -= 1
-                self.Hero.blitOffset[0] = -(self.CHUNK_SIZE - self.Hero.blitOffset[0])
-                self.Hero.mainChunkPosX = (
-                    self.Hero.initChunkPosX + self.Hero.blitOffset[0]
+                self.Hero.blitOffset = iso_vec_into_standard(
+                    standard_vec_into_iso(*self.Hero.blitOffset)[0]
+                    - standard_vec_into_iso(self.CHUNK_SIZE, 0)[0],
+                    0,
                 )
+
             self.reGenChunkFlag = True
 
-        if abs(standard_vec_into_iso(*self.Hero.blitOffset)[1]) >= self.CHUNK_SIZE / 2:
+        if (
+            abs(standard_vec_into_iso(*self.Hero.blitOffset)[1])
+            >= standard_vec_into_iso(0, self.CHUNK_SIZE / 2)[1]
+        ):
             if (
                 standard_vec_into_iso(*self.Hero.blitOffset)[1] < 0
             ):  # Go to the down chunk
                 self.chunkData["currentChunkPos"][1] += 1
-                self.Hero.blitOffset[1] = self.CHUNK_SIZE + self.Hero.blitOffset[1]
-                self.Hero.mainChunkPosY = (
-                    self.Hero.initChunkPosY + self.Hero.blitOffset[1]
+                self.Hero.blitOffset = iso_vec_into_standard(
+                    0,
+                    standard_vec_into_iso(0, self.CHUNK_SIZE)[1]
+                    + standard_vec_into_iso(*self.Hero.blitOffset)[1],
                 )
 
             else:
                 self.chunkData["currentChunkPos"][1] -= 1
-                self.Hero.blitOffset[1] = -(self.CHUNK_SIZE - self.Hero.blitOffset[1])
-                self.Hero.mainChunkPosY = (
-                    self.Hero.initChunkPosY + self.Hero.blitOffset[1]
+                self.Hero.blitOffset = iso_vec_into_standard(
+                    0,
+                    standard_vec_into_iso(*self.Hero.blitOffset)[1]
+                    - standard_vec_into_iso(0, self.CHUNK_SIZE)[1],
                 )
+
             self.reGenChunkFlag = True
 
         # If there is a change of chunk, we need to regenerate if needed some chunks, and reset the flag system
         if self.reGenChunkFlag:
+
+            self.Hero.disp_mainChunkPosX = (
+                self.Hero.initChunkPosX + self.Hero.blitOffset[0]
+            )
+            self.Hero.disp_mainChunkPosY = (
+                self.Hero.initChunkPosY + self.Hero.blitOffset[1]
+            )
+
+            logger.info(self.Hero.blitOffset)
 
             self.Hero.posMainChunkCenter = [
                 int(

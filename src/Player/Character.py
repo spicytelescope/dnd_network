@@ -400,10 +400,13 @@ class Character:
                 self.direction = "down" if self.YDistanceToTarget > 0 else "up"
 
             # First checking collision with the open world then computing and updating character pos
-            if not envGenerator.isColliding(
-                self.imageState["image"].get_rect(center=self.posMainChunkCenter),
-                self.direction,
-            ) or True:
+            if (
+                not envGenerator.isColliding(
+                    self.imageState["image"].get_rect(center=self.posMainChunkCenter),
+                    self.direction,
+                )
+                or True
+            ):
 
                 # Updating running animation
                 if (
@@ -427,12 +430,10 @@ class Character:
                     self.keys[self.direction]["value"][1] * self.normalizedDistance
                 )
 
-                print("before :", (DELTA_X, DELTA_Y))
                 # Updating the distance between the target and the character
                 self.XDistanceToTarget += DELTA_X
                 self.YDistanceToTarget += DELTA_Y
 
-                print("after :", iso_vec_into_standard(DELTA_X, DELTA_Y))
                 if mapName == "openWorld":
                     self.mainChunkPosX += DELTA_X
                     self.mainChunkPosY += DELTA_Y
@@ -463,9 +464,14 @@ class Character:
                         ),
                     ]
 
-                    for ennemy in envGenerator.ennemies:
-                        ennemy["value"]["entity"].setPos(
-                            standard_vec_into_iso(*iso_vec_into_standard(DELTA_X, DELTA_Y))
+                    for item in envGenerator.items:
+                        item.setPos(
+                            [
+                                coor + offset
+                                for coor, offset in zip(
+                                    item.pos, iso_vec_into_standard(DELTA_X, DELTA_Y)
+                                )
+                            ],
                         )
 
                     # if self.Game.debug_mode:
@@ -486,23 +492,24 @@ class Character:
                             ]
                         )
 
-                for item in envGenerator.items:
-                    item.setPos(
-                        [
-                            coor + offset
-                            for coor, offset in zip(item.pos, (DELTA_X, DELTA_Y))
-                        ],
-                    )
+                    for item in envGenerator.items:
+                        item.setPos(
+                            [
+                                coor + offset
+                                for coor, offset in zip(item.pos, (DELTA_X, DELTA_Y))
+                            ],
+                        )
 
-    def updateClickPoint(self):
+    def updateClickPoint(self, no_iso=False):
 
         # Updated at each click, so the tuple is converted to be exploited
         self.targetPos = pygame.mouse.get_pos()
         self.XDistanceToTarget = self.targetPos[0] - self.pos[0]
         self.YDistanceToTarget = self.targetPos[1] - self.pos[1]
-        self.XDistanceToTarget, self.YDistanceToTarget = standard_vec_into_iso(
-            self.XDistanceToTarget, self.YDistanceToTarget
-        )
+        if not no_iso:
+            self.XDistanceToTarget, self.YDistanceToTarget = standard_vec_into_iso(
+                self.XDistanceToTarget, self.YDistanceToTarget
+            )
 
         # self.targetChunkPos = [
         #     coor + self.Map.CHUNK_SIZE * self.Map.renderDistance

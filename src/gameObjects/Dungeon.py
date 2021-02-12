@@ -989,7 +989,7 @@ class Dungeon:
                         self.PauseMenu.mainLoop()
                         break
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-                    self.Hero.updateClickPoint()
+                    self.Hero.updateClickPoint(no_iso=True)
 
                 if event.type == pygame.QUIT:
                     pygame.quit()

@@ -257,7 +257,7 @@ while Game.currentState != "quit":
             # ------------------- HUD HANDLING ----------- #
 
             Hero.CharBar.show()
-            Player_Map.miniMap.show()
+            # Player_Map.miniMap.show()
             Hero.Inventory.draw()
             Hero.QuestJournal.draw()
             Hero.SpellBook.draw()

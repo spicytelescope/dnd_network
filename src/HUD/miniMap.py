@@ -338,15 +338,15 @@ class MiniMap:
 
                 for player in self.Game.NetworkController.players.values():
                     self.extendedChunkMap.blit(
-                        pygame.transform.scale2x(playerConf.CLASSES[player.classId]["icon"]),
+                        pygame.transform.scale2x(
+                            playerConf.CLASSES[player.classId]["icon"]
+                        ),
                         (
                             int(
-                                self.chunkMapRaw.get_width() / 2
-                                - player.blitOffset[0]
+                                self.chunkMapRaw.get_width() / 2 - player.blitOffset[0]
                             ),
                             int(
-                                self.chunkMapRaw.get_height() / 2
-                                - player.blitOffset[1]
+                                self.chunkMapRaw.get_height() / 2 - player.blitOffset[1]
                             ),
                         ),
                     )
