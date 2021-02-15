@@ -514,9 +514,8 @@ class Character:
     def updateClickPoint(self, subclick=[]):
 
         if subclick != []:
-            self.XDistanceToTarget,self.YDistanceToTarget = subclick
+            self.XDistanceToTarget, self.YDistanceToTarget = subclick
 
-            print("vec : ", (self.XDistanceToTarget, self.YDistanceToTarget))
         else:
             self.pathfinding_q.queue.clear()
             # Updated at each click, so the tuple is converted to be exploited
@@ -560,9 +559,7 @@ class Character:
                             )
                             // self.Map.stepGeneration
                         )
-                        for coor, offset in zip(
-                            pygame.mouse.get_pos(), self.blitOffset
-                        )
+                        for coor, offset in zip(pygame.mouse.get_pos(), self.blitOffset)
                     ]
                 )
 
@@ -570,7 +567,7 @@ class Character:
                 paths, runs = finder.find_path(start, end, grid)
 
                 self.pathfinding_q.queue.clear()
-                
+
                 if len(paths) > 0:
                     for i in range(len(paths)):
                         if i == 0:
@@ -627,6 +624,8 @@ class Character:
 
             # Reseting the chrono to move the character
             self.lastRenderedTime = time.time()
+            if self.Game.isOnline:
+                self.Map.transmitPosInfos(self.networkId)
 
     def show(self):
         if self.genOrder > 0:

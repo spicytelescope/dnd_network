@@ -154,7 +154,7 @@ while Game.currentState != "quit":
         for event in pygame.event.get():
 
             # ------------------- NETWORK HANDLING ----------------- #
-            if NetworkController.players != {}:
+            if Game.isOnline and NetworkController.players != {}:
                 NetworkController.handleInteractions(event)
 
             # ------------------ HUD Handling --------------------- #
@@ -210,6 +210,14 @@ while Game.currentState != "quit":
                     Player_Map.miniMap._show = not Player_Map.miniMap._show
 
                 elif (
+                    event.key
+                    == Game.KeyBindings["Show the connected player (Online mode only)"][
+                        "value"
+                    ]
+                ):
+                    NetworkController._show = not NetworkController._show
+
+                elif (
                     len(Hero_group) > 1
                     and event.key == Game.KeyBindings["Switch heroes"]["value"]
                 ):
@@ -251,7 +259,8 @@ while Game.currentState != "quit":
             Player_Map.envGenerator.showItems()
 
             # -------------- PLAYERS HANDLING ----------- #
-            NetworkController.showConnectedPlayers()
+            if Game.isOnline:
+                NetworkController.handleConnectedPlayers()
             Hero.show()
 
             # ------------------- HUD HANDLING ----------- #
@@ -269,9 +278,6 @@ while Game.currentState != "quit":
 
         if Game.debug_mode:
 
-            logger.debug(
-                f"current : {[pos // Player_Map.stepGeneration for pos in Hero.posMainChunkCenter]} and target : {[(coor + Player_Map.CHUNK_SIZE * Player_Map.renderDistance - offset )// Player_Map.stepGeneration for coor, offset in zip(list(pygame.mouse.get_pos()), Hero.blitOffset)]}"
-            )
             pygame.display.set_caption(
                 f"Pyhm World - {str(int(Game_Clock.get_fps()))} fps"
             )

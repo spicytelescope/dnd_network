@@ -1,4 +1,5 @@
 from copy import copy
+import json
 import math
 import os
 import platform
@@ -608,6 +609,20 @@ class OpenWorldMap:
         RessourceHandler.loadLandscapeRessources(self.stepGeneration)
         RessourceHandler.loadOpenWorldRessources(self.stepGeneration)
 
+    # ----------------------- NETWORK -------------------- #
+
+    def transmitPosInfos(self, player_id):
+        if self.Game.isOnline:
+            try:
+                data = json.load(open("./datas.json"))
+                with open("./datas.json", "w") as f:
+                    data["players"][player_id] = {
+                        "chunkPos": self.Hero.posMainChunkCenter,
+                        "chunkCoor": self.Hero.Map.chunkData["currentChunkPos"],
+                    }
+                    json.dump(data, f)
+            except:
+                logger.info(f'Latency case for entity {self.Hero.networkId}!')
     # def __getstate__(self):
 
     #     state = self.__dict__.copy()

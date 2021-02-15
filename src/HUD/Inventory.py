@@ -18,6 +18,7 @@ from config.HUDConf import *
 from config.itemConf import *
 import config.itemConf as itemConf
 from copy import *
+import json
 
 
 class Inventory:
@@ -66,7 +67,6 @@ class Inventory:
         self.clock = pygame.time.Clock()
         self.time_delta = self.clock.tick(self.Game.refresh_rate)
 
-
         # ---------------- ITEMS ------------------- #
 
         self.storageLength = [INVENTORY_STORAGE_WIDTH, INVENTORY_STORAGE_HEIGHT]
@@ -82,9 +82,9 @@ class Inventory:
         }
         for j in range(INVENTORY_STORAGE_HEIGHT):
             for i in range(INVENTORY_STORAGE_WIDTH):
-                if j * 3 + i < playerConf.DEFAULT_NUM_ITEM:
+                if j * INVENTORY_STORAGE_WIDTH + i < playerConf.DEFAULT_NUM_ITEM:
                     itemId = playerConf.CLASSES[self.Hero.classId]["defaultItemKitId"][
-                        j * 3 + i
+                        j * INVENTORY_STORAGE_WIDTH + i
                     ]
                     self.storage["tab"][j][i] = deepcopy(itemConf.ITEM_DB[itemId])
                     self.storage["tab"][j][i].loadIcon()
@@ -214,7 +214,7 @@ class Inventory:
 
     def draw(self):
 
-        if self.open: # Act as a first time opening
+        if self.open:  # Act as a first time opening
             self.time_delta = self.clock.tick(self.Game.refresh_rate)
             self.animations.update(self.time_delta)
             self.openInventory()
@@ -807,6 +807,85 @@ class Inventory:
 
         self.informationSpot["item"] = None
         self.informationSpot["coor"] = []
+
+    # -------------------------- NETWORK ----------------------- #
+
+    def updateInventory(self, eq_item_ids={}, storage_item_ids=[]):
+        """Update the inventory given 3 actions :
+        + INIT : intialise the inventory with the two lists of ids
+        + ADD : add some items copied from the given ids, the eq_item_ids is made with the folliwing pattern : key = eq_slot_id and value = item's db ID
+        + REMOVE : remove some items copied identified by the given ids, note : the eq_item_ids's values will be useless as only the keys will be used to remove the adequate items
+
+        Args:
+            action_type (str): [description]
+            eq_item_ids (dict, optional): [description]. Defaults to {}.
+            storage_item_ids (list, optional): [description]. Defaults to [].
+        """
+        # Storage part
+        # the sort() methods is here to not take into account the arrangement of the items, just making sure that there are the same items, otherwise there is a diff and we need to reorganise it.
+        if (
+            storage_item_ids.sort()
+            != [
+                self.storage["tab"][j][i].property["Id"]
+                for j in range(INVENTORY_STORAGE_HEIGHT)
+                for i in range(INVENTORY_STORAGE_WIDTH)
+                if self.storage["tab"][j][i] != None
+            ].sort()
+        ):
+            for j in range(INVENTORY_STORAGE_HEIGHT):
+                for i in range(INVENTORY_STORAGE_WIDTH):
+                    if (j * INVENTORY_STORAGE_WIDTH + i + 1) == len(storage_item_ids):
+                        break
+
+                    self.storage["tab"][j][i] = deepcopy(
+                        itemConf.ITEM_DB[
+                            storage_item_ids[j * INVENTORY_STORAGE_WIDTH + i]
+                        ]
+                    )
+                    if self.icon == None:
+                        self.storage["tab"][j][i].loadIcon()
+                    if self.property["desc"]["descText"] == None:
+                        self.storage["tab"][j][i].loadSurfDesc()
+                    self.storage["tab"][j][i].setCoor(
+                        (
+                            self.storage["initPoint"][0]
+                            + i * self.storage["offset"][0],
+                            self.storage["initPoint"][1]
+                            + j * self.storage["offset"][1],
+                        )
+                    )
+
+        if list(eq_item_ids.values()) != [
+            slot_item["item"].property["Id"]
+            for slot_item in self.equipment.values()
+            if slot_item["item"] != None
+        ]:
+            for slot_id, item_id in eq_item_ids.items():
+                self.equipment[slot_id] = deepcopy(itemConf.ITEM_DB[item_id])
+                if self.icon == None:
+                    self.storage["tab"][j][i].loadIcon()
+                if self.property["desc"]["descText"] == None:
+                    self.storage["tab"][j][i].loadSurfDesc()
+
+    def transmitInventoryInfos(self, player_id):
+
+        data = json.load(open("./datas.json"))
+        with open("./datas.json", "w") as f:
+            data["players"][player_id]["inventory"]["storage"] = [
+                str(self.storage["tab"][j][i].property["Id"])
+                for j in range(INVENTORY_STORAGE_HEIGHT)
+                for i in range(INVENTORY_STORAGE_WIDTH)
+                if self.storage["tab"][j][i] != None
+            ]
+            data["players"][player_id]["inventory"]["equipment"] = {
+                str(slot): str(slot_item["item"].property["Id"])
+                for slot, slot_item in self.equipment.items()
+                if slot_item["item"] != None
+            }
+            logger.info(
+                f"data ???? {data} {[self.storage['tab'][j][i].property['Id'] for j in range(INVENTORY_STORAGE_HEIGHT) for i in range(INVENTORY_STORAGE_WIDTH) if self.storage['tab'][j][i] != None ]}"
+            )
+            json.dump(data, f)
 
     # def __getstate__(self):
 

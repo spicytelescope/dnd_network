@@ -38,7 +38,7 @@ class GameController:
         self.MAX_RESOLUTION = 1920
         self.MAX_RENDER_DISTANCE = 10
         self.MAX_REFRESH_RATE = 240
-        self.WINDOW = pygame.display.set_mode(self.WINDOW_SIZE, NOFRAME)
+        self.WINDOW = pygame.display.set_mode(self.WINDOW_SIZE) #NOFRAME)
 
         self.enableSound = 1
         self.debug_mode = 1
@@ -79,6 +79,7 @@ class GameController:
             "Switch heroes": {"value": pygame.K_TAB, "key": "TAB"},
             "Cancel trade": {"value": pygame.K_ESCAPE, "key": "ESC"},
             "Center the Map's view": {"value": pygame.K_r, "key": "R"},
+            "Show the connected player (Online mode only)": {"value": pygame.K_c, "key": "C"},
         }
 
         self.cursor = Cursor(self)
@@ -92,6 +93,7 @@ class GameController:
         # ---------- NETWORK ------------ #
 
         self.NetworkController = None
+        self.isOnline = False
 
     def selectGame(self):
         self.currentState = "selectGame"

@@ -2,6 +2,7 @@ import pygame
 
 from HUD.CharBar import CharBar
 from Map.envGenerator import EnvGenerator
+from network.NetworkController import NetworkController
 
 pygame.init()
 
@@ -41,25 +42,22 @@ LdingMenu = LoadingMenu(Game, Player_Map)
 Hero = Character(Game, Player_Map)
 Game.heroesGroup = [Hero]
 
+ContextMenu = NonBlockingPopupMenu(POP_UP_ACTIONS, Game)
+NetworkController = NetworkController(Game, Player_Map, Hero, ContextMenu)
+Game.NetworkController = NetworkController
+NetworkController._show = True
+
+
 Hero.genOrder = 0
 Hero.initHUD(LdingMenu)
 
+NetworkController.createTestConnection()
+
+
 while True:
+    NetworkController.handleConnectedPlayers()
 
     Game.screen.fill((0, 0, 0))
 
-    Hero.createFight(
-        [
-            Hero,
-            Ennemy(
-                Game.screen,
-                Hero,
-                Game,
-                None,
-                "Skeleton",
-                0,
-                1,
-            ),
-        ]
-    )
+    NetworkController.drawPannel()
     Game.show()

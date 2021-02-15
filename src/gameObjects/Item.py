@@ -8,7 +8,7 @@ from config.HUDConf import *
 import math
 from UI.UI_utils_text import Dialog, ScrollText
 import time
-
+import uuid
 from config.playerConf import ITEM_PICK_UP_RANGE
 
 
@@ -40,7 +40,6 @@ class Item:
         effect=None,
         stackable=False,
     ) -> None:
-
 
         self._stateSaved = False
         self.stackable = stackable
@@ -83,7 +82,8 @@ class Item:
         )
 
         self.property = {
-            "Id": properties[0],
+            "UId": uuid.uuid1(),  # Proper id related to the player, serves on network purposes
+            "Id": properties[0],  # Object id
             "slotId": properties[1],
             "name": properties[2],
             "rarety": properties[3],
@@ -179,10 +179,10 @@ class Item:
             self.property["durability"]["currentDurability"] = 0
 
     def setInitPos(self, pos):
-        self.initLootPos = [coor + random.uniform(-ITEM_LOOT_RANGE, ITEM_LOOT_RANGE) for coor in pos]
-        self.setPos(
-            self.initLootPos
-        )
+        self.initLootPos = [
+            coor + random.uniform(-ITEM_LOOT_RANGE, ITEM_LOOT_RANGE) for coor in pos
+        ]
+        self.setPos(self.initLootPos)
         self.lastTimeRecovered = time.time()
 
     def setPos(self, pos):

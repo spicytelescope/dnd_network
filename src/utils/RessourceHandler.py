@@ -803,7 +803,7 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                 "Building": {"PNJHouse": 1, "Shop": 1},
                 "Dungeon": {"Death's Dungeon": 1},
                 "NPC": {"Seller": 1, "Villager": 4},
-                "Ennemy": {"Skeleton": 1},
+                "Ennemy": {"Skeleton": 0},
                 "Landscape": {
                     "Plains_tree": 5,  # -1 means no limit
                     "Plains_flower": 7,
