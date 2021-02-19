@@ -331,12 +331,12 @@ class NonBlockingPopupMenu(PopupMenu):
                 if e.name is None:
                     self.hide()
                 elif e.name == "Character Options":
-                    if e.text == "Show Inventory":
+                    if e.text == "Inventory":
                         if self.Target.Inventory._show:
                             self.Target.Inventory.close()
                         else:
                             self.Target.Inventory.open = True
-                    elif e.text == "Show Spellbook":
+                    elif e.text == "Spellbook":
                         if self.Target.SpellBook._show:
                             self.Target.SpellBook.transitionFlag = "close"
                         else:

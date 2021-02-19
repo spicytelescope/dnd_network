@@ -96,8 +96,8 @@ TRADE_LOCK_BTN_CLICKED = pygame.image.load("./assets/UI/TradeUI/lock_btn_clicked
 
 POP_UP_ACTIONS = (
     "Character Options",
-    "Show Inventory",
-    "Show Spellbook",
+    "Inventory",
+    "Spellbook",
     "Trade",
     "Fight",
     # (

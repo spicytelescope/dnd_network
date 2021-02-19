@@ -611,18 +611,15 @@ class OpenWorldMap:
 
     # ----------------------- NETWORK -------------------- #
 
-    def transmitPosInfos(self, player_id):
-        if self.Game.isOnline:
-            try:
-                data = json.load(open("./datas.json"))
-                with open("./datas.json", "w") as f:
-                    data["players"][player_id] = {
-                        "chunkPos": self.Hero.posMainChunkCenter,
-                        "chunkCoor": self.Hero.Map.chunkData["currentChunkPos"],
-                    }
-                    json.dump(data, f)
-            except:
-                logger.info(f'Latency case for entity {self.Hero.networkId}!')
+    def transmitPosInfos(self, player_id, data):
+        
+        data["players"][player_id][
+            "chunkPos"
+        ] = self.Hero.posMainChunkCenter
+        data["players"][player_id]["chunkCoor"] = self.Hero.Map.chunkData[
+            "currentChunkPos"
+        ]
+
     # def __getstate__(self):
 
     #     state = self.__dict__.copy()

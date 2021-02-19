@@ -1,9 +1,11 @@
-import json
+import json, sys
 from math import sqrt
+import time
 import pygame
 
 from pygame.constants import KEYDOWN, MOUSEBUTTONDOWN, MOUSEBUTTONUP
 from Player.Character import Character
+from config import playerConf
 from config.UIConf import BUTTON_FONT_SIZE, DUNGEON_FONT
 from config.playerConf import CLASSES_NAMES
 from utils.utils import logger
@@ -32,82 +34,133 @@ class NetworkController:
         self.players.update({new_id: Character(self.Game, self.Map)})
         self.players[new_id].initHUD()
 
-        logger.debug(f"Player list : {self.players}")
-
     def createTestConnection(self):
 
         self.Game.isOnline = True
         # Adding the hero
         data = json.load(open("./datas.json"))
+
         with open("./datas.json", "w") as f:
             data["players"][self.Hero.networkId] = {
                 "chunkPos": self.Hero.posMainChunkCenter,
                 "chunkCoor": self.Hero.Map.chunkData["currentChunkPos"],
                 "inventory": {"storage": [], "equipment": {}},
-                "creator": False,
+                "creator": not any(
+                    [player["creator"] for player in data["players"].values()]
+                ),
+                "characterInfo": {
+                    "classId": self.Hero.classId,
+                    "imagePos": self.Hero.imageState["imagePos"],
+                    "direction": self.Hero.direction,
+                    "spellsID": self.Hero.spellsID,
+                    "name": self.Hero.name,
+                },
+                "mapInfo": {
+                    "seed": self.Map.mapSeed
+                    if not any(
+                        [player["creator"] for player in data["players"].values()]
+                    )
+                    else None,
+                    "chunkData": [],
+                },
             }
+            logger.debug(f"Dumping {data}")
             json.dump(data, f)
-        self.Hero.Inventory.transmitInventoryInfos(self.Hero.networkId)
 
     def handleConnectedPlayers(self):
 
         # ------------------ DATA TRANSMISSION ---------------------- #
 
         try:
-            with open("datas.json", "r") as f:
-                data = json.load(f)
+            data = json.load(open("./datas.json"))
+            with open("datas.json", "w") as f:
 
-                # New player detection
+                # ---------------------- CLIENT UPDATE (SEND PART) ------------ #
+                self.Hero.Inventory.transmitInventoryInfos(self.Hero.networkId, data)
+                self.Hero.Map.transmitPosInfos(self.Hero.networkId, data)
+                self.Hero.transmitAnimInfos(self.Hero.networkId, data)
+                json.dump(data, f)
+
+                # --------------- NEW PLAYER DETECTION -------------------------- #
                 for player_id in data["players"]:
                     if player_id != self.Hero.networkId:
                         if player_id not in self.players:
                             self.addPlayer(player_id)
-                        else:
-                            # Pos update
-                            self.players[player_id].posMainChunkCenter = data[
-                                "players"
-                            ][player_id]["chunkPos"]
 
+                # ------------------- Other PLAYERS UPDATING (RECV PART) ---------- #
                 for player_id, player in self.players.items():
 
-                    # player.Inventory.updateInventory({}, [])
+                    # ------------------ INVENTORY RECEIVING ------------------- #
+                    player.Inventory.updateInventory(
+                        data["players"][player_id]["inventory"]["storage"],
+                        data["players"][player_id]["inventory"]["equipment"],
+                    )
 
-                    # -------------------- INTERACTIONS --------------------- #
+                    # -------------------- HUD GRAPHICAL UPDATING -------------- #
                     player.Inventory.draw()
                     player.SpellBook.draw()
 
-                    # Check wether the player and the other connected are on the same chunk or not
-                    if (
-                        sqrt(
-                            sum(
-                                [
-                                    (p1coor - p2coor) ** 2
-                                    for p1coor, p2coor in zip(
-                                        data["players"][player_id]["chunkPos"],
-                                        self.Hero.Map.chunkData["currentChunkPos"],
-                                    )
-                                ]
-                            )
-                        )
-                    ) <= self.Map.renderDistance:
-                        playersDist = [
-                            pos1 - pos2
-                            for pos1, pos2 in zip(
-                                player.posMainChunkCenter, self.Hero.posMainChunkCenter
-                            )
-                        ]
-                        self.Game.screen.blit(
-                            player.imageState["image"],
-                            player.imageState["image"].get_rect(
-                                center=[
-                                    self.Game.resolution // 2 + distCoor
-                                    for distCoor in playersDist
-                                ]
-                            ),
-                        )
+                    # ----------------- CHARAC INFO RECEIVING ------------------ #
+                    player.classId = data["players"][player_id]["characterInfo"][
+                        "classId"
+                    ]
+                    player.direction = data["players"][player_id]["characterInfo"][
+                        "direction"
+                    ]
 
-        except:
-            logger.info(f"Latency case for entity {self.Hero.networkId}!")
+                    player.imageState = {
+                        "image": playerConf.CLASSES[player.classId]["directions"][
+                            player.direction
+                        ][data["players"][player_id]["characterInfo"]["imagePos"]],
+                        "imagePos": data["players"][player_id]["characterInfo"][
+                            "imagePos"
+                        ],
+                    }
+                    p_spells = sorted(player.spellsID[::])
+                    d_spells = sorted(
+                        data["players"][player_id]["characterInfo"]["spellsID"][::]
+                    )
+                    if p_spells != d_spells:
+                        player.spellsID = data["players"][player_id]["characterInfo"][
+                            "spellsID"
+                        ]
+                        player.SpellBook.updateSpellBook()
+
+                    #  ------------------- MAP RECEIVING ----------------------- #
+                    # Check wether the player and the other connected are on the same chunk or not
+                    player.posMainChunkCenter = data["players"][player_id]["chunkPos"]
+                    # if (
+                    #     sqrt(
+                    #         sum(
+                    #             [
+                    #                 (p1coor - p2coor) ** 2
+                    #                 for p1coor, p2coor in zip(
+                    #                     data["players"][player_id]["chunkPos"],
+                    #                     self.Hero.Map.chunkData["currentChunkPos"],
+                    #                 )
+                    #             ]
+                    #         )
+                    #     )
+                    # ) <= self.Map.renderDistance:
+                    playersDist = [
+                        pos1 - pos2
+                        for pos1, pos2 in zip(
+                            player.posMainChunkCenter, self.Hero.posMainChunkCenter
+                        )
+                    ]
+                    self.Game.screen.blit(
+                        player.imageState["image"],
+                        player.imageState["image"].get_rect(
+                            center=[
+                                self.Game.resolution // 2 + distCoor
+                                for distCoor in playersDist
+                            ]
+                        ),
+                    )
+
+        except Exception as e:
+            #     # logger.error(f"Latency case for entity {self.Hero.networkId}!")
+            logger.error(e)
 
     def handleInteractions(self, event):
 
@@ -119,8 +172,13 @@ class NetworkController:
 
         self.ContextMenu.checkEvents(event)
 
-        if event.type == MOUSEBUTTONUP and event.button == 1:
-            for player in self.players.values():
+        for player in self.players.values():
+            if player.SpellBook._show:
+                player.SpellBook.checkActions(event)
+            if player.Inventory._show:
+                player.Inventory.checkActions(event, protected=True)
+
+            if event.type == MOUSEBUTTONUP and event.button == 1:
                 if (
                     player.imageState["image"]
                     .get_rect(center=player.posMainChunkCenter)
@@ -147,10 +205,10 @@ class NetworkController:
             )
 
             title = pygame.font.Font(DUNGEON_FONT, 50).render(
-                "CONNECTED PLAYERS", True, (0,0,0)
+                "CONNECTED PLAYERS", True, (0, 0, 0)
             )
             heroFont = pygame.font.Font(DUNGEON_FONT, BUTTON_FONT_SIZE).render(
-                f"{self.Hero.name}", True, (0,0,0)
+                f"{self.Hero.name}", True, (0, 0, 0)
             )
 
             layout.blit(
@@ -165,7 +223,9 @@ class NetworkController:
             for i, (player_id, player) in enumerate(self.players.items()):
 
                 nameFont = pygame.font.Font(DUNGEON_FONT, BUTTON_FONT_SIZE).render(
-                    f"{player.name} - {CLASSES_NAMES[player.classId]} Lv {player._Level}", True, (0,0,0)
+                    f"{player.name} - {CLASSES_NAMES[player.classId]} Lv {player._Level}",
+                    True,
+                    (0, 0, 0),
                 )
                 layout.blit(
                     nameFont,

@@ -259,8 +259,6 @@ while Game.currentState != "quit":
             Player_Map.envGenerator.showItems()
 
             # -------------- PLAYERS HANDLING ----------- #
-            if Game.isOnline:
-                NetworkController.handleConnectedPlayers()
             Hero.show()
 
             # ------------------- HUD HANDLING ----------- #
@@ -271,7 +269,9 @@ while Game.currentState != "quit":
             Hero.QuestJournal.draw()
             Hero.SpellBook.draw()
             Player_Map.miniMap.drawExtendedMap()
-            ContextMenu.draw()
+            if Game.isOnline:
+                NetworkController.handleConnectedPlayers()
+                ContextMenu.draw()
 
             Game.show()
             Game.spaceTransition("Pyhm World")

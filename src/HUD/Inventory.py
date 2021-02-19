@@ -159,11 +159,12 @@ class Inventory:
 
         remove_animations_of(self.rect, self.animations)
 
-    def checkActions(self, event):
+    def checkActions(self, event, protected = False):
+        """The protected arg is here to make sure that the inventory cannot be modified by other player in online games"""
 
         # ------------ ITEMS ACTION CHECKING --------- #
 
-        self._checkItemSelection(event)
+        self._checkItemSelection(event, protected)
         self._handleDragSpot(event)
 
         # ---------- EXIT HANDLING ----------- #
@@ -303,8 +304,9 @@ class Inventory:
                     self.equipment[slot]["item"].icon, self.equipment[slot]["slotRect"]
                 )
 
-    def _checkItemSelection(self, event):
-        """method handling the dragging of an item, the displaying of information if one item's icon is hovered"""
+    def _checkItemSelection(self, event, protected=False):
+        """method handling the dragging of an item, the displaying of information if one item's icon is hovered,
+        the protected arg is a flag to make sure that, when the game is online, no other entites can modify the items of the player"""
 
         mousePosTranslated = [
             coor - self.rect.topleft[i]
@@ -323,7 +325,7 @@ class Inventory:
                         self.itemHovered = True
 
                         # Check if the item is clicked or not
-                        if event.type == MOUSEBUTTONDOWN and event.button == 1:
+                        if event.type == MOUSEBUTTONDOWN and event.button == 1 and not protected:
                             if (
                                 self.draggedItemCoor == None
                                 and self.equipmentDraggedCoor == None
@@ -418,6 +420,7 @@ class Inventory:
                         event.type == MOUSEBUTTONDOWN
                         and event.button == 1
                         and emptyCaseRect.collidepoint(mousePosTranslated)
+                        and not protected
                     ):
                         if self.draggedItemCoor != None:
                             self.storage["tab"][j][i] = self.storage["tab"][
@@ -464,7 +467,7 @@ class Inventory:
                 ):
                     self.itemHovered = True
 
-                    if event.type == MOUSEBUTTONDOWN and event.button == 1:
+                    if event.type == MOUSEBUTTONDOWN and event.button == 1 and not protected:
                         if (
                             self.draggedItemCoor == None
                             and self.equipmentDraggedCoor == None
@@ -527,7 +530,7 @@ class Inventory:
                     and event.button == 1
                     and self.equipment[itemSlot]["slotRect"].collidepoint(
                         mousePosTranslated
-                    )
+                    ) and not protected
                 ):
                     if self.equipmentDraggedCoor != None:
                         self.equipmentDraggedCoor = None  # as there is no swaps between 2 items in the equipment zone
@@ -810,7 +813,7 @@ class Inventory:
 
     # -------------------------- NETWORK ----------------------- #
 
-    def updateInventory(self, eq_item_ids={}, storage_item_ids=[]):
+    def updateInventory(self, storage_item_ids={}, eq_item_ids={}):
         """Update the inventory given 3 actions :
         + INIT : intialise the inventory with the two lists of ids
         + ADD : add some items copied from the given ids, the eq_item_ids is made with the folliwing pattern : key = eq_slot_id and value = item's db ID
@@ -821,39 +824,31 @@ class Inventory:
             eq_item_ids (dict, optional): [description]. Defaults to {}.
             storage_item_ids (list, optional): [description]. Defaults to [].
         """
-        # Storage part
-        # the sort() methods is here to not take into account the arrangement of the items, just making sure that there are the same items, otherwise there is a diff and we need to reorganise it.
-        if (
-            storage_item_ids.sort()
-            != [
-                self.storage["tab"][j][i].property["Id"]
-                for j in range(INVENTORY_STORAGE_HEIGHT)
-                for i in range(INVENTORY_STORAGE_WIDTH)
-                if self.storage["tab"][j][i] != None
-            ].sort()
-        ):
+        # Storage part, simple version not optimised taking into account positions ! It means that at each change on one client's inventory, all the inventory is reload e.g the textures of each items
+
+        # Creating a dict containing the current player infos , matching the scheme on the datas.json file
+        p_items = {
+            str(self.storage["tab"][j][i].property["Id"]) : [i,j]
+            for j in range(INVENTORY_STORAGE_HEIGHT)
+            for i in range(INVENTORY_STORAGE_WIDTH)
+            if self.storage["tab"][j][i] != None
+        }
+
+        if p_items != storage_item_ids:
             for j in range(INVENTORY_STORAGE_HEIGHT):
                 for i in range(INVENTORY_STORAGE_WIDTH):
-                    if (j * INVENTORY_STORAGE_WIDTH + i + 1) == len(storage_item_ids):
-                        break
+                    self.storage["tab"][j][i] = None
 
-                    self.storage["tab"][j][i] = deepcopy(
-                        itemConf.ITEM_DB[
-                            storage_item_ids[j * INVENTORY_STORAGE_WIDTH + i]
-                        ]
+            for item_id, (i, j) in storage_item_ids.items():
+                self.storage["tab"][j][i] = deepcopy(itemConf.ITEM_DB[int(item_id)])
+                self.storage["tab"][j][i].loadIcon()
+                self.storage["tab"][j][i].loadSurfDesc()
+                self.storage["tab"][j][i].setCoor(
+                    (
+                        self.storage["initPoint"][0] + i * self.storage["offset"][0],
+                        self.storage["initPoint"][1] + j * self.storage["offset"][1],
                     )
-                    if self.icon == None:
-                        self.storage["tab"][j][i].loadIcon()
-                    if self.property["desc"]["descText"] == None:
-                        self.storage["tab"][j][i].loadSurfDesc()
-                    self.storage["tab"][j][i].setCoor(
-                        (
-                            self.storage["initPoint"][0]
-                            + i * self.storage["offset"][0],
-                            self.storage["initPoint"][1]
-                            + j * self.storage["offset"][1],
-                        )
-                    )
+                )
 
         if list(eq_item_ids.values()) != [
             slot_item["item"].property["Id"]
@@ -861,31 +856,23 @@ class Inventory:
             if slot_item["item"] != None
         ]:
             for slot_id, item_id in eq_item_ids.items():
-                self.equipment[slot_id] = deepcopy(itemConf.ITEM_DB[item_id])
-                if self.icon == None:
-                    self.storage["tab"][j][i].loadIcon()
-                if self.property["desc"]["descText"] == None:
-                    self.storage["tab"][j][i].loadSurfDesc()
+                self.equipment[int(slot_id)]["item"] = deepcopy(itemConf.ITEM_DB[item_id])
+                self.equipment[int(slot_id)]["item"].loadIcon()
+                self.equipment[int(slot_id)]["item"].loadSurfDesc()
 
-    def transmitInventoryInfos(self, player_id):
+    def transmitInventoryInfos(self, player_id, data):
 
-        data = json.load(open("./datas.json"))
-        with open("./datas.json", "w") as f:
-            data["players"][player_id]["inventory"]["storage"] = [
-                str(self.storage["tab"][j][i].property["Id"])
-                for j in range(INVENTORY_STORAGE_HEIGHT)
-                for i in range(INVENTORY_STORAGE_WIDTH)
-                if self.storage["tab"][j][i] != None
-            ]
-            data["players"][player_id]["inventory"]["equipment"] = {
-                str(slot): str(slot_item["item"].property["Id"])
-                for slot, slot_item in self.equipment.items()
-                if slot_item["item"] != None
-            }
-            logger.info(
-                f"data ???? {data} {[self.storage['tab'][j][i].property['Id'] for j in range(INVENTORY_STORAGE_HEIGHT) for i in range(INVENTORY_STORAGE_WIDTH) if self.storage['tab'][j][i] != None ]}"
-            )
-            json.dump(data, f)
+        data["players"][player_id]["inventory"]["storage"] = {
+            str(self.storage["tab"][j][i].property["Id"]): (i, j)
+            for j in range(INVENTORY_STORAGE_HEIGHT)
+            for i in range(INVENTORY_STORAGE_WIDTH)
+            if self.storage["tab"][j][i] != None
+        }
+        data["players"][player_id]["inventory"]["equipment"] = {
+            str(slot): int(slot_item["item"].property["Id"])
+            for slot, slot_item in self.equipment.items()
+            if slot_item["item"] != None
+        }
 
     # def __getstate__(self):
 

@@ -624,8 +624,6 @@ class Character:
 
             # Reseting the chrono to move the character
             self.lastRenderedTime = time.time()
-            if self.Game.isOnline:
-                self.Map.transmitPosInfos(self.networkId)
 
     def show(self):
         if self.genOrder > 0:
@@ -656,6 +654,15 @@ class Character:
             self.zoomedSurf,
             self.zoomedRect,
         )
+
+    # -------------------------- NETWORK ----------------------- #
+    def transmitAnimInfos(self, player_id, data):
+        data["players"][player_id]["characterInfo"] = {
+            "classId": self.classId,
+            "imagePos": self.imageState["imagePos"],
+            "direction": self.direction,
+            "spellsID": self.spellsID,
+        }
 
     # def __getstate__(self):
 
