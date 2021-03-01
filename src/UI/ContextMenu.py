@@ -273,6 +273,8 @@ class NonBlockingPopupMenu(PopupMenu):
         self.init_data = data
         self._init_pos = pos
         self.Game = gameController
+        self.networkController = None
+        self.tradeUI = None
 
         if show:
             self.show()
@@ -283,6 +285,10 @@ class NonBlockingPopupMenu(PopupMenu):
 
         self.Hero = Hero
         self.Target = TargetHero
+
+        self.tradeUI = TradeUI(
+            self.Game, self.Hero, self.Target, self.networkController
+        )
 
     def show(self):
         """generate the menu geometry and graphics, and makes the menu visible"""
@@ -342,7 +348,13 @@ class NonBlockingPopupMenu(PopupMenu):
                         else:
                             self.Target.SpellBook.open = True
                     elif e.text == "Trade":
-                        TradeUI(self.Game, self.Hero, self.Target).show()
+                        if self.tradeUI._show:
+                            self.Hero.Inventory._close()
+                        else:
+                            self.networkController.sendTradeInv(self.Target.networkId)
+
+                        self.tradeUI._show = not self.tradeUI._show
+
                     elif e.text == "Fight":
                         self.Hero.createFight([self.Hero, self.Target])
 

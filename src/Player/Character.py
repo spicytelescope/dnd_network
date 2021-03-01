@@ -184,14 +184,14 @@ class Character:
         self.SpellBook.updateSpellBook()
 
         if not self._Level == 1:  # The inital level up does not require something else
-            Dialog(
-                f"{self.name} gain a level ! What characteristic do you want to up ?",
-                (self.Game.resolution // 2, self.Game.resolution // 2),
-                self.Game.screen,
-                (255, 0, 0),
-                self.Game,
-                charLimit=50,
-            ).mainShow()
+            # Dialog(
+            #     f,
+            #     (self.Game.resolution // 2, self.Game.resolution // 2),
+            #     self.Game.screen,
+            #     (255, 0, 0),
+            #     self.Game,
+            #     charLimit=50,
+            # ).mainShow()
 
             def addStat(stat, value):
                 def int_func():
@@ -207,6 +207,7 @@ class Character:
                 self.Game.screen,
                 self.Game,
                 (self.Game.resolution // 2, self.Game.resolution // 2),
+                f"{self.name} gain a level ! What characteristic do you want to up ?"
             ).show()
 
     def modifyStat(self, stat, value):
@@ -656,12 +657,15 @@ class Character:
         )
 
     # -------------------------- NETWORK ----------------------- #
+
     def transmitAnimInfos(self, player_id, data):
         data["players"][player_id]["characterInfo"] = {
             "classId": self.classId,
             "imagePos": self.imageState["imagePos"],
             "direction": self.direction,
             "spellsID": self.spellsID,
+            "name": self.name,
+            "stats": self.stats
         }
 
     # def __getstate__(self):

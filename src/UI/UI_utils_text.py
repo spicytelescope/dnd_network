@@ -301,7 +301,7 @@ class SelectPopUp:
     with "action" value being a function
     """
 
-    def __init__(self, choices, parentSurf, gameController, centerCoor) -> None:
+    def __init__(self, choices, parentSurf, gameController, centerCoor, text="") -> None:
 
         assert len(choices) != 0, logger.error(
             "Choices must be passed in the select pop up !"
@@ -312,6 +312,7 @@ class SelectPopUp:
         self.open = False
         self.centerCoor = centerCoor
         self.hovered = [False for elt in self.choices]
+        self.text = text
 
         # --------------- FONTS ------------- #
 
@@ -321,16 +322,19 @@ class SelectPopUp:
             )
             for choice in self.choices.keys()
         ]
+        self.textFont = pygame.font.Font(DUNGEON_FONT, BUTTON_FONT_SIZE + 10).render(
+                self.text, True, (0, 0, 0)
+            )
 
         # --------- TEXTURES ---------- #
 
-        maxSurfWidth = max([surf.get_width() for surf in self.fonts])
-        totalHeight = sum([surf.get_height() for surf in self.fonts])
+        maxSurfWidth = max([surf.get_width() for surf in self.fonts]) + self.textFont.get_width()
+        totalHeight = sum([surf.get_height() for surf in self.fonts]) + self.textFont.get_height()*2
 
         self.parentSurf = parentSurf
         self.blank_surf = pygame.transform.scale(
             HUDConf.NAME_SLOT,
-            (int(maxSurfWidth * 1.5), int(totalHeight * 1.5)),
+            (int(maxSurfWidth * 1.2), int(totalHeight * 2)),
         )
         self.surf = self.blank_surf.copy()
 
@@ -338,7 +342,7 @@ class SelectPopUp:
         self.PADDING = totalHeight // len(self.choices)
         self.initPoint = [
             self.rect.width // 2,
-            self.rect.height // (len(self.choices) + 1),
+            self.rect.height // (len(self.choices) + 1) + int(self.textFont.get_height()*0.75),
         ]
 
         self.fontRects = [
@@ -395,7 +399,7 @@ class SelectPopUp:
             ]
             self.fontRects = [
                 font.get_rect(
-                    center=(self.initPoint[0], self.initPoint[1] + (i * self.PADDING))
+                    center=(self.initPoint[0], self.initPoint[1] + ((i+1) * self.PADDING))
                 )
                 for i, font in enumerate(self.fonts)
             ]
@@ -403,6 +407,8 @@ class SelectPopUp:
             if self.open:
                 # ------------ BLITING ----------------- #
                 self.surf = self.blank_surf.copy()
+                if self.text != "":
+                    self.surf.blit(self.textFont, self.textFont.get_rect(center=(self.initPoint)))
 
                 for i in range(len(self.choices)):
 
@@ -417,9 +423,9 @@ MAX_LEN_NAME = 10
 
 
 class TextBoxControl(object):
-    def __init__(self, centerCoor):
+    def __init__(self, centerCoor, size=(200,50)):
         self.input = TextBox(
-            pygame.Surface((200, 50)).get_rect(center=centerCoor),
+            pygame.Surface(size).get_rect(center=centerCoor),
             command=self.changeName,
             clear_on_enter=True,
             inactive_on_enter=False,
@@ -441,8 +447,3 @@ class TextBoxControl(object):
     def reset(self):
         self.input.buffer = []
         self.name = ""
-
-
-if __name__ == "__main__":
-    app = TextBoxControl()
-    app.show()

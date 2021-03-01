@@ -209,7 +209,7 @@ class Inventory:
                     self.storage["tab"][j][i] != None
                     and self.storage["tab"][j][i].rect.collidepoint(mousePosTranslated)
                     and event.type == MOUSEBUTTONDOWN
-                    and event.button == 3
+                    and event.button == 1
                 ):
                     TradeUI.inventory_to_trade((i, j))
 

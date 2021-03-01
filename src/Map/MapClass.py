@@ -1,4 +1,4 @@
-from copy import copy
+from copy import copy, deepcopy
 import json
 import math
 import os
@@ -202,8 +202,6 @@ class OpenWorldMap:
                             ]
                             for j in range(MIN_CHUNK_SUBDIVISON)
                         ],
-                        # Flag for marking if a chunk has already been processed by the envGenerator
-                        "elementsGenerated": False,
                         "surface": pygame.Surface(
                             (self.Game.resolution, self.Game.resolution)
                         ),
@@ -588,7 +586,7 @@ class OpenWorldMap:
         self.WorldMapLoaded = True
 
     def resetChunks(self):
-        """Method called to regenate the chunk, usually after the LDO has been modified"""
+        """Method called to regenarate the chunk, usually after the LDO has been modified"""
 
         # Copy the current chunk coor in order not to lose them because we regen the main chunk from it
         tmpCurrentPos = self.chunkData["currentChunkPos"]
@@ -612,13 +610,51 @@ class OpenWorldMap:
     # ----------------------- NETWORK -------------------- #
 
     def transmitPosInfos(self, player_id, data):
-        
-        data["players"][player_id][
-            "chunkPos"
-        ] = self.Hero.posMainChunkCenter
+
+        data["players"][player_id]["chunkPos"] = self.Hero.posMainChunkCenter
         data["players"][player_id]["chunkCoor"] = self.Hero.Map.chunkData[
             "currentChunkPos"
         ]
+
+    def serializeRect(self, d):
+        """d must be a dict containing a "value" dict with a key "rect" and a value of type pygame.Rect"""
+        d["value"]["rect"] = (
+            *d["value"]["rect"].topleft,
+            *d["value"]["rect"].size,
+        )
+
+    def unserializeRect(self, d):
+        d["value"]["rect"] = pygame.Rect(d["value"]["rect"])
+
+    def transmitChunkCoors(self, player_id, data, sessionChunks):
+        """sessionChunks is a list of all the chunkCoors generated in the game, by all the players combined"""
+
+        for chunkCoor in self.chunkData.keys():
+            if chunkCoor not in sessionChunks.keys() and chunkCoor not in [
+                "mainChunk",
+                "currentChunkPos",
+            ]:
+                sessionChunks[
+                    chunkCoor
+                ] = (
+                    []
+                )  # By default, as the chunk has been discoverd and thus generated in local, there is no need to copy it a it's already in self.chunkData
+                transformedChunkData = deepcopy(self.chunkData[chunkCoor]["elementTab"])
+                for j in range(len(self.chunkData[chunkCoor]["elementTab"])):
+                    for i in range(len(self.chunkData[chunkCoor]["elementTab"][j])):
+                        if (
+                            self.chunkData[chunkCoor]["elementTab"][j][i]["value"]
+                            != None
+                        ):
+                            if (
+                                self.chunkData[chunkCoor]["elementTab"][j][i]["value"][
+                                    "rect"
+                                ]
+                                != None
+                            ):
+                                self.serializeRect(transformedChunkData[j][i])
+
+                data["players"][player_id]["mapInfo"]["chunkData"][chunkCoor] = transformedChunkData
 
     # def __getstate__(self):
 

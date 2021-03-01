@@ -44,7 +44,7 @@ class Building:
         ]
         self.elementTab = [
             [
-                {"entity": None, "onContact": lambda: None}
+                {"entity": None, "onContact": None}
                 for _ in range(BUILDING_MAP_SIZE)
             ]
             for __ in range(BUILDING_MAP_SIZE)

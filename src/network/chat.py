@@ -3,7 +3,12 @@ from pygame import color
 from pygame.constants import *
 from UI.UI_utils_fonc import formatDialogContent
 from config.UIConf import *
-class CombatLog():
+from UI.UI_utils_text import TextBoxControl
+
+class GameChat():
+
+    """Fusion of the combat log and an input box with networking helpers"""
+
     def __init__(self, gameController) -> None:
 
         self.Game = gameController
@@ -11,18 +16,19 @@ class CombatLog():
         # ------------------ TEXTURES ---------- #
 
         self.surf = pygame.Surface((1024 // 3, 1024 // 4), SRCALPHA)
-        self.rect = self.surf.get_rect(topright=(1024, 0))
+        self.rect = self.surf.get_rect(bottomleft=(0, self.Game.resolution))
 
-        # ---------------- FIGHT ATTR ------------- #
+        # ---------------- CHAT ATTR ------------- #
 
-        self.turn = 0
         self.text = []
-        self.textSurf = None
-        self.textRect = None
+        self.textSurf = pygame.Surface((self.rect.width, len(self.text) * 20), SRCALPHA)
+        self.textRect = self.textSurf.get_rect()
 
-        self.COLORS = {"TURN": (0, 255, 00), "SPELL": (0, 0, 255), "DMG": (255, 0, 0)}
+        self.COLORS = {"NEW": (0, 255, 00), "CHAT": (0, 0, 255), "CHAT_2": (255, 0, 0)}
 
-        self.addTurn()
+        # --------------------- INPUT ----------------------- #
+        self.inputBox = TextBoxControl((100, int(self.rect.height*0.9)), size=(self.rect.width-2, 50))
+        self.addText('test')
 
     def updateTextSurf(self):
 
@@ -37,28 +43,7 @@ class CombatLog():
 
         self.textRect.bottom = self.rect.height
 
-    def addTurn(self):
-
-        self.turn += 1
-        self.text += [
-            (
-                f"================== TURN N°{self.turn} ======================",
-                self.COLORS["TURN"],
-            )
-        ]
-        self.updateTextSurf()
-
-    def rollDice(self, dValue, actionName="DMG"):
-        """
-        Args:
-            + dValue (int): [description]
-            + actionName (str): can be either "DMG" or "SPELL"
-        """
-
-        self.text += [(f"Rolling a d{dValue} ...", self.COLORS[actionName])]
-        self.updateTextSurf()
-
-    def addText(self, text, actionName="DMG"):
+    def addText(self, text, actionName="CHAT"):
 
         textList = []
         textList += formatDialogContent(text, 40)
@@ -71,15 +56,17 @@ class CombatLog():
     def reset(self):
 
         self.text = []
-        logger.info("Reseting combat log !")
 
     def show(self):
+
         self.surf.fill((0, 0, 0, 127))
         self.surf.blit(self.textSurf, self.textRect)
+        self.inputBox.show(self.surf)
         self.Game.screen.blit(self.surf, self.rect)
 
     def update(self, event):
-
+        
+        self.inputBox.checkEvent(event)
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()

@@ -58,8 +58,7 @@ class MainMenu:
             Button(
                 self.Game.resolution * 0.85,
                 self.Game.resolution * 0.95,
-                ("Documentation", "dejavusansmono",
-                 (255, 255, 255), BUTTON_FONT_SIZE),
+                ("Documentation", "dejavusansmono", (255, 255, 255), BUTTON_FONT_SIZE),
                 # action=lambda: openDoc(),
             ),
         ]
@@ -178,8 +177,7 @@ class MainMenu:
         if self.Id != 3:
 
             self.mainSurface = pygame.transform.scale(
-                menuConf.MAIN_BACKGROUND, (self.Game.resolution,
-                                           self.Game.resolution)
+                menuConf.MAIN_BACKGROUND, (self.Game.resolution, self.Game.resolution)
             ).copy()
 
         if self.Id == 2 and self.stepsCursor == 1:
@@ -191,8 +189,7 @@ class MainMenu:
             )
             layout = pygame.transform.scale(
                 menuConf.SCROLL,
-                (int(fontText.get_width() * 1.25),
-                 int(fontText.get_height() * 1.5)),
+                (int(fontText.get_width() * 1.25), int(fontText.get_height() * 1.5)),
             )
             layout.blit(
                 fontText,
@@ -203,8 +200,7 @@ class MainMenu:
             self.mainSurface.blit(
                 layout,
                 layout.get_rect(
-                    center=(self.Game.resolution // 2,
-                            int(self.Game.resolution // 2))
+                    center=(self.Game.resolution // 2, int(self.Game.resolution // 2))
                 ),
             )
             self.textBox.show(self.mainSurface)
@@ -276,10 +272,8 @@ class OptionMenu(MainMenu):
 
         self.selectedResolution = StringVar(self.root)
         self.selectedRefreshRate = IntVar(self.root, self.Game.refresh_rate)
-        self.selectedRenderDistance = IntVar(
-            self.root, self.Map.renderDistance)
-        self.enableWaterAnimation = IntVar(
-            self.root, self.Map.enableWaterAnimation)
+        self.selectedRenderDistance = IntVar(self.root, self.Map.renderDistance)
+        self.enableWaterAnimation = IntVar(self.root, self.Map.enableWaterAnimation)
         self.selectedLDO = IntVar(self.root, self.Map.lod)
         self.enableDebugMode = IntVar(self.root, self.Game.debug_mode)
         self.enableSound = IntVar(self.root, self.Game.enableSound)
@@ -322,8 +316,7 @@ class OptionMenu(MainMenu):
         ]
 
         # To get the intial resolution, need to be set up AFTER widget creation
-        self.selectedResolution.set(
-            f"{self.Game.resolution}x{self.Game.resolution}")
+        self.selectedResolution.set(f"{self.Game.resolution}x{self.Game.resolution}")
 
         # -------------------------   BLITTING WIDGETS  ---------------------- #
 
@@ -346,8 +339,7 @@ class OptionMenu(MainMenu):
         ):
 
             # Changing GameController Settings
-            self.Game.resolution = int(
-                self.selectedResolution.get().split("x")[0])
+            self.Game.resolution = int(self.selectedResolution.get().split("x")[0])
             self.Game.refresh_rate = self.selectedRefreshRate.get()
 
             self.Game.screen = pygame.Surface(
@@ -368,8 +360,7 @@ class OptionMenu(MainMenu):
 
             for Hero in self.heroesGroup:
                 Hero.charRect = Hero.imageState["image"].get_rect(
-                    center=(self.Game.resolution // 2,
-                            self.Game.resolution // 2)
+                    center=(self.Game.resolution // 2, self.Game.resolution // 2)
                 )
 
             # Music
@@ -580,8 +571,7 @@ class SelectMenu(MainMenu):
         self.stepTitle = Button(
             self.initButtonPos[0],
             self.initButtonPos[1] - 200,
-            [self.currentStep, BUTTON_FONT_NAME,
-                (255, 255, 255), BUTTON_FONT_SIZE * 2],
+            [self.currentStep, BUTTON_FONT_NAME, (255, 255, 255), BUTTON_FONT_SIZE * 2],
             clickable=False,
         )
 
@@ -723,8 +713,7 @@ class SelectMenu(MainMenu):
         self.createGameButton = Button(
             self.initButtonPos[0],
             self.initButtonPos[1] + self.buttonSpacing * 2,
-            ["LAUNCH GAME", BUTTON_FONT_NAME,
-                (255, 215, 0), BUTTON_FONT_SIZE * 2],
+            ["LAUNCH GAME", BUTTON_FONT_NAME, (255, 215, 0), BUTTON_FONT_SIZE * 2],
             action=self.loadGame,
         )
 
@@ -759,8 +748,7 @@ class SelectMenu(MainMenu):
         self.Game.loadNewGame()
 
     def increaseCount(self):
-        self.characSelecCursor = (
-            self.characSelecCursor + 1) % len(playerConf.CLASSES)
+        self.characSelecCursor = (self.characSelecCursor + 1) % len(playerConf.CLASSES)
         self.updateAnimation()
         self.HeroesGroup[self.HeroIndex].classId = self.characSelecCursor
         self.HeroesGroup[self.HeroIndex].imageState["image"] = playerConf.CLASSES[
@@ -768,8 +756,7 @@ class SelectMenu(MainMenu):
         ]["directions"]["down"][0]
 
     def decreaseCount(self):
-        self.characSelecCursor = (
-            self.characSelecCursor - 1) % len(playerConf.CLASSES)
+        self.characSelecCursor = (self.characSelecCursor - 1) % len(playerConf.CLASSES)
         self.updateAnimation()
         self.HeroesGroup[self.HeroIndex].classId = self.characSelecCursor
         self.HeroesGroup[self.HeroIndex].imageState["image"] = playerConf.CLASSES[
@@ -777,7 +764,7 @@ class SelectMenu(MainMenu):
         ]["directions"]["down"][0]
 
     def nextStep(self):
-        logger.debug(f"{self.stepsCursor} and {self.HeroIndex}")
+        # logger.debug(f"{self.stepsCursor} and {self.HeroIndex}")
         if self.stepsCursor == 1 and self.HeroIndex < len(self.HeroesGroup) - 1:
             if (
                 playerConf.MAX_NAME_LENGTH
@@ -852,8 +839,7 @@ class SelectMenu(MainMenu):
                     action=action,
                 )
                 for action, direction, i in zip(
-                    [self.decreaseCount, self.increaseCount], [
-                        "left", "right"], [-1, 1]
+                    [self.decreaseCount, self.increaseCount], ["left", "right"], [-1, 1]
                 )
             ]
 
@@ -878,8 +864,7 @@ class SelectMenu(MainMenu):
             ]
 
             for i, button in enumerate(self.genButtons):
-                button.text = GEN_MAP_PARAM_NAMES[i] + \
-                    f" : {self.genParams[i]}"
+                button.text = GEN_MAP_PARAM_NAMES[i] + f" : {self.genParams[i]}"
             self.buttons = (
                 [self.stepTitle]
                 + self.stepsNavButtons
@@ -912,7 +897,15 @@ class SelectMenu(MainMenu):
 
 
 class PauseMenu(OptionMenu):
-    def __init__(self, gameController, Map, Hero, SaveController, HeroesGroup, NetworkController=None):
+    def __init__(
+        self,
+        gameController,
+        Map,
+        Hero,
+        SaveController,
+        HeroesGroup,
+        NetworkController=None,
+    ):
 
         self.Game = gameController
         self.Map = Map
@@ -932,8 +925,7 @@ class PauseMenu(OptionMenu):
         # --------------- MENU SURFACE  ------------- #
 
         self.menuSurface = pygame.transform.scale(
-            menuConf.BG_WOOD, (self.Game.resolution // 2,
-                               self.Game.resolution // 2)
+            menuConf.BG_WOOD, (self.Game.resolution // 2, self.Game.resolution // 2)
         )
         self.menuRect = self.menuSurface.get_rect(
             center=(self.Game.resolution // 2, self.Game.resolution // 2)
@@ -1117,7 +1109,9 @@ class LoadingMenu:
                             "desc": f"Generating chunk n°{i} ...",
                             "weight": round(
                                 OPEN_WORLD_FLAGS_WEIGHTS["MAP"]
-                                / ((1 + self.Player_Map.renderDistance * 2) ** 2), 2),
+                                / ((1 + self.Player_Map.renderDistance * 2) ** 2),
+                                2,
+                            ),
                             "checked": False,
                         }
                         for i in range(
@@ -1208,53 +1202,69 @@ class LoadingMenu:
 
         """
 
-        if self.Game.currentState == "loadingNewGame":
+        if not parentFlagName == "":
+            flag = self.openWorldFlags[parentFlagName]["subflags"][flagName]
+            flag["checked"] = True
+            if all(
+                [
+                    subflag["checked"]
+                    for subflag in self.openWorldFlags[parentFlagName][
+                        "subflags"
+                    ].values()
+                ]
+            ):
+                self.openWorldFlags[parentFlagName]["checked"] = True
+        else:
+            flag = self.openWorldFlags[flagName]
+            flag["checked"] = True
 
-            if not parentFlagName == "":
-                flag = self.openWorldFlags[parentFlagName]["subflags"][flagName]
-                flag["checked"] = True
-                if all(
-                    [
-                        subflag["checked"]
-                        for subflag in self.openWorldFlags[parentFlagName][
-                            "subflags"
-                        ].values()
-                    ]
-                ):
-                    self.openWorldFlags[parentFlagName]["checked"] = True
+        # Updating weights
+        logger.debug(f"ADDING to {flagName} : {flag['weight']} ")
+        self.loadingPourcentage += flag["weight"]
+        self.loadingPourcentage = round(self.loadingPourcentage, 2)
+        debugCheckStr = "\n{\n"
+        for i, flag in enumerate(self.openWorldFlags.values()):
+            if flag["checked"]:
+                debugCheckStr += f"\t👉 {list(self.openWorldFlags.keys())[i]} : ✅\n"
             else:
-                flag = self.openWorldFlags[flagName]
-                flag["checked"] = True
+                debugCheckStr += f"\t👉 {list(self.openWorldFlags.keys())[i]} : ⌛\n"
+        debugCheckStr += "}\n"
 
-            # Updating weights
-            logger.debug(f"ADDING to {flagName} : {flag['weight']} ")
-            self.loadingPourcentage += flag["weight"]
-            self.loadingPourcentage = round(self.loadingPourcentage, 2)
-            debugCheckStr = "\n{\n"
-            for i, flag in enumerate(self.openWorldFlags.values()):
-                if flag["checked"]:
-                    debugCheckStr += f"\t👉 {list(self.openWorldFlags.keys())[i]} : ✅\n"
-                else:
-                    debugCheckStr += f"\t👉 {list(self.openWorldFlags.keys())[i]} : ⌛\n"
-            debugCheckStr += "}\n"
-
-            if self.Game.debug_mode and self.flagDebug:
-                os.system("cls") if platform.system() == "Windows" else os.system(
-                    "clear"
-                )
-                print(debugCheckStr)
+        if self.Game.debug_mode and self.flagDebug:
+            os.system("cls") if platform.system() == "Windows" else os.system(
+                "clear"
+            )
+            print(debugCheckStr)
 
     def resetFlags(self) -> None:
         """
-        Reset the flags "checked" in the self.openWorldFlags dict by setting them all to False.
+        Reset the flags
         """
 
-        for flag in self.openWorldFlags.values():
-            if flag["subflags"] == None:
-                flag["checked"] = False
-            else:
-                for subflag in flag["subflags"].values():
-                    subflag["checked"] = False
+        self.openWorldFlags = OPEN_WORLD_FLAGS
+        self.openWorldFlags.update(
+            {
+                "map": {
+                    "subflags": {
+                        f"chunk_{i}": {
+                            "desc": f"Generating chunk n°{i} ...",
+                            "weight": round(
+                                OPEN_WORLD_FLAGS_WEIGHTS["MAP"]
+                                / ((1 + self.Player_Map.renderDistance * 2) ** 2),
+                                2,
+                            ),
+                            "checked": False,
+                        }
+                        for i in range(
+                            1, ((1 + self.Player_Map.renderDistance * 2) ** 2) + 1
+                        )
+                    },
+                    "weight": OPEN_WORLD_FLAGS_WEIGHTS["MAP"],
+                    "checked": False,
+                }
+            }
+        )
+        self.loadingPourcentage = 0
 
     def show(self):
 
@@ -1288,7 +1298,6 @@ class LoadingMenu:
 
             self.resetFlags()
             self.Game.goToOpenWorld()
-            self.loadingPourcentage = 0
 
     def blitLoadingIcon(self, Hero):
 
@@ -1311,8 +1320,7 @@ class LoadingMenu:
             )
 
             self.Game.screen.blit(
-                loadingIcon, (self.Game.resolution * 0.8,
-                              self.Game.resolution * 0.8)
+                loadingIcon, (self.Game.resolution * 0.8, self.Game.resolution * 0.8)
             )
             self.Game.show()
 

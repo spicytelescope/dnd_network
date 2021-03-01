@@ -3,8 +3,6 @@ import pygame as pg
 
 
 ACCEPTED = string.ascii_letters + string.digits + string.punctuation + " " + "éè"
-
-
 class TextBox(object):
     def __init__(self, rect, **kwargs):
         self.rect = pg.Rect(rect)

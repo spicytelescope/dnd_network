@@ -71,7 +71,7 @@ class Dungeon:
             [
                 {
                     "entity": None,
-                    "onContact": lambda: None,
+                    "onContact": None,
                 }
                 for _ in range(self.MAP_SIZE[0] // 12)
             ]

@@ -3,6 +3,7 @@ import pygame
 from HUD.CharBar import CharBar
 from Map.envGenerator import EnvGenerator
 from network.NetworkController import NetworkController
+from network.chat import GameChat
 
 pygame.init()
 
@@ -24,8 +25,8 @@ from utils.RessourceHandler import *
 
 # CREATING BASED FEATURES
 Game = GameController()
-Game.combatLog = CombatLog(Game)
-Game.fightMode = FightMode(Game)
+# Game.combatLog = CombatLog(Game)
+# Game.fightMode = FightMode(Game)
 
 # LOADING RESSOURCES
 loadPlayerRessources()
@@ -40,24 +41,29 @@ loadSpellRessources()
 Player_Map = OpenWorldMap(PLAYER_CONFIG, Game, debug=True)
 LdingMenu = LoadingMenu(Game, Player_Map)
 Hero = Character(Game, Player_Map)
-Game.heroesGroup = [Hero]
+Hero.genOrder = 0
+Hero2 = Character(Game, Player_Map)
+Game.heroesGroup = [Hero, Hero2]
+Hero.initHUD(LdingMenu)
+Hero2.initHUD(LdingMenu)
 
 ContextMenu = NonBlockingPopupMenu(POP_UP_ACTIONS, Game)
 NetworkController = NetworkController(Game, Player_Map, Hero, ContextMenu)
 Game.NetworkController = NetworkController
-NetworkController._show = True
+ContextMenu.bind(Hero, Hero2)
 
 
-Hero.genOrder = 0
-Hero.initHUD(LdingMenu)
 
-NetworkController.createTestConnection()
-
+# ContextMenu.tradeUI.waitingFlag = True
+ContextMenu.tradeUI.waitChrono = time.time()
+ContextMenu.tradeUI.confirmRecvFlag = True
+ContextMenu.tradeUI._show = True
 
 while True:
-    NetworkController.handleConnectedPlayers()
 
-    Game.screen.fill((0, 0, 0))
+    Game.screen.fill((255, 255, 255))
+    for event in pygame.event.get():
+        ContextMenu.tradeUI.checkActions(event)
 
-    NetworkController.drawPannel()
+    ContextMenu.tradeUI.draw()
     Game.show()

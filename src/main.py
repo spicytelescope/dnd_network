@@ -60,7 +60,9 @@ Game.heroesGroup += Hero_group
 # ------------------ NETWORKING -------------- #
 
 ContextMenu = NonBlockingPopupMenu(POP_UP_ACTIONS, Game)
-NetworkController = NetworkController(Game, Player_Map, Hero_group[0], ContextMenu)
+NetworkController = NetworkController(
+    Game, Player_Map, Hero_group[0], ContextMenu
+)
 Game.NetworkController = NetworkController
 
 # ------------------- MENUS -------------------- #
@@ -72,7 +74,7 @@ PauseMenu = PauseMenu(
     Game, Player_Map, Hero_group, SaveController, Game.heroesGroup, NetworkController
 )
 LoadingMenu = LoadingMenu(Game, Player_Map)
-
+NetworkController.LoadingMenu = LoadingMenu
 # ------------------ SAVES -------------------- #
 
 SaveController.gameClasses = [
@@ -145,6 +147,8 @@ while Game.currentState != "quit":
     while Game.currentState == "openWorld":
 
         Hero = Hero_group[Game.heroIndex]
+
+        # ----------------- REST MECHANIC -------------------- #
         if (time.time() - Hero.lastTimeoutHealed) > TIME_OUT_REST:
             for H in Hero_group:
                 H.modifyHP(2)
@@ -214,6 +218,7 @@ while Game.currentState != "quit":
                     == Game.KeyBindings["Show the connected player (Online mode only)"][
                         "value"
                     ]
+                    and Game.isOnline
                 ):
                     NetworkController._show = not NetworkController._show
 
@@ -264,13 +269,16 @@ while Game.currentState != "quit":
             # ------------------- HUD HANDLING ----------- #
 
             Hero.CharBar.show()
-            Player_Map.miniMap.show()
+            # Player_Map.miniMap.show()
             Hero.Inventory.draw()
             Hero.QuestJournal.draw()
             Hero.SpellBook.draw()
             Player_Map.miniMap.drawExtendedMap()
             if Game.isOnline:
                 NetworkController.handleConnectedPlayers()
+                NetworkController.drawPannel()
+                if ContextMenu.tradeUI != None:
+                    ContextMenu.tradeUI.draw()
                 ContextMenu.draw()
 
             Game.show()

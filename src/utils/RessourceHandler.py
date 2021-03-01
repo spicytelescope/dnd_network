@@ -423,7 +423,7 @@ def loadLandscapeRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                 "spawnTreshold": None,
                 "placeholder": {"type": "alone", "flag": False},
                 "spawnTileCode": None,
-                "onContact": NoContact,
+                "onContact": None,
                 "entity": None,
             }
 
@@ -574,7 +574,7 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                 "spawnRange": 3,
                 "spawnTreshold": 9,
                 "spawnTileCode": GREEN,
-                "onContact": NoContact,
+                "onContact": None,
                 "entity": None,
                 "mapSurfPath": "./assets/world_textures/buildings/house/PNJHouse001/PNJHouse001_interior.png",
                 "mapLayerPath": [
@@ -596,7 +596,7 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                 "spawnRange": 3,
                 "spawnTreshold": 9,
                 "spawnTileCode": GREEN,
-                "onContact": NoContact,
+                "onContact": None,
                 "entity": None,
                 "mapLayerPath": [
                     f"./assets/world_textures/buildings/shop/Seller_Tile Layer {i}.csv"
@@ -618,7 +618,7 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                 "spawnRange": 3,
                 "spawnTreshold": 9,
                 "spawnTileCode": GREEN,
-                "onContact": NoContact,
+                "onContact": None,
                 "entity": None,
                 "NPC": {},
             },
@@ -636,7 +636,7 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                 "spawnRange": 3,
                 "spawnTreshold": 9,
                 "spawnTileCode": GREEN,
-                "onContact": NoContact,
+                "onContact": None,
                 "entity": None,
                 "composition": {
                     "ennemy": ["Skeleton", "Flying_eye"],
@@ -703,7 +703,7 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                 "spawnTreshold": 4,
                 "placeholder": {"type": "alone", "flag": False},
                 "spawnTileCode": GREEN,
-                "onContact": NoContact,
+                "onContact": None,
                 "entity": None,
                 "defaultGoldValue": ennemyConf.ENNEMY_DEFAULT_GOLD_VALUE[ennemyName],
                 "frames": {
@@ -737,7 +737,7 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                 "spawnTreshold": 3,
                 "placeholder": {"type": "alone", "flag": False},
                 "spawnTileCode": GREEN,
-                "onContact": NoContact,
+                "onContact": None,
                 "entity": None,
                 "CHEST_ANIM_OPEN": [
                     pygame.transform.scale(
@@ -768,7 +768,7 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                 "surf": None,
                 "rect": None,
                 "placeholder": {"type": "alone", "flag": False},
-                "onContact": NoContact,
+                "onContact": None,
                 "entity": None,
             }
         },
@@ -780,7 +780,7 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                 "spawnTreshold": 3,
                 "placeholder": {"type": "alone", "flag": False},
                 "spawnTileCode": GREEN,
-                "onContact": NoContact,
+                "onContact": None,
                 "entity": None,
             }
             for professionName in listdir("./assets/world_textures/NPC/")

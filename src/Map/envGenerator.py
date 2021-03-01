@@ -18,6 +18,8 @@ from gameObjects.NPC import NPC, Seller
 from Player.Character import Character
 from UI.UI_utils_text import InfoTip
 
+from copy import deepcopy
+
 
 class EnvGenerator:
     def __init__(self, gameController, Map):
@@ -433,6 +435,16 @@ class EnvGenerator:
                     scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["type"] = type
                     scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["name"] = name
 
+                    # Filtering surfaces to allow serialization afterward
+                    scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
+                        "CHEST_SURF"
+                    ] = None
+                    scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
+                        "CHEST_ANIM_OPEN"
+                    ] = None
+                    scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
+                        "CHEST_ANIM_CLOSE"
+                    ] = None
                     if (
                         type == "Landscape"
                         and isinstance(
@@ -447,79 +459,41 @@ class EnvGenerator:
                         )
 
                     # ------------------ AFFECTING ENTITY ----------------- #
+                    # To avoid stroring actual pygame Surfaces, we just store the information needed for a real instanciation afterward in the displayWorldTextures method
 
                     if name == "Chest":
 
                         scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
                             "entity"
-                        ] = Chest(self.Game, self.Hero, None)
-
-                        scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
-                            "onContact"
-                        ] = scopeGridFiltered[caseSelectedPosY][caseSelectedPosX][
-                            "value"
-                        ][
-                            "entity"
-                        ].show
+                        ] = {"type": "Chest"}
 
                     elif name == "Seller":
                         scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
                             "entity"
-                        ] = Seller(
-                            self.Map.chunkData["mainChunk"],
-                            random.randint(100, 300),
-                            self.Game,
-                            self.Hero,
-                            random.choice(
-                                listdir("./assets/world_textures/NPC/Seller/")
-                            ),
-                        )
-
-                        scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
-                            "onContact"
-                        ] = scopeGridFiltered[caseSelectedPosY][caseSelectedPosX][
-                            "value"
-                        ][
-                            "entity"
-                        ].openInterface
+                        ] = {
+                            "type": "Seller",
+                            "args": [
+                                random.randint(100, 300),
+                                random.choice(
+                                    listdir("./assets/world_textures/NPC/Seller/")
+                                ),
+                            ],
+                        }
 
                     elif name == "Villager":
                         scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
                             "entity"
-                        ] = NPC(
-                            self.Map.chunkData["mainChunk"],
-                            random.choices(["Talk-only", "Quest"], weights=[1, 2], k=1)[
-                                0
+                        ] = {
+                            "type": "Seller",
+                            "args": [
+                                random.choices(
+                                    ["Talk-only", "Quest"], weights=[1, 2], k=1
+                                )[0],
+                                random.choice(
+                                    listdir("./assets/world_textures/NPC/Villager/")
+                                ),
                             ],
-                            self.Hero,
-                            self.Game,
-                            random.choice(
-                                listdir("./assets/world_textures/NPC/Villager/")
-                            ),
-                            name,
-                        )
-
-                        scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
-                            "onContact"
-                        ] = scopeGridFiltered[caseSelectedPosY][caseSelectedPosX][
-                            "value"
-                        ][
-                            "entity"
-                        ].openDialog
-
-                    elif type == "Ennemy":
-
-                        scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
-                            "entity"
-                        ] = Ennemy(
-                            self.Game.screen,
-                            self.Hero,
-                            self.Game,
-                            self.Map.envGenerator,
-                            name,
-                            0,
-                            1,
-                        )
+                        }
 
                 elif elt["placeholder"]["type"] == "all":
 
@@ -532,37 +506,15 @@ class EnvGenerator:
                             ].copy()
                             scopeGrid[k][l]["type"] = type
                             scopeGrid[k][l]["name"] = name
+                            scopeGrid[k][l]["value"]["surf"] = None
 
-                    if type == "Building":
-                        scopeGrid[0][0]["value"]["entity"] = Building(
-                            type,
-                            name,
-                            self.Game,
-                            self.Map,
-                            self.Hero,
-                        )
-                    elif type == "Dungeon":
-                        scopeGrid[0][0]["value"]["entity"] = Dungeon(
-                            name,
-                            self.Game,
-                            self.Hero,
-                            [
-                                32,
-                                32,
-                            ],
-                            self.Map,
-                            random.randrange(2, int(32 * 32 * 0.01)),
-                        )
+                            if type == "Dungeon":
+                                scopeGrid[k][l]["value"]["tileset"] = None
 
-                    # We give to all the pack the same entity object to reference to
-                    for k in range(elt["spawnRange"]):
-                        for l in range(elt["spawnRange"]):
-                            scopeGrid[k][l]["value"]["entity"] = scopeGrid[0][0][
-                                "value"
-                            ]["entity"]
-                            scopeGrid[k][l]["value"]["onContact"] = scopeGrid[0][0][
-                                "value"
-                            ]["entity"].show
+                    if type == "Dungeon":
+                        scopeGrid[0][0]["value"]["entity"] = {
+                            "args": [random.randrange(2, int(32 * 32 * 0.01))]
+                        }
 
         # logger.info(f"Generated {type}-{name}")
         return limit - generationCount
@@ -639,9 +591,8 @@ class EnvGenerator:
                         for l in range(len(scopeGrid[k])):
                             scopeGrid[k][l]["structure"] = {
                                 "name": name,
-                                "borderSurf": structTemplate["borderSurf"],
+                                "borderSurf": None,
                             }
-
                             scopeGrid[k][l]["structure"]["isBorder"] = (
                                 True if (l, k) in borderCoor else False
                             )
@@ -775,7 +726,9 @@ class EnvGenerator:
                     )
                 if elt["structure"]["isBorder"]:
 
-                    fenceRect = elt["structure"]["borderSurf"].get_rect(
+                    fenceRect = textureConf.WORLD_ELEMENTS_STRUCTURE[
+                        elt["structure"]["name"]
+                    ]["borderSurf"].get_rect(
                         topleft=(
                             i * self.scaleFactor * self.Map.stepGeneration,
                             j * self.scaleFactor * self.Map.stepGeneration,
@@ -789,7 +742,9 @@ class EnvGenerator:
                     )
 
                     self.Map.chunkData["mainChunk"].blit(
-                        elt["structure"]["borderSurf"],
+                        textureConf.WORLD_ELEMENTS_STRUCTURE[elt["structure"]["name"]][
+                            "borderSurf"
+                        ],
                         (
                             i * self.scaleFactor * self.Map.stepGeneration,
                             j * self.scaleFactor * self.Map.stepGeneration,
@@ -815,22 +770,59 @@ class EnvGenerator:
             for i in range(len(self.mainChunkElementsTab)):
 
                 elt = self.mainChunkElementsTab[j][i]
+                tmpEntry = deepcopy(elt)
 
                 if elt["type"] != None:
 
                     if elt["value"]["placeholder"]["type"] == "alone":
                         # The NPC got a special treatment as they are world elements that needs to be animated
-                        if elt["type"] == "NPC" or elt["type"] == "Ennemy":
 
-                            elt["value"]["entity"].init(
-                                (
-                                    i * self.scaleFactor * self.Map.stepGeneration,
-                                    j * self.scaleFactor * self.Map.stepGeneration,
-                                )
-                            )
+                        if elt["name"] == "Chest":
+                            tmpEntry["value"]["entity"] = Chest(self.Game, self.Hero)
+                            tmpEntry["value"]["onContact"] = tmpEntry["value"][
+                                "entity"
+                            ].show
+
+                        elif elt["type"] in ["NPC", "Ennemy"]:
+
                             if elt["type"] == "NPC":
 
-                                elt["value"]["rect"] = elt["value"][
+                                if elt["name"] == "Seller":
+                                    tmpEntry["value"]["entity"] = Seller(
+                                        self.Map.chunkData["mainChunk"],
+                                        elt["value"]["entity"]["args"][0],
+                                        self.Game,
+                                        self.Hero,
+                                        elt["value"]["entity"]["args"][1],
+                                    )
+
+                                    tmpEntry["value"]["onContact"] = tmpEntry["value"][
+                                        "entity"
+                                    ].openInterface
+                                else:
+                                    tmpEntry["value"]["entity"] = NPC(
+                                        self.Map.chunkData["mainChunk"],
+                                        elt["value"]["entity"]["args"][0],
+                                        self.Hero,
+                                        self.Game,
+                                        random.choice(
+                                            listdir(
+                                                "./assets/world_textures/NPC/Villager/"
+                                            )
+                                        ),
+                                        elt["name"],
+                                    )
+                                    tmpEntry["value"]["onContact"] = tmpEntry["value"][
+                                        "entity"
+                                    ].openDialog
+
+                                tmpEntry["value"]["entity"].init(
+                                    (
+                                        i * self.scaleFactor * self.Map.stepGeneration,
+                                        j * self.scaleFactor * self.Map.stepGeneration,
+                                    )
+                                )
+                                tmpEntry["value"]["rect"] = tmpEntry["value"][
                                     "entity"
                                 ].surf.get_rect(
                                     topleft=(
@@ -838,10 +830,21 @@ class EnvGenerator:
                                         j * self.scaleFactor * self.Map.stepGeneration,
                                     )
                                 )
-                                self.npc.append(elt)
-                                self.obstaclesList.append(elt)
+
+                                self.npc.append(tmpEntry)
+                                self.obstaclesList.append(tmpEntry)
                             else:
-                                self.ennemies.append(elt)
+                                tmpEntry["value"]["entity"] = Ennemy(
+                                    self.Game.screen,
+                                    self.Hero,
+                                    self.Game,
+                                    self.Map.envGenerator,
+                                    elt["name"],
+                                    0,
+                                    1,
+                                )
+                                self.ennemies.append(tmpEntry)
+
                             continue
 
                     elif elt["value"]["placeholder"]["type"] == "all":
@@ -850,6 +853,31 @@ class EnvGenerator:
                             continue
 
                         if not elt["value"]["placeholder"]["flag"]:
+
+                            if elt["type"] == "Building":
+
+                                tmpEntry["value"]["entity"] = Building(
+                                    elt["type"],
+                                    elt["name"],
+                                    self.Game,
+                                    self.Map,
+                                    self.Hero,
+                                )
+                            elif elt["type"] == "Dungeon":
+
+                                tmpEntry["value"]["entity"] = Dungeon(
+                                    elt["name"],
+                                    self.Game,
+                                    self.Hero,
+                                    [
+                                        32,
+                                        32,
+                                    ],
+                                    self.Map,
+                                    elt["value"]["entity"]["args"][0],
+                                )
+                            tmpEntry["value"]["onContact"] = tmpEntry["value"]["entity"].show
+
                             # Initialise all the flag for unbliting the next one cases of the element's components
 
                             for l in range(elt["value"]["spawnRange"]):
@@ -904,7 +932,7 @@ class EnvGenerator:
 
                         continue
 
-                    elt["value"]["rect"] = textureConf.WORLD_ELEMENTS[elt["type"]][
+                    tmpEntry["value"]["rect"] = textureConf.WORLD_ELEMENTS[elt["type"]][
                         elt["name"]
                     ]["surf"].get_rect(
                         topleft=(
@@ -914,11 +942,11 @@ class EnvGenerator:
                     )
                     self.Map.chunkData["mainChunk"].blit(
                         textureConf.WORLD_ELEMENTS[elt["type"]][elt["name"]]["surf"],
-                        elt["value"]["rect"],
+                        tmpEntry["value"]["rect"],
                     )
 
                     if not "flower" in elt["name"]:
-                        self.obstaclesList.append(elt)
+                        self.obstaclesList.append(tmpEntry)
 
     def showInfoTipElt(self):
 
