@@ -60,9 +60,7 @@ Game.heroesGroup += Hero_group
 # ------------------ NETWORKING -------------- #
 
 ContextMenu = NonBlockingPopupMenu(POP_UP_ACTIONS, Game)
-NetworkController = NetworkController(
-    Game, Player_Map, Hero_group[0], ContextMenu
-)
+NetworkController = NetworkController(Game, Player_Map, Hero_group[0], ContextMenu)
 Game.NetworkController = NetworkController
 
 # ------------------- MENUS -------------------- #

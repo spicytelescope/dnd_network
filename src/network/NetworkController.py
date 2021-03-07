@@ -44,6 +44,7 @@ class NetworkController:
         self.tradeInvRefused = None
         self.sendTradeConf = False
         self.acceptTradeState = "UNDEFINED"
+        self.resetTradeSettings = False
 
     def addPlayer(self, new_id, name):
         """Create a Character Instance based of the informations given by the connexion of the player"""
@@ -160,6 +161,33 @@ class NetworkController:
                 # --------------------------- TRADE UI -------------- #
                 if self.ContextMenu.tradeUI != None:
                     self.ContextMenu.tradeUI.transmitItems(self.Hero.networkId, data)
+
+                if self.resetTradeSettings:
+                    self.resetTradeSettings = False
+                    resetDict = {
+                        "state": False,
+                        "to": None,
+                        "refused": False,
+                    }
+                    #     },
+                    #     "tradedItems": []
+                    #     "confirmFlag": False,  # Flag send when player 1 lock and ask for confirmation
+                    #     "tradeState": "UNDEFINED",  # Flag send when player 2 accept the trade
+                    # }
+                    data["players"][self.Hero.networkId]["trade"][
+                        "tradeInvitation"
+                    ] = resetDict
+                    data["players"][self.Hero.networkId]["trade"][
+                        "tradeState"
+                    ] = "UNDEFINED"
+
+                    data["players"][self.Hero.networkId]["trade"][
+                        "tradeInvitation"
+                    ] = "UNDEFINED"
+                    data["players"][self.ContextMenu.tradeUI.target.networkId]["trade"][
+                        "tradeInvitation"
+                    ] = resetDict
+
                 if self.sendTradeDestId != None:
                     data["players"][self.Hero.networkId]["trade"]["tradeInvitation"] = {
                         "state": True,
@@ -179,18 +207,16 @@ class NetworkController:
                     data["players"][self.Hero.networkId]["trade"]["confirmFlag"] = True
 
                 if self.acceptTradeState == "ACCEPTED":
-                    self.acceptTradeState = "UNDEFINED"
                     data["players"][self.Hero.networkId]["trade"][
                         "tradeState"
                     ] = "ACCEPTED"
+                    self.acceptTradeState = "UNDEFINED"
+
                 elif self.acceptTradeState == "REFUSED":
                     self.acceptTradeState = "UNDEFINED"
                     data["players"][self.Hero.networkId]["trade"][
                         "tradeState"
                     ] = "REFUSED"
-                    data["players"][self.Hero.networkId]["trade"][
-                        "confirmFlag"
-                    ] = False
 
                 json.dump(data, f)
 
@@ -208,8 +234,7 @@ class NetworkController:
                 if data["players"][self.Hero.networkId]["trade"]["tradeInvitation"][
                     "refused"
                 ]:
-                    self.ContextMenu.tradeUI._show = False
-                    self.ContextMenu.tradeUI.Target.Inventory.close()
+                    self.ContextMenu.tradeUI.hide()
 
                 for player_id, player in self.players.items():
 
@@ -218,10 +243,6 @@ class NetworkController:
                         data["players"][player_id]["inventory"]["storage"],
                         data["players"][player_id]["inventory"]["equipment"],
                     )
-
-                    # -------------------- HUD GRAPHICAL UPDATING -------------- #
-                    player.Inventory.draw()
-                    player.SpellBook.draw()
 
                     # ----------------- CHARAC INFO RECEIVING ------------------ #
                     player.classId = data["players"][player_id]["characterInfo"][
@@ -276,10 +297,13 @@ class NetworkController:
 
                     if self.ContextMenu.tradeUI != None:
 
-                        if not self.ContextMenu.tradeUI.confirmRecvFlag:
-                            self.ContextMenu.tradeUI.confirmRecvFlag = data["players"][
-                                self.ContextMenu.tradeUI.target.networkId
-                            ]["trade"]["confirmFlag"]
+                        if (
+                            data["players"][self.ContextMenu.tradeUI.target.networkId][
+                                "trade"
+                            ]["confirmFlag"]
+                            and not self.ContextMenu.tradeUI.confirmRecvFlag
+                        ):
+                            self.ContextMenu.tradeUI.confirmRecvFlag = True
 
                         self.ContextMenu.tradeUI.targetAcceptedTrade = data["players"][
                             self.ContextMenu.tradeUI.target.networkId
@@ -316,7 +340,15 @@ class NetworkController:
             #     # logger.error(f"Latency case for entity {self.Hero.networkId}!")
             logger.error(e)
 
+        # --------------------------------- GRAPHICAL UPDATING ------------------------- #
+
         for player in self.players.values():
+
+            # HUD Updating
+            player.Inventory.draw()
+            player.SpellBook.draw()
+
+            # Map pos updating
             playersDist = [
                 pos1 - pos2
                 for pos1, pos2 in zip(
@@ -438,3 +470,6 @@ class NetworkController:
 
     def sendTradeInv(self, dest_id):
         self.sendTradeDestId = dest_id
+
+    def resetTrade(self):
+        self.resetTradeSettings = True

@@ -348,10 +348,9 @@ class NonBlockingPopupMenu(PopupMenu):
                         else:
                             self.Target.SpellBook.open = True
                     elif e.text == "Trade":
-                        if self.tradeUI._show:
-                            self.Hero.Inventory._close()
-                        else:
+                        if not self.tradeUI._show:
                             self.networkController.sendTradeInv(self.Target.networkId)
+                            self.networkController.inTrade = True
 
                         self.tradeUI._show = not self.tradeUI._show
 

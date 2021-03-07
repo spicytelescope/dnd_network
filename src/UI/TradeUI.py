@@ -1,4 +1,3 @@
-from os import close, wait
 from pandas.core.indexes import base
 from UI.UI_utils_text import Dialog, SelectPopUp
 import copy
@@ -16,7 +15,6 @@ from config.HUDConf import *
 from config.itemConf import *
 from config.playerConf import *
 from config.UIConf import *
-from HUD.Inventory import Inventory
 
 
 class TradeUI:
@@ -46,7 +44,7 @@ class TradeUI:
         self.lockBtn = TRADE_LOCK_BTN
         self.lockBtnRect = self.lockBtn.get_rect(center=LOCK_BUTTON_POS)
         self.acceptPopUp = SelectPopUp(
-            {"Yes": self.sendTradeAccept, "No": self.NetworkController.refuseTrade},
+            {"Yes": self.sendTradeAccept, "No": self.sendTradeRefuse},
             self.Game.screen,
             self.Game,
             (self.Game.resolution // 2, self.Game.resolution // 2),
@@ -76,12 +74,11 @@ class TradeUI:
         }
 
         self.numRestriction = [DEFAULT_NUM_CHEST_MIN, DEFAULT_NUM_CHEST_MAX]
-        self.bg = None
 
         # ----------------- NETWORK ---------------- #
 
         self.confirmRecvFlag = False
-        self.targetAcceptedTrade = False
+        self.targetAcceptedTrade = "UNDEFINED"
         self.waitingFlag = False  #  UI flag to display the waiting for the target to accept/refuse the trade
         self.waitChrono = None
         self.acceptTrade = False
@@ -145,74 +142,74 @@ class TradeUI:
             self.surf.blit(target_font, target_font.get_rect(center=NAME_SLOT_1))
             self.surf.blit(player_font, player_font.get_rect(center=NAME_SLOT_2))
 
-            if self._show:
+            # ---------------- BUTTON HANDLING -------------- #
+            if self.lockBtnRect.collidepoint(
+                [
+                    coor1 - coor2
+                    for coor1, coor2 in zip(pygame.mouse.get_pos(), self.rect.topleft)
+                ]
+            ):
+                self.surf.blit(TRADE_LOCK_BTN, self.lockBtnRect)
 
-                # ---------------- BUTTON HANDLING -------------- #
-                if self.lockBtnRect.collidepoint(
-                    [
-                        coor1 - coor2
-                        for coor1, coor2 in zip(
-                            pygame.mouse.get_pos(), self.rect.topleft
-                        )
-                    ]
-                ):
-                    self.surf.blit(TRADE_LOCK_BTN, self.lockBtnRect)
+            else:
+                self.surf.blit(TRADE_LOCK_BTN_CLICKED, self.lockBtnRect)
 
-                else:
-                    self.surf.blit(TRADE_LOCK_BTN_CLICKED, self.lockBtnRect)
+            #  --------------------- TRADE HANDLING ------------- #
 
-                #  --------------------- TRADE HANDLING ------------- #
-
-                #  Confirm pop-up send, waiting case :
-                if self.waitingFlag:
-                    waitingFont = pygame.font.Font(
-                        DUNGEON_FONT, BUTTON_FONT_SIZE + 20
-                    ).render(
-                        f"Waiting for response {'.'*(int(1.5*(time.time()-self.waitChrono)) % 4)}",
-                        True,
-                        (0, 0, 0),
-                    )
-                    layout = pygame.transform.scale(
-                        HUDConf.NAME_SLOT.copy(),
-                        (
-                            int(waitingFont.get_width() * 1.5),
-                            int(waitingFont.get_height() * 1.5),
-                        ),
-                    )
-                    layout.blit(
-                        waitingFont,
-                        waitingFont.get_rect(
-                            center=(layout.get_width() // 2, layout.get_height() // 2)
-                        ),
-                    )
-                    self.Game.screen.blit(
-                        layout,
-                        layout.get_rect(
-                            center=(
-                                self.Game.resolution // 2,
-                                int(self.Game.resolution * 0.925),
-                            )
-                        ),
-                    )
-
-                # --------------- ITEM HANDLING ----------------- #
-                self._showItems()
-                self.Game.screen.blit(self.surf, self.rect)
-
-                # When receiving confirmation from the target send by the network, pop up the choice to accept it or not
-                if self.confirmRecvFlag:
-                    self.acceptPopUp.show()
-                    self.confirmRecvFlag = False
-
-                if self.targetAcceptedTrade == "ACCEPTED":
-                    self.proceedTrade()
-                elif self.targetAcceptedTrade == "REFUSED":
-                    self.waitingFlag = False
-                # --------------- INVENTORY HANDLING ---------------- #
-
-                self.Hero.Inventory.nestedShow(
-                    [self.Game.resolution // 2, self.Game.resolution // 3]
+            #  Confirm pop-up send, waiting case :
+            if self.waitingFlag:
+                waitingFont = pygame.font.Font(
+                    DUNGEON_FONT, BUTTON_FONT_SIZE + 20
+                ).render(
+                    f"Waiting for response {'.'*(int(1.5*(time.time()-self.waitChrono)) % 4)}",
+                    True,
+                    (0, 0, 0),
                 )
+                layout = pygame.transform.scale(
+                    HUDConf.NAME_SLOT.copy(),
+                    (
+                        int(waitingFont.get_width() * 1.5),
+                        int(waitingFont.get_height() * 1.5),
+                    ),
+                )
+                layout.blit(
+                    waitingFont,
+                    waitingFont.get_rect(
+                        center=(layout.get_width() // 2, layout.get_height() // 2)
+                    ),
+                )
+                self.Game.screen.blit(
+                    layout,
+                    layout.get_rect(
+                        center=(
+                            self.Game.resolution // 2,
+                            int(self.Game.resolution * 0.925),
+                        )
+                    ),
+                )
+
+            # --------------- ITEM HANDLING ----------------- #
+            self._showItems()
+            self.Game.screen.blit(self.surf, self.rect)
+
+            # When receiving confirmation from the target send by the network, pop up the choice to accept it or not
+            if self.confirmRecvFlag and self.NetworkController.inTrade:
+                self.acceptPopUp.show()
+                self.confirmRecvFlag = False
+
+            if self.targetAcceptedTrade == "ACCEPTED":
+                self.proceedTrade()
+                self.targetAcceptedTrade = "UNDEFINED"
+            elif self.targetAcceptedTrade == "REFUSED":
+                self.waitingFlag = False
+                self.reset()
+                self.targetAcceptedTrade = "UNDEFINED"
+
+            # --------------- INVENTORY HANDLING ---------------- #
+
+            self.Hero.Inventory.nestedShow(
+                [self.Game.resolution // 2, self.Game.resolution // 3]
+            )
 
     def _checkItemSelection(self, event):
 
@@ -294,53 +291,116 @@ class TradeUI:
                     itemPlaced = True
                     break
 
+    def hide(self):
+        self._show = False
+        self.Hero.Inventory.close()
+
     def reset(self):
 
-        self._init__(self.Game, self.Hero)
+        self.__init__(self.Game, self.Hero, self.target, self.NetworkController)
+        self.hide()
+        self.NetworkController.resetTrade()
+        self.NetworkController.inTrade = False
 
     # --------------------- NETWORK --------------------- #
 
     def transmitItems(self, player_id, data):
-        data["players"][player_id]["trade"]["tradedItems"] = [
-            int(self.player_storage["tab"][j][i].property["Id"])
-            for j in range(self.storageLength[1])
-            for i in range(self.storageLength[0])
-            if self.player_storage["tab"][j][i] != None
-        ]
+
+        if self.NetworkController.inTrade:
+            data["players"][player_id]["trade"]["tradedItems"] = [
+                int(self.player_storage["tab"][j][i].property["Id"])
+                for j in range(self.storageLength[1])
+                for i in range(self.storageLength[0])
+                if self.player_storage["tab"][j][i] != None
+            ]
 
     def updateStuff(self, player_id, data):
-        p_items = [
-            self.target_storage["tab"][j][i].property["Id"]
-            for j in range(self.storageLength[1])
-            for i in range(self.storageLength[0])
-            if self.target_storage["tab"][j][i] != None
-        ]
 
-        if p_items != data["players"][player_id]["trade"]["tradedItems"]:
-            for j in range(self.storageLength[1]):
-                for i in range(self.storageLength[0]):
-                    self.target_storage["tab"][j][i] = None
+        if self.NetworkController.inTrade:
 
-            for i, item_id in enumerate(
-                data["players"][player_id]["trade"]["tradedItems"]
-            ):
-                # j = 0 as the storage of the trade is just one line
-                self.target_storage["tab"][0][i] = copy.deepcopy(
-                    itemConf.ITEM_DB[item_id]
-                )
-                self.target_storage["tab"][0][i].loadIcon()
-                self.target_storage["tab"][0][i].loadSurfDesc()
-                self.target_storage["tab"][0][i].setCoor(
-                    (
-                        TARGET_INIT_POINT[0] + i * self.target_storage["offset"][0],
-                        TARGET_INIT_POINT[1],
+            p_items = [
+                self.target_storage["tab"][j][i].property["Id"]
+                for j in range(self.storageLength[1])
+                for i in range(self.storageLength[0])
+                if self.target_storage["tab"][j][i] != None
+            ]
+
+            if p_items != data["players"][player_id]["trade"]["tradedItems"]:
+                for j in range(self.storageLength[1]):
+                    for i in range(self.storageLength[0]):
+                        self.target_storage["tab"][j][i] = None
+
+                for i, item_id in enumerate(
+                    data["players"][player_id]["trade"]["tradedItems"]
+                ):
+                    # j = 0 as the storage of the trade is just one line
+                    self.target_storage["tab"][0][i] = copy.deepcopy(
+                        itemConf.ITEM_DB[item_id]
                     )
-                )
+                    self.target_storage["tab"][0][i].loadIcon()
+                    self.target_storage["tab"][0][i].loadSurfDesc()
+                    self.target_storage["tab"][0][i].setCoor(
+                        (
+                            TARGET_INIT_POINT[0] + i * self.target_storage["offset"][0],
+                            TARGET_INIT_POINT[1],
+                        )
+                    )
 
     def sendTradeAccept(self):
+
         self.NetworkController.acceptTrade()  # Send the flag so the local changes can be done onto the target's local version
-        self.proceedTrade()
+        self.proceedTrade()  # Contains the reset method call
+
+    def sendTradeRefuse(self):
+
+        self.NetworkController.refuseTrade()
+        self.reset()
 
     def proceedTrade(self):
 
-        pass
+        logger.debug(
+            f"Proceeding with player storage : {self.player_storage} and target storage : {self.target_storage}"
+        )
+
+        # First : clean the trade UI slot so the items trade by the player disappear locally
+        for j in range(self.storageLength[1]):
+            for i in range(self.storageLength[0]):
+                self.player_storage["tab"][j][i] = None
+
+        #  Then, creating the item from the IDs of the target
+        targetItemLen = (
+            len(
+                [
+                    self.target_storage["tab"][j][i]
+                    for i in range(self.storageLength[0])
+                    for j in range(self.storageLength[1])
+                    if self.target_storage["tab"][j][i] != None
+                ]
+            )
+            - 1
+        )
+
+        for j in range(INVENTORY_STORAGE_HEIGHT):
+            for i in range(INVENTORY_STORAGE_WIDTH):
+                if (
+                    self.Hero.Inventory.storage["tab"][j][i] == None
+                    and targetItemLen >= 0
+                ):
+                    (
+                        self.target_storage["tab"][0][targetItemLen],
+                        self.Hero.Inventory.storage["tab"][j][i],
+                    ) = (
+                        self.Hero.Inventory.storage["tab"][j][i],
+                        self.target_storage["tab"][0][targetItemLen],
+                    )
+                    self.Hero.Inventory.storage["tab"][j][i].setCoor(
+                        (
+                            INVENTORY_STORAGE_INIT_POS[0]
+                            + i * self.Hero.Inventory.storage["offset"][0],
+                            INVENTORY_STORAGE_INIT_POS[1]
+                            + j * self.Hero.Inventory.storage["offset"][1],
+                        )
+                    )
+                    targetItemLen -= 1
+
+        self.reset()

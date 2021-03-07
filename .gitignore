@@ -1,2 +1,3 @@
 *.pyc
 dnd_db.db
+*.json
