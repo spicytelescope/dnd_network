@@ -1,4 +1,3 @@
-import random
 from saves.savesController import SaveController
 from gameObjects.NPC import Seller
 import time

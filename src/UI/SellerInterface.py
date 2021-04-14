@@ -1,6 +1,5 @@
 from UI.UI_utils_text import Dialog
 import copy
-import random
 from threading import Thread
 
 from pygame.constants import KEYDOWN, MOUSEBUTTONDOWN

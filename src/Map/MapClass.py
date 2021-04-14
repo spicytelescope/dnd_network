@@ -1,9 +1,5 @@
 from copy import copy, deepcopy
-import json
 import math
-import os
-import platform
-import random
 
 import noise
 import pygame
@@ -19,7 +15,7 @@ from pygame.locals import *
 from tqdm import tqdm
 from utils.utils import logger
 from multiprocessing import Process
-
+import random
 
 class OpenWorldMap:
 

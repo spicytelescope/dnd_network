@@ -11,7 +11,6 @@ import time
 import uuid
 from config.playerConf import ITEM_PICK_UP_RANGE
 
-
 class Item:
     """Class representing an item.
     An item has at least an icon, and some properties.

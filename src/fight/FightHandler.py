@@ -21,8 +21,9 @@ class FightHandler:
         self._lastID = 0
         for self._lastID in range(len(entitylist)):
             self._queue[self._lastID].setId(self._lastID)
-            self.fightMode.stats[self._queue[self._lastID]._fightName] = 0 # Initialising damages dealt
-
+            self.fightMode.stats[
+                self._queue[self._lastID]._fightName
+            ] = 0  # Initialising damages dealt
 
         self._fightended = False  # boolean to know if the fight is on going or is ended
         self._fightresult = None  # 0-> fight lose | 1-> fight win
@@ -84,7 +85,9 @@ class FightHandler:
         for entity in self._queue:
             if isinstance(entity, Character):
                 hero = entity
-                logger.debug(f"{entity._fightName}'s turn until rest : {entity.lastedTurnRest}")
+                logger.debug(
+                    f"{entity._fightName}'s turn until rest : {entity.lastedTurnRest}"
+                )
                 if (entity.lastedTurnRest) >= TURN_REST:
                     entity.lastedTurnRest = 0
                     entity.modifyHP(1)

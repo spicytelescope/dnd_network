@@ -1,1 +1,86 @@
-{"players": {"92a3c27f-4ee7-4d94-b72d-f29b501fadf4": {"chunkPos": [1562, 1556], "chunkCoor": [0, 0], "inventory": {"storage": {}, "equipment": {"0": 26, "6": 131, "8": 6}}, "creator": true, "characterInfo": {"classId": 0, "imagePos": 1, "direction": "left", "spellsID": [2, 18], "name": "Xt", "stats": {"STR": 17, "DEX": 10, "CON": 16, "INT": 8, "WIS": 16, "CHA": 16, "HP": 18, "HP_max": 18, "Mana": 16, "Mana_max": 16, "Money": 27, "DEF": 4, "ATK": 2}}, "mapInfo": {"seed": 0, "chunkData": {}}, "trade": {"tradeInvitation": {"state": false, "to": null, "refused": false}, "tradedItems": [], "confirmFlag": false, "tradeState": "UNDEFINED"}}, "9a437509-1e81-455e-8652-051a4625187d": {"chunkPos": [1596, 1442], "chunkCoor": [0, 0], "inventory": {"storage": {}, "equipment": {}}, "creator": false, "characterInfo": {"classId": 0, "imagePos": 3, "direction": "right", "spellsID": [2, 18], "name": "Vwn", "stats": {"STR": 19, "DEX": 12, "CON": 18, "INT": 10, "WIS": 15, "CHA": 16, "HP": 20, "HP_max": 20, "Mana": 15, "Mana_max": 15, "Money": 23, "DEF": 4, "ATK": 4}}, "mapInfo": {"seed": null, "chunkData": {}}, "trade": {"tradeInvitation": {"state": false, "to": null, "refused": false}, "tradedItems": [], "confirmFlag": false, "tradeState": "UNDEFINED"}}}}
+{
+  "players": {
+    "998049f3-6aef-43d9-b081-018ca0ca4553": {
+      "chunkPos": [1489, 1516],
+      "chunkCoor": [0, 0],
+      "inventory": {
+        "storage": { "68": [0, 0], "108": [1, 0], "102": [2, 0] },
+        "equipment": {}
+      },
+      "creator": true,
+      "characterInfo": {
+        "classId": 2,
+        "imagePos": 0,
+        "direction": "down",
+        "spellsID": [0, 16],
+        "name": "Fpme",
+        "stats": {
+          "STR": 15,
+          "DEX": 19,
+          "CON": 15,
+          "INT": 19,
+          "WIS": 16,
+          "CHA": 14,
+          "HP": 15,
+          "HP_max": 15,
+          "Mana": 16,
+          "Mana_max": 16,
+          "Money": 24,
+          "DEF": 1,
+          "ATK": 2
+        }
+      },
+      "mapInfo": { "seed": 0, "chunkData": {} },
+      "trade": {
+        "tradeInvitation": { "state": false, "to": null, "refused": false },
+        "tradedItems": [86, 59, 68],
+        "confirmFlag": false,
+        "tradeState": "ACCEPTED"
+      }
+    },
+    "a03ae7ac-cae3-4b4b-96d9-0ab7cd6d8853": {
+      "chunkPos": [1569, 1496],
+      "chunkCoor": [0, 0],
+      "inventory": {
+        "storage": {
+          "68": [0, 0],
+          "133": [1, 0],
+          "59": [2, 0],
+          "71": [1, 1],
+          "86": [2, 1]
+        },
+        "equipment": {}
+      },
+      "creator": false,
+      "characterInfo": {
+        "classId": 1,
+        "imagePos": 0,
+        "direction": "right",
+        "spellsID": [1, 3, 6, 9, 12],
+        "name": "Mxmgc",
+        "stats": {
+          "STR": 8,
+          "DEX": 12,
+          "CON": 19,
+          "INT": 15,
+          "WIS": 19,
+          "CHA": 14,
+          "HP": 19,
+          "HP_max": 19,
+          "Mana": 24,
+          "Mana_max": 24,
+          "Money": 25,
+          "DEF": 4,
+          "ATK": 1
+        }
+      },
+      "mapInfo": { "seed": null, "chunkData": {} },
+      "trade": {
+        "tradeInvitation": "UNDEFINED",
+        "tradedItems": [125, 108],
+        "confirmFlag": true,
+        "tradeState": "UNDEFINED"
+      }
+    }
+  }
+}

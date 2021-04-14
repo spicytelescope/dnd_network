@@ -2,17 +2,11 @@
 #!coding:utf-8
 
 import threading
-import multiprocessing
 import time
-from pickle import load
+import random
 
 import pygame
 from pygame.locals import *
-from HUD.QuestController import QuestController
-from HUD.miniMap import MiniMap
-from config.UIConf import POP_UP_ACTIONS
-
-from config.playerConf import MAX_TEAM_LENGH, TIME_OUT_REST
 
 pygame.init()
 # pygame.mixer.init()
@@ -23,18 +17,22 @@ import platform
 
 os.system("cls") if platform.system() == "Windows" else os.system("clear")
 
+
 import utils.RessourceHandler as RessourceHandler
 from config.eventConf import *
 from config.mapConf import PLAYER_CONFIG, WORLD_MAP_CONFIG
+from config.playerConf import MAX_TEAM_LENGH, TIME_OUT_REST
+from config.UIConf import POP_UP_ACTIONS
 from fight.CombatLog import CombatLog
 from fight.FightMode import FightMode
 from gameController import GameController
 from Map.MapClass import OpenWorldMap
+from network.NetworkController import NetworkController
 from Player.Character import Character
 from saves.savesController import *
-from UI.menuClass import LoadingMenu, MainMenu, OptionMenu, PauseMenu, SelectMenu
-from network.NetworkController import NetworkController
 from UI.ContextMenu import NonBlockingPopupMenu
+from UI.menuClass import (LoadingMenu, MainMenu, OptionMenu, PauseMenu,
+                          SelectMenu)
 
 RessourceHandler.loadMusicRessources()
 

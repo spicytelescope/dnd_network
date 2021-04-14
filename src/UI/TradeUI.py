@@ -1,7 +1,6 @@
 from pandas.core.indexes import base
 from UI.UI_utils_text import Dialog, SelectPopUp
 import copy
-import random
 from threading import Thread
 
 from pygame.constants import KEYDOWN, MOUSEBUTTONDOWN

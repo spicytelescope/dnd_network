@@ -1,8 +1,6 @@
-from UI.UI_utils_text import Dialog, SelectPopUp
-import random
+from UI.UI_utils_text import SelectPopUp
 import string
 import time
-from threading import Thread
 from config import spellsConf, textureConf
 from config.ennemyConf import ENNEMY_DETECTION_RANGE
 
@@ -18,7 +16,6 @@ from HUD.CharBar import CharBar
 from HUD.Inventory import Inventory
 from HUD.spellBook import SpellBook
 from HUD.QuestController import QuestController
-from multiprocessing import Process
 
 from pathfinding.core.grid import Grid
 from pathfinding.finder.a_star import AStarFinder

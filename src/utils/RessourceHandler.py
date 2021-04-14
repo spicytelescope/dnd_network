@@ -1,8 +1,9 @@
 import copy
 import fnmatch
 import os
-import random
 from os import listdir
+import random
+
 from os.path import isfile, join
 
 import config.HUDConf as HUDConf
@@ -12,7 +13,6 @@ import config.menuConf as menuConf
 import config.playerConf as playerConf
 import config.spellsConf as spellsConf
 import config.textureConf as textureConf
-import config.UIConf as UIConf
 import pandas
 import pygame
 from config import NPCConf, ennemyConf, musicConf, openWorldConf

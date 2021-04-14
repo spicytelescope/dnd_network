@@ -1,7 +1,6 @@
 from UI.UI_utils_text import Dialog
 from config import playerConf
 from gameObjects.Item import Item
-import random
 
 from pygame.constants import MOUSEBUTTONDOWN
 

@@ -1,25 +1,19 @@
-from gameObjects.Dungeon import Dungeon
+from copy import deepcopy
 from math import *
-from random import *
 from typing import List, Tuple
-
-import pygame
-
 import config.textureConf as textureConf
+import pygame
 from config.mapConf import *
 from config.openWorldConf import *
-from config.playerConf import PLAYER_SIZE
 from config.textureConf import *
-from gameController import GameController
 from gameObjects.Building import Building
 from gameObjects.Chest import Chest
+from gameObjects.Dungeon import Dungeon
 from gameObjects.Ennemy import Ennemy
 from gameObjects.NPC import NPC, Seller
-from Player.Character import Character
 from UI.UI_utils_text import InfoTip
-
-from copy import deepcopy
-
+import random
+random.seed(0)
 
 class EnvGenerator:
     def __init__(self, gameController, Map):
@@ -306,7 +300,6 @@ class EnvGenerator:
                 ]
 
             possiblePos = [coor for coor in possiblePos if coor in specificValues]
-
         while len(possiblePos) != 0:
             i, j = possiblePos.pop(random.randrange(len(possiblePos)))
 
@@ -405,6 +398,7 @@ class EnvGenerator:
                     # We need to randomly select on scopeGrid and not ScopeGridFiltered as the index need to remain the same e.g the grid need to be (spawnRange)x(spawnRange)
 
                     caseSelectedPosY = random.choice(list(enumerate(scopeGridFiltered)))
+
                     caseSelectedPosX = random.choice(
                         list(enumerate(caseSelectedPosY[1]))
                     )
@@ -418,9 +412,11 @@ class EnvGenerator:
                         scopeGridFiltered[caseSelectedPosY[0]][caseSelectedPosX[0]]
                         != None
                     ):
+
                         caseSelectedPosY = random.choice(
                             list(enumerate(scopeGridFiltered))
                         )
+
                         caseSelectedPosX = random.choice(
                             list(enumerate(caseSelectedPosY[1]))
                         )
@@ -452,6 +448,7 @@ class EnvGenerator:
                         )
                         and len(textureConf.WORLD_ELEMENTS[type][name]["surf"]) != 0
                     ):
+
                         scopeGridFiltered[caseSelectedPosY][caseSelectedPosX][
                             "surfIndex"
                         ] = random.randrange(
@@ -468,6 +465,7 @@ class EnvGenerator:
                         ] = {"type": "Chest"}
 
                     elif name == "Seller":
+
                         scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
                             "entity"
                         ] = {
@@ -481,6 +479,7 @@ class EnvGenerator:
                         }
 
                     elif name == "Villager":
+
                         scopeGridFiltered[caseSelectedPosY][caseSelectedPosX]["value"][
                             "entity"
                         ] = {
@@ -512,6 +511,7 @@ class EnvGenerator:
                                 scopeGrid[k][l]["value"]["tileset"] = None
 
                     if type == "Dungeon":
+
                         scopeGrid[0][0]["value"]["entity"] = {
                             "args": [random.randrange(2, int(32 * 32 * 0.01))]
                         }
@@ -584,6 +584,7 @@ class EnvGenerator:
                     ]
                     for _ in range(structTemplate["numberOfEntry"]):
                         # Creating doors
+
                         borderCoor.pop(random.randrange(len(borderCoor)))
 
                     count += 1
@@ -800,6 +801,7 @@ class EnvGenerator:
                                         "entity"
                                     ].openInterface
                                 else:
+
                                     tmpEntry["value"]["entity"] = NPC(
                                         self.Map.chunkData["mainChunk"],
                                         elt["value"]["entity"]["args"][0],
@@ -876,7 +878,9 @@ class EnvGenerator:
                                     self.Map,
                                     elt["value"]["entity"]["args"][0],
                                 )
-                            tmpEntry["value"]["onContact"] = tmpEntry["value"]["entity"].show
+                            tmpEntry["value"]["onContact"] = tmpEntry["value"][
+                                "entity"
+                            ].show
 
                             # Initialise all the flag for unbliting the next one cases of the element's components
 
@@ -1097,7 +1101,6 @@ class EnvHandler:
 
     def genLandscapesElements(self):
         """Generate elements that can appears at each chunk rendering"""
-
         for biomeName in BIOME_NAMES:
             for biomeElt in BIOME_LANDSCAPE_NAME:
                 elementEntry = f"{biomeName[0].upper() + biomeName[1:]}_{biomeElt}"
@@ -1108,10 +1111,12 @@ class EnvHandler:
 
         for eltType in BUILDING_NAMES_RANDOM_GEN:
             for eltName, genTreshhold in BUILDING_NAMES_RANDOM_GEN[eltType].items():
+
                 if random.uniform(0.0, 1.0) <= genTreshhold:
                     self.envGenerator.generateElement(eltType, eltName, 1)
 
         for structName, genTreshhold in STRUCTS_NAMES_RANDOM_GEN.items():
+
             if random.uniform(0.0, 1.0) <= genTreshhold:
                 self.envGenerator.generateStructure(structName, 1)
 

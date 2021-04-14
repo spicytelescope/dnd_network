@@ -2,7 +2,6 @@ from copy import deepcopy
 from fnmatch import fnmatch
 import time
 import pygame
-import random
 import math
 from pygame import transform
 from pygame.constants import SRCALPHA

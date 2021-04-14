@@ -11,7 +11,7 @@ import copy
 class Chest:
 
     """
-    Class representing a chest, which is a storage UI opened and closed with an animation.A
+    Class representing a chest, which is a storage UI opened and closed with an animation.
     The chest is initialised with a default content which can be empty.
     """
 

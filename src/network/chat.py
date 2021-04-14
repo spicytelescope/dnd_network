@@ -5,7 +5,8 @@ from UI.UI_utils_fonc import formatDialogContent
 from config.UIConf import *
 from UI.UI_utils_text import TextBoxControl
 
-class GameChat():
+
+class GameChat:
 
     """Fusion of the combat log and an input box with networking helpers"""
 
@@ -27,8 +28,10 @@ class GameChat():
         self.COLORS = {"NEW": (0, 255, 00), "CHAT": (0, 0, 255), "CHAT_2": (255, 0, 0)}
 
         # --------------------- INPUT ----------------------- #
-        self.inputBox = TextBoxControl((100, int(self.rect.height*0.9)), size=(self.rect.width-2, 50))
-        self.addText('test')
+        self.inputBox = TextBoxControl(
+            (100, int(self.rect.height * 0.9)), size=(self.rect.width - 2, 50)
+        )
+        self.addText("test")
 
     def updateTextSurf(self):
 
@@ -65,7 +68,7 @@ class GameChat():
         self.Game.screen.blit(self.surf, self.rect)
 
     def update(self, event):
-        
+
         self.inputBox.checkEvent(event)
         if event.type == pygame.QUIT:
             pygame.quit()

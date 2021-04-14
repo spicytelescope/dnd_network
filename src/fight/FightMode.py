@@ -1,9 +1,6 @@
 import math
-import os
-from numpy.lib.arraysetops import isin
 import pygame
 import random
-from math import floor, hypot
 from pygame.locals import *
 from UI.UI_utils_text import Dialog
 from config import HUDConf, playerConf, spellsConf, textureConf

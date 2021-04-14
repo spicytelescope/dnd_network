@@ -68,6 +68,7 @@ CLASSES_DEFAULT_STATS = {
         },
 }
 
+logger.debug(CLASSES_DEFAULT_STATS)
 # Setting afterwards the HP/MANA :
 
 for className in CLASSES_NAMES:

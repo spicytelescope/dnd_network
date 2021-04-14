@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "C:\\Users\\jbezi\\AppData\\Local\\Programs\\Python\\Python37\\python.exe",
+    "python.pythonPath": "/bin/python3",
     "python.formatting.provider": "black"
 }

@@ -1,7 +1,6 @@
 from UI.UI_utils_text import Dialog, SelectPopUp, TextBoxControl
 import os
 import platform
-import random
 from tkinter import Button as tkButton, Canvas, Scrollbar
 from tkinter import (
     Checkbutton,
