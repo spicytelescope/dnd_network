@@ -1,0 +1,8 @@
+*.pyc
+src
+README.md
+requirements.txt
+Composition_Equipe_Pyhm_World.pdf
+Pipfile
+Pipfile.lock
+settings.json
