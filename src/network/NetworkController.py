@@ -2,6 +2,7 @@ import json, sys
 from math import sqrt
 import threading
 import time
+import os, sys
 import pygame
 
 from pygame.constants import KEYDOWN, MOUSEBUTTONDOWN, MOUSEBUTTONUP
@@ -14,6 +15,13 @@ from utils.utils import logger
 import uuid
 
 import config.HUDConf as HUDConf
+
+# write data to info_input
+def write(data):
+    FIFO_PATH2 = "info_input"
+
+    pipe = open(FIFO_PATH2, "w")
+    pipe.write(data)
 
 
 class NetworkController:
@@ -147,7 +155,7 @@ class NetworkController:
         # ------------------ DATA TRANSMISSION ---------------------- #
 
         try:
-            data = json.load(open("./datas.json"))
+            data = json.load(open("./datas.json"))  # Insérer ici pipe de Younes
             with open("datas.json", "w") as f:
 
                 # ---------------------- CLIENT UPDATE (SEND PART) ------------ #

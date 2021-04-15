@@ -31,8 +31,7 @@ from network.NetworkController import NetworkController
 from Player.Character import Character
 from saves.savesController import *
 from UI.ContextMenu import NonBlockingPopupMenu
-from UI.menuClass import (LoadingMenu, MainMenu, OptionMenu, PauseMenu,
-                          SelectMenu)
+from UI.menuClass import LoadingMenu, MainMenu, OptionMenu, PauseMenu, SelectMenu
 
 RessourceHandler.loadMusicRessources()
 
@@ -71,6 +70,7 @@ PauseMenu = PauseMenu(
 )
 LoadingMenu = LoadingMenu(Game, Player_Map)
 NetworkController.LoadingMenu = LoadingMenu
+
 # ------------------ SAVES -------------------- #
 
 SaveController.gameClasses = [
