@@ -68,32 +68,58 @@ typedef struct{
     uint8_t head;
 
 }   game_packet1;
+
 /**
  * @struct game_packet2
  * @brief 
- * this structure contains all the dynamic values,the purpose is to send it quickly and frequently
- * "stats1": {
-          "STR":  1st byte
-          "DEX":  2nd byte
-          "CON":  3rd byte
-          "INT":  4th byte
-          "WIS":  5th byte
-          "CHA":  6th byte
-          "HP":  7th byte
-          "HP_max":  8th byte 
-    }
-    stats2{
-          "Mana":  1st byte 
-          "Mana_max":  2nd byte
-          "Money":  3rd byte
-          "DEF":   4th byte / 2 firsts bits
-          "ATK":  4th byte / 2 seconds bits
-    }
+ *  this structure contains all the dynamic values,the purpose is to send it quickly and frequently
+ *  "chunkPos": [1562, 1556] 12 bits
+ *  "chunkCoor": 7 bits
+ *  "inventory": {
+ *      "storage": (id of the item*nb slots) 8*21=168 bits, the first bytes is for the first slot and so on
+ *      "equipment": (id of the item*nb slots) 8*11=88 bits, the first bytes is for the first slot and so on
+ *  } => datas saves in 4*8 bytes the 168 first bits for the storage and the 88 last for the equipment
+ *  "stats": {
+ *      "stats1": {
+ *          "STR":  1st byte
+ *          "DEX":  2nd byte
+ *          "CON":  3rd byte
+ *          "INT":  4th byte
+ *          "WIS":  5th byte
+ *          "CHA":  6th byte
+ *          "HP":  7th byte
+ *          "HP_max":  8th byte 
+ *      }
+ *      "stats2":{
+ *          "Mana":  1st byte 
+ *          "Mana_max":  2nd byte
+ *          "Money":  3rd byte
+ *          "DEF":   4th byte / 2 firsts bits
+ *          "ATK":  4th byte / 2 seconds bits
+ *      }
+ *  }
+ *  "Direction": 2 bits 0 -> left, 1 -> right, 2 -> up, 3 -> down
+ *  "spells": 10 bits    ==>direction and spells 16 bits 10 firsts for direction and 2 for
+ *  "trade" :{
+ *      "tradeInvitation": state : 1 bits, to : 7 bits and refused : 1 bits ==> 9 bits
+ *      "tradedItems": 5 items, so 5*id (8 bits)
+ *      "confirmFlag": 1 bit (y/n)
+ *      "tradeState" : 0->"REFUSED", 1->"ACCEPTED", 2->"REFUSED" ==> 2 bits
+ * } ==> 64 bits structure : 9 firsts tradeInvitation, 48 next tradedItems, 1 next confirmFlag and the to next tradeState
  */
 typedef struct{
-    uint8_t head;
-    uint64_t stats1;
-    uint32_t stats2;
+    uint_fast8_t head;
+    uint_fast16_t chunkP;
+    uint_fast8_t chunkC;
+    uint_fast64_t inventory1;
+    uint_fast64_t inventory2;
+    uint_fast64_t inventory3;
+    uint_fast64_t inventory4;
+    uint_fast64_t stats1;
+    uint_fast32_t stats2;
+    uint_fast8_t direction;
+    uint_fast16_t spells;
+    uint_fast64_t trade;
 }   game_packet2;
 
 int main(int argc, char *argv[]){
