@@ -61,7 +61,8 @@ void stop(char *msg){
  *  
  */
 typedef struct{
-    uint8_t head;
+    int head;
+    int ok;
 }   game_packet1;
 /**
  * @struct game_packet2
@@ -93,7 +94,7 @@ typedef struct{
 }   game_packet2;
 
 int main(int argc, char *argv[]){
-    game_packet2 pack={0,0,0};
+    game_packet1 pack={2,10};
     int sfd;
     int stats[]={10,17,24,15,5,37,23,23};
     struct sockaddr_in cli;
@@ -104,7 +105,7 @@ int main(int argc, char *argv[]){
         stop("adress ip");
     cli.sin_family=AF_INET;
     cli.sin_port=htons(7000);
-    SET_STATS1(pack,stats);
+    /*SET_STATS1(pack,stats);
     for(int i=0;i<64;i++){
         if(IS_SET_BIT(pack.stats1,i)){
             printf("+");
@@ -112,11 +113,11 @@ int main(int argc, char *argv[]){
         else{
             printf(".");
         }
-    }
+    }*/
     int len=sizeof(cli);
     uint8_t n[]={0,0,0,0,0,0,0,0};
-    SET_NUM(n,pack.stats1);
+    //SET_NUM(n,pack.stats1);
     sendto(sfd,(char *) &pack,sizeof(pack),0,(struct sockaddr *) &cli, len);
-    printf("\n %d \n %d \n %d \n %d \n %d \n %d \n %d \n %d \n", n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7]);
+    printf("%d %d", pack.head, pack.ok);
     return 0;
 }
