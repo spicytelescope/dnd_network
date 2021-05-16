@@ -28,7 +28,7 @@ void stop(char *msg){
 }*/
 
 int main(int argc, char *argv[]){
-
+    /*
     // Create the fifo needed to get informations from the game
     if (mkfifo(fifo_output_path, 0777) == -1)
     {
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
     {
         perror("open");
         exit(EXIT_FAILURE);
-    }
+    }*/
     game_packet1 pck;
 
     //game_packet2 pack={0,0,0};
@@ -78,12 +78,11 @@ int main(int argc, char *argv[]){
     serv.sin_port=htons(7000);
 
     //fdmax is the maximum number in the fd set fds
-    int fdmax=MMax(fdudp,ind)+1;
-
+    //int fdmax=MMax(fdudp,ind)+1;
     int len=sizeof(cli);
     if(bind(fdudp, (const struct sockaddr *) &serv, sizeof(serv))==-1)
         stop("bind");
-        /*
+    /*
     while(1){
         //set of sockets intialisation for the select
         FD_ZERO(&fds);
