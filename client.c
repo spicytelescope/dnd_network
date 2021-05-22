@@ -52,6 +52,16 @@ void stop(char *msg){
     exit(EXIT_FAILURE);
 }
 
+int checkin(int *list, int elem){
+    //check if an element elem is in the list and check if the list is complete,
+    //return i if it's in, else -1
+    for(int i=0; i<10;i++){
+        if(elem==list[i])
+            return i;
+    }
+    return -1;
+}
+
 
 /**
  * @struct game_packet1
@@ -61,7 +71,7 @@ void stop(char *msg){
  *  
  */
 typedef struct{
-    int head;
+    int head[10];
     int ok;
 }   game_packet1;
 /**
@@ -94,7 +104,10 @@ typedef struct{
 }   game_packet2;
 
 int main(int argc, char *argv[]){
-    game_packet1 pack={2,10};
+    game_packet1 pack;
+    memset(&pack,0,sizeof(game_packet1));
+    pack.head[2]=10;
+    pack.ok=2;
     int sfd;
     int stats[]={10,17,24,15,5,37,23,23};
     struct sockaddr_in cli;
@@ -118,6 +131,9 @@ int main(int argc, char *argv[]){
     uint8_t n[]={0,0,0,0,0,0,0,0};
     //SET_NUM(n,pack.stats1);
     sendto(sfd,(char *) &pack,sizeof(pack),0,(struct sockaddr *) &cli, len);
-    printf("%d %d", pack.head, pack.ok);
+    in_addr_t a[10];
+    memcpy(&a[3], &cli.sin_addr.s_addr, sizeof(cli));
+    int u=checkin(&a,cli.sin_addr.s_addr);
+    printf("%d %d", pack.head[2], u);
     return 0;
 }

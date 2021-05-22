@@ -44,7 +44,7 @@ char *fifo_input_path = "/tmp/info_intput";
  *  
  */
 typedef struct{
-    int head;
+    int head[10];
     int ok;
 
 }   game_packet1;
@@ -90,7 +90,7 @@ typedef struct{
 
 typedef struct{
     uint_fast8_t head;
-    uint_fast16_t chunkP;
+    int chunkP;
     uint_fast8_t chunkC;
     uint_fast64_t inventory1;
     uint_fast64_t inventory2;
