@@ -1,6 +1,7 @@
 from UI.UI_utils_text import Dialog
 from config import playerConf
 from gameObjects.Item import Item
+from network.packet_types import TEMPLATE_INVENTORY
 
 from pygame.constants import MOUSEBUTTONDOWN
 
@@ -158,11 +159,10 @@ class Inventory:
 
         remove_animations_of(self.rect, self.animations)
 
-    def checkActions(self, event, protected = False):
+    def checkActions(self, event, protected=False):
         """The protected arg is here to make sure that the inventory cannot be modified by other player in online games"""
 
         # ------------ ITEMS ACTION CHECKING --------- #
-
         self._checkItemSelection(event, protected)
         self._handleDragSpot(event)
 
@@ -177,6 +177,10 @@ class Inventory:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+
+        if self.Game.isOnline:
+            self.Hero.transmitCharacInfos()
+            self.transmitInvInfos()
 
     def checkSellItem(self, event, Seller):
 
@@ -324,7 +328,11 @@ class Inventory:
                         self.itemHovered = True
 
                         # Check if the item is clicked or not
-                        if event.type == MOUSEBUTTONDOWN and event.button == 1 and not protected:
+                        if (
+                            event.type == MOUSEBUTTONDOWN
+                            and event.button == 1
+                            and not protected
+                        ):
                             if (
                                 self.draggedItemCoor == None
                                 and self.equipmentDraggedCoor == None
@@ -466,7 +474,11 @@ class Inventory:
                 ):
                     self.itemHovered = True
 
-                    if event.type == MOUSEBUTTONDOWN and event.button == 1 and not protected:
+                    if (
+                        event.type == MOUSEBUTTONDOWN
+                        and event.button == 1
+                        and not protected
+                    ):
                         if (
                             self.draggedItemCoor == None
                             and self.equipmentDraggedCoor == None
@@ -529,7 +541,8 @@ class Inventory:
                     and event.button == 1
                     and self.equipment[itemSlot]["slotRect"].collidepoint(
                         mousePosTranslated
-                    ) and not protected
+                    )
+                    and not protected
                 ):
                     if self.equipmentDraggedCoor != None:
                         self.equipmentDraggedCoor = None  # as there is no swaps between 2 items in the equipment zone
@@ -827,7 +840,7 @@ class Inventory:
 
         # Creating a dict containing the current player infos , matching the scheme on the datas.json file
         p_items = {
-            str(self.storage["tab"][j][i].property["Id"]) : [i,j]
+            str(self.storage["tab"][j][i].property["Id"]): [i, j]
             for j in range(INVENTORY_STORAGE_HEIGHT)
             for i in range(INVENTORY_STORAGE_WIDTH)
             if self.storage["tab"][j][i] != None
@@ -855,19 +868,22 @@ class Inventory:
             if slot_item["item"] != None
         ]:
             for slot_id, item_id in eq_item_ids.items():
-                self.equipment[int(slot_id)]["item"] = deepcopy(itemConf.ITEM_DB[item_id])
+                self.equipment[int(slot_id)]["item"] = deepcopy(
+                    itemConf.ITEM_DB[item_id]
+                )
                 self.equipment[int(slot_id)]["item"].loadIcon()
                 self.equipment[int(slot_id)]["item"].loadSurfDesc()
 
-    def transmitInventoryInfos(self, player_id, data):
-
-        data["players"][player_id]["inventory"]["storage"] = {
+    def transmitInvInfos(self):
+        inv_packet = copy.deepcopy(TEMPLATE_INVENTORY)
+        inv_packet["sender_id"] = self.Hero.networkId
+        inv_packet["storage"] = {
             str(self.storage["tab"][j][i].property["Id"]): (i, j)
             for j in range(INVENTORY_STORAGE_HEIGHT)
             for i in range(INVENTORY_STORAGE_WIDTH)
             if self.storage["tab"][j][i] != None
         }
-        data["players"][player_id]["inventory"]["equipment"] = {
+        inv_packet["equipment"] = {
             str(slot): int(slot_item["item"].property["Id"])
             for slot, slot_item in self.equipment.items()
             if slot_item["item"] != None

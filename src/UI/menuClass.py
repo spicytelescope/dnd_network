@@ -964,7 +964,7 @@ class PauseMenu(OptionMenu):
 
     def openToLan(self):
 
-        self.NetworkController.createTestConnection()
+        self.NetworkController.createConnection()
         self.open = False
 
     def showSaves(self):

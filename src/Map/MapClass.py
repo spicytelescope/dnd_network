@@ -1,8 +1,11 @@
 from copy import copy, deepcopy
 import math
+from network.packet_types import TEMPLATE_POS
 
 import noise
 import pygame
+from utils.Network_helpers import *
+from config.netConf import *
 import utils.RessourceHandler as RessourceHandler
 from config.devConf import *
 from config.HUDConf import *
@@ -605,12 +608,15 @@ class OpenWorldMap:
 
     # ----------------------- NETWORK -------------------- #
 
-    def transmitPosInfos(self, player_id, data):
+    def transmitPosInfos(self):
 
-        data["players"][player_id]["chunkPos"] = self.Hero.posMainChunkCenter
-        data["players"][player_id]["chunkCoor"] = self.Hero.Map.chunkData[
-            "currentChunkPos"
-        ]
+        pos_packet = copy.deepcopy(TEMPLATE_POS)
+        pos_packet["sender_id"] = self.Hero.networkId
+        pos_packet["chunkPos"] = self.Hero.posMainChunkCenter
+        pos_packet["chunkCoor"] = self.Hero.Map.chunkData["currentChunkPos"]
+        pos_packet["imagePos"] = self.Hero.imageState["imagePos"]
+        pos_packet["direction"] = self.Hero.direction
+        write_to_pipe(IPC_FIFO_OUTPUT, pos_packet)
 
     def serializeRect(self, d):
         """d must be a dict containing a "value" dict with a key "rect" and a value of type pygame.Rect"""

@@ -1,14 +1,18 @@
+import copy
 from UI.UI_utils_text import SelectPopUp
 import string
 import time
 from config import spellsConf, textureConf
 from config.ennemyConf import ENNEMY_DETECTION_RANGE
+from network.packet_types import TEMPLATE_CHARACTER_INFO
+from utils.Network_helpers import write_to_pipe
 
 import utils.RessourceHandler as RessourceHandler
 from assets.animation import *
 from config import playerConf
 from config.HUDConf import *
 from config.playerConf import *
+from config.netConf import *
 from config.textureConf import *
 from gameController import *
 from gameObjects import *
@@ -206,6 +210,9 @@ class Character:
                 (self.Game.resolution // 2, self.Game.resolution // 2),
                 f"{self.name} gain a level ! What characteristic do you want to up ?"
             ).show()
+
+        if self.Game.isOnline:
+            self.transmitCharacInfos()
 
     def modifyStat(self, stat, value):
         self.stats[stat] += value
@@ -485,6 +492,9 @@ class Character:
                     #         f"{self.Map.chunkData['currentChunkPos']} - {self.direction} -> {self.blitOffset}"
                     #     )
 
+                    if self.Game.isOnline:
+                        self.Game.NetworkController.transmitPosInfos()
+
                 elif mapName == "building":
                     self.buildingPosX -= DELTA_X
                     self.buildingPosY -= DELTA_Y
@@ -653,17 +663,14 @@ class Character:
             self.zoomedRect,
         )
 
-    # -------------------------- NETWORK ----------------------- #
+    # -------------------- NETWORK --------------- #
 
-    def transmitAnimInfos(self, player_id, data):
-        data["players"][player_id]["characterInfo"] = {
-            "classId": self.classId,
-            "imagePos": self.imageState["imagePos"],
-            "direction": self.direction,
-            "spellsID": self.spellsID,
-            "name": self.name,
-            "stats": self.stats
-        }
+    def transmitCharacInfos(self):
+        charac_packet = copy.deepcopy(TEMPLATE_CHARACTER_INFO)
+        charac_packet["sender_id"] = self.networkId
+        charac_packet["spellsID"] = self.spellsID
+        charac_packet["stats"] = self.stats
+        write_to_pipe(IPC_FIFO_OUTPUT, charac_packet)
 
     # def __getstate__(self):
 
