@@ -17,8 +17,11 @@ import config.HUDConf as HUDConf
 from config.HUDConf import *
 from config.itemConf import *
 import config.itemConf as itemConf
+from config.netConf import *
 from copy import *
 import json
+
+from utils.Network_helpers import write_to_pipe
 
 
 class Inventory:
@@ -875,7 +878,7 @@ class Inventory:
                 self.equipment[int(slot_id)]["item"].loadSurfDesc()
 
     def transmitInvInfos(self):
-        inv_packet = copy.deepcopy(TEMPLATE_INVENTORY)
+        inv_packet = deepcopy(TEMPLATE_INVENTORY)
         inv_packet["sender_id"] = self.Hero.networkId
         inv_packet["storage"] = {
             str(self.storage["tab"][j][i].property["Id"]): (i, j)
@@ -888,6 +891,7 @@ class Inventory:
             for slot, slot_item in self.equipment.items()
             if slot_item["item"] != None
         }
+        write_to_pipe(IPC_FIFO_OUTPUT_CREA if self.Game.NetworkController.creator_of_session else IPC_FIFO_OUTPUT_JOINER, inv_packet)
 
     # def __getstate__(self):
 

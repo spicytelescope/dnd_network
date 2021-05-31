@@ -960,11 +960,17 @@ class PauseMenu(OptionMenu):
         self.buttons[2].action = self.showControlSettings
         self.buttons[3].action = self.resumeGame
         self.buttons[4].action = self.openToLan
-        self.buttons[5].action = self.backToMenu
+        self.buttons[5].action = self.joinLan
+        self.buttons[6].action = self.backToMenu
 
     def openToLan(self):
 
         self.NetworkController.createConnection()
+        self.open = False
+
+    def joinLan(self):
+
+        self.NetworkController.joinConnection()
         self.open = False
 
     def showSaves(self):
@@ -1230,9 +1236,7 @@ class LoadingMenu:
         debugCheckStr += "}\n"
 
         if self.Game.debug_mode and self.flagDebug:
-            os.system("cls") if platform.system() == "Windows" else os.system(
-                "clear"
-            )
+            os.system("cls") if platform.system() == "Windows" else os.system("clear")
             print(debugCheckStr)
 
     def resetFlags(self) -> None:

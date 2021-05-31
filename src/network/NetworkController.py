@@ -1,4 +1,5 @@
 import json
+from logging import Logger
 import sys
 from math import sqrt
 import threading
@@ -10,7 +11,7 @@ import copy
 
 from pygame.constants import KEYDOWN, MOUSEBUTTONDOWN, MOUSEBUTTONUP
 from Player.Character import Character
-from UI.UI_utils_text import SelectPopUp
+from UI.UI_utils_text import Dialog, SelectPopUp
 from config import playerConf
 from config.UIConf import BUTTON_FONT_SIZE, DUNGEON_FONT
 from config.playerConf import CLASSES_NAMES
@@ -21,6 +22,7 @@ import config.HUDConf as HUDConf
 from utils.Network_helpers import *
 from .packet_types import *
 from config.netConf import *
+import socket
 
 
 class NetworkController:
@@ -41,6 +43,12 @@ class NetworkController:
         self.sessionChunks = (
             {}
         )  # Contains the chunkCoors/elementsTab discovered by ALL the players in the game
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 1))  # connect() for UDP doesn't send packets
+        self.local_ip_address = s.getsockname()[0]
+
+        self.creator_of_session = False
 
         # ------------ GRAPHICAL PANNEL --------------- #
 
@@ -64,207 +72,259 @@ class NetworkController:
         self.players[new_id].name = name
         self.players[new_id].networkId = new_id
 
-    def joinConnection(self, ip_addr):
+    def joinConnection(self, ip_addr="127.0.0.1"):
 
         self.Game.isOnline = True
 
-        with open(IPC_FIFO_OUTPUT) as fifo:
-            data = fifo.read()
-            if len(data) == 0:
-                data = self.cache_data
-            else:
-                str_data = get_raw_data_to_str(fifo)
-                data = json.loads(str_data, indent=2)
+        try:
+            # Local version
+            os.mkfifo(IPC_FIFO_INPUT_JOINER)
+            os.mkfifo(IPC_FIFO_OUTPUT_JOINER)
 
-        fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
-        user_encode_data = json.dumps(data, indent=2).encode("utf-8")
-        os.write(fifo, create_msg(user_encode_data))
-        os.close(fifo)
+            Dialog(
+                f"Joining {ip_addr}:{DEFAULT_PORT} !",
+                (self.Game.resolution // 2, self.Game.resolution // 2),
+                self.Game.screen,
+                ONLINE_DIALOG_COLOR,
+                self.Game,
+            ).mainShow()
 
-        # MAP LOADING
-        if not data["players"][self.Hero.networkId]["creator"]:
+        except:
+            Dialog(
+                f"The game at {ip_addr}:{DEFAULT_PORT} cannot be joined.",
+                (self.Game.resolution // 2, self.Game.resolution // 2),
+                self.Game.screen,
+                ONLINE_DIALOG_COLOR,
+                self.Game,
+                error=True,
+            ).mainShow()
+            logger.debug("FIFOs already created !")
+            os.remove(IPC_FIFO_INPUT_JOINER)
+            os.remove(IPC_FIFO_OUTPUT_JOINER)
 
-            new_seed = None
-            for player in data["players"].values():
-                if player["creator"]:
-                    new_seed = player["mapInfo"]["seed"]
-                    break
+        # with open(IPC_FIFO_OUTPUT_JOINER) as fifo:
+        #     # data = fifo.read()
 
-            if new_seed != self.Map.mapSeed:
-                self.Game.loadNewGame()  # State to 'loadingNewGame'
+        #     str_data = get_raw_data_to_str(fifo)
+        #     data = json.loads(str_data, indent=2)
 
-                self.LoadingMenu.confirmLoading("HUDLoading")
-                self.LoadingMenu.confirmLoading("ItemDBLoading", "gameObjectLoading")
-                self.LoadingMenu.confirmLoading("spellDBLoading", "gameObjectLoading")
+        # # fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
+        # # user_encode_data = json.dumps(data, indent=2).encode("utf-8")
+        # # os.write(fifo, create_msg(user_encode_data))
+        # # os.close(fifo)
 
-                def reGenMap():
-                    # reseting chunks for flags update
-                    self.Map.mapSeed = new_seed
-                    self.Map.chunkData = {
-                        "mainChunk": pygame.Surface(
-                            (
-                                self.Map.CHUNK_SIZE * (self.Map.renderDistance + 2),
-                                self.Map.CHUNK_SIZE * (self.Map.renderDistance + 2),
-                            )
-                        ),
-                        "currentChunkPos": [0, 0],
-                    }
+        # # MAP LOADING
+        # if not data["players"][self.Hero.networkId]["creator"]:
 
-                    for Hero in self.Game.heroesGroup:
-                        self.Map.loadPlayerdMap(self.Map.maxChunkGen, Hero)
+        #     new_seed = None
+        #     for player in data["players"].values():
+        #         if player["creator"]:
+        #             new_seed = player["mapInfo"]["seed"]
+        #             break
 
-                loadingThread = threading.Thread(target=reGenMap)
-                loadingThread.start()
+        #     if new_seed != self.Map.mapSeed:
+        #         self.Game.loadNewGame()  # State to 'loadingNewGame'
 
-                self.LoadingMenu.worldflags = None
-                while self.Game.currentState == "loadingNewGame":
-                    self.LoadingMenu.show()
+        #         self.LoadingMenu.confirmLoading("HUDLoading")
+        #         self.LoadingMenu.confirmLoading("ItemDBLoading", "gameObjectLoading")
+        #         self.LoadingMenu.confirmLoading("spellDBLoading", "gameObjectLoading")
 
-                # self.Map.miniMap.worldMapSurf = (
-                #     None  # Retrigger the minimap "world map" loading
-                # )
-                # self.Map.miniMap.WorldMap.mapSeed = new_seed
+        #         def reGenMap():
+        #             # reseting chunks for flags update
+        #             self.Map.mapSeed = new_seed
+        #             self.Map.chunkData = {
+        #                 "mainChunk": pygame.Surface(
+        #                     (
+        #                         self.Map.CHUNK_SIZE * (self.Map.renderDistance + 2),
+        #                         self.Map.CHUNK_SIZE * (self.Map.renderDistance + 2),
+        #                     )
+        #                 ),
+        #                 "currentChunkPos": [0, 0],
+        #             }
+
+        #             for Hero in self.Game.heroesGroup:
+        #                 self.Map.loadPlayerdMap(self.Map.maxChunkGen, Hero)
+
+        #         loadingThread = threading.Thread(target=reGenMap)
+        #         loadingThread.start()
+
+        #         self.LoadingMenu.worldflags = None
+        #         while self.Game.currentState == "loadingNewGame":
+        #             self.LoadingMenu.show()
+
+        #         # self.Map.miniMap.worldMapSurf = (
+        #         #     None  # Retrigger the minimap "world map" loading
+        #         # )
+        #         # self.Map.miniMap.WorldMap.mapSeed = new_seed
 
     def createConnection(self):
 
         self.Game.isOnline = True
+        self.creator_of_session = True
+
+        try:
+            # Local version
+            os.mkfifo(IPC_FIFO_INPUT_CREA)
+            os.mkfifo(IPC_FIFO_OUTPUT_CREA)
+            os.mkfifo(FIFO_PATH_CREA_TO_JOINER)
+            os.mkfifo(FIFO_PATH_JOINER_TO_CREA)
+
+            Dialog(
+                f"Your game is online, on {self.local_ip_address}:{DEFAULT_PORT} ! Share this adress to someone who wants to join you on your LAN !",
+                (self.Game.resolution // 2, self.Game.resolution // 2),
+                self.Game.screen,
+                ONLINE_DIALOG_COLOR,
+                self.Game,
+            ).mainShow()
+
+        except:
+            Dialog(
+                f"The game can't be ported on LAN.",
+                (self.Game.resolution // 2, self.Game.resolution // 2),
+                self.Game.screen,
+                ONLINE_DIALOG_COLOR,
+                self.Game,
+                error=True,
+            ).mainShow()
+            logger.debug("FIFOs already created !")
+            os.remove(IPC_FIFO_INPUT_CREA)
+            os.remove(IPC_FIFO_OUTPUT_CREA)
+            os.remove(FIFO_PATH_CREA_TO_JOINER)
+            os.remove(FIFO_PATH_JOINER_TO_CREA)
 
     def handleConnectedPlayers(self):
 
         # ------------------ DATA RECV PART ---------------------- #
 
-        with open(IPC_FIFO_INPUT, os.O_RDONLY | os.O_NONBLOCK) as fifo:
-            data = fifo.read()
-            if len(data) == 0:
-                # data = self.cache_data
-                logger.debug("No input data")
-            else:
+        fifo = os.open(
+            IPC_FIFO_INPUT_CREA if self.creator_of_session else IPC_FIFO_INPUT_JOINER,
+            os.O_RDONLY | os.O_NONBLOCK,
+        )
+        str_data = get_raw_data_to_str(fifo)
+        if str_data != "":
+            packet = json.loads(str_data, indent=2)
 
-                str_data = get_raw_data_to_str(fifo)
-                packet = json.loads(str_data, indent=2)
+            # --------------- NEW PLAYER DETECTION -------------------------- #
 
-                # --------------- NEW PLAYER DETECTION -------------------------- #
+            if packet["name"] == "discovery" and packet["sender_id"] not in list(
+                self.players.keys()
+            ) + [self.Hero.networkId]:
+                self.addPlayer(
+                    packet["sender_id"],
+                    packet["player_name"],
+                )
 
-                if packet["name"] == "discovery" and packet["sender_id"] not in list(
-                    self.players.keys()
-                ) + [self.Hero.networkId]:
-                    self.addPlayer(
-                        packet["sender_id"],
-                        packet["player_name"],
-                    )
+            for player_id, player in self.players.items():
+                if player_id == packet["sender_id"]:
 
-                for player_id, player in self.players.items():
-                    if player_id == packet["sender_id"]:
+                    # -------------- MAP RECV ------------ #
+                    if packet["name"] == "info_pos":
 
-                        # -------------- MAP RECV ------------ #
-                        if packet["name"] == "info_pos":
+                        if packet["chunkCoor"] not in self.sessionChunks:
+                            self.sessionChunks[packet["chunkCoor"]] = []  # TODO
 
-                            if packet["chunkCoor"] not in self.sessionChunks:
-                                self.sessionChunks[packet["chunkCoor"]] = []  # TODO
+                        # Check wether the player and the other connected are on the same chunk or not
+                        player.posMainChunkCenter = packet["chunkPos"]
 
-                            # Check wether the player and the other connected are on the same chunk or not
-                            player.posMainChunkCenter = data["players"][player_id][
-                                "chunkPos"
-                            ]
+                        player.imageState = {
+                            "image": playerConf.CLASSES[player.classId]["directions"][
+                                player.direction
+                            ][packet["imagePos"]],
+                            "imagePos": packet["imagePos"],
+                        }
 
-                            player.imageState = {
-                                "image": playerConf.CLASSES[player.classId][
-                                    "directions"
-                                ][player.direction][packet["imagePos"]],
-                                "imagePos": packet["imagePos"],
-                            }
+                        # Chunk rendering optimisation TODO
+                        # if (
+                        #     sqrt(
+                        #         sum(
+                        #             [
+                        #                 (p1coor - p2coor) ** 2
+                        #                 for p1coor, p2coor in zip(
+                        #                     data["players"][player_id]["chunkPos"],
+                        #                     self.Hero.Map.chunkData["currentChunkPos"],
+                        #                 )
+                        #             ]
+                        #         )
+                        #     )
+                        # ) <= self.Map.renderDistance :
+                    # ------------------ INVENTORY RECV ------------------- #
+                    if packet["name"] == "info_inv":
+                        player.Inventory.updateInventory(
+                            packet["storage"],
+                            packet["equipment"],
+                        )
 
-                            # Chunk rendering optimisation TODO
-                            # if (
-                            #     sqrt(
-                            #         sum(
-                            #             [
-                            #                 (p1coor - p2coor) ** 2
-                            #                 for p1coor, p2coor in zip(
-                            #                     data["players"][player_id]["chunkPos"],
-                            #                     self.Hero.Map.chunkData["currentChunkPos"],
-                            #                 )
-                            #             ]
-                            #         )
-                            #     )
-                            # ) <= self.Map.renderDistance :
-                        # ------------------ INVENTORY RECV ------------------- #
-                        if packet["name"] == "info_inv":
-                            player.Inventory.updateInventory(
-                                packet["storage"],
-                                packet["equipment"],
-                            )
+                    # ----------------- CHARAC INFO RECV ------------------ #
+                    if packet["name"] == "info_charac":
+                        player.classId = packet["classId"]
+                        player.direction = packet["direction"]
+                        player.stats = packet["stats"]
 
-                        # ----------------- CHARAC INFO RECV ------------------ #
-                        if packet["name"] == "info_charac":
-                            player.classId = packet["classId"]
-                            player.direction = packet["direction"]
-                            player.stats = packet["stats"]
+                        p_spells = sorted(player.spellsID[::])
+                        d_spells = sorted(packet["spellsID"][::])
+                        if p_spells != d_spells:
+                            player.spellsID = packet["spellsID"]
+                            player.SpellBook.updateSpellBook()
 
-                            p_spells = sorted(player.spellsID[::])
-                            d_spells = sorted(packet["spellsID"][::])
-                            if p_spells != d_spells:
-                                player.spellsID = packet["spellsID"]
-                                player.SpellBook.updateSpellBook()
+                    # ------------------ TRADE RECV ----------- #
+                    if packet["name"] == "trade":
+                        pass
+                        # if data["players"][self.Hero.networkId]["trade"][
+                        #     "tradeInvitation"
+                        # ]["refused"]:
+                        #     self.ContextMenu.tradeUI.hide()
 
-                        # ------------------ TRADE RECV ----------- #
-                        if packet["name"] == "trade":
-                            if data["players"][self.Hero.networkId]["trade"][
-                                "tradeInvitation"
-                            ]["refused"]:
-                                self.ContextMenu.tradeUI.hide()
+                        # for player_id, player in self.players.items():
 
-                            for player_id, player in self.players.items():
+                        #     # ----------------------------- TRADES HANDLING ------------------ #
 
-                                # ----------------------------- TRADES HANDLING ------------------ #
+                        #     # Invitation to trade handling
+                        #     if not self.inTrade:
+                        #         for _player_id, _player in data["players"].items():
+                        #             if (
+                        #                 _player["trade"]["tradeInvitation"]["to"]
+                        #                 == self.Hero.networkId
+                        #             ):
+                        #                 SelectPopUp(
+                        #                     {
+                        #                         "Yes": lambda: self.acceptTradeInv(
+                        #                             _player_id
+                        #                         ),
+                        #                         "No": lambda: self.refuseTradeInv(
+                        #                             _player_id
+                        #                         ),
+                        #                     },
+                        #                     self.Game.screen,
+                        #                     self.Game,
+                        #                     (
+                        #                         self.Game.resolution // 2,
+                        #                         self.Game.resolution // 2,
+                        #                     ),
+                        #                     f"{self.players[_player_id].name} wants to trade with you, do you accept ?",
+                        #                 ).show()
+                        #                 break
 
-                                # Invitation to trade handling
-                                if not self.inTrade:
-                                    for _player_id, _player in data["players"].items():
-                                        if (
-                                            _player["trade"]["tradeInvitation"]["to"]
-                                            == self.Hero.networkId
-                                        ):
-                                            SelectPopUp(
-                                                {
-                                                    "Yes": lambda: self.acceptTradeInv(
-                                                        _player_id
-                                                    ),
-                                                    "No": lambda: self.refuseTradeInv(
-                                                        _player_id
-                                                    ),
-                                                },
-                                                self.Game.screen,
-                                                self.Game,
-                                                (
-                                                    self.Game.resolution // 2,
-                                                    self.Game.resolution // 2,
-                                                ),
-                                                f"{self.players[_player_id].name} wants to trade with you, do you accept ?",
-                                            ).show()
-                                            break
+                        #     if self.ContextMenu.tradeUI != None:
 
-                                if self.ContextMenu.tradeUI != None:
+                        #         if (
+                        #             data["players"][
+                        #                 self.ContextMenu.tradeUI.target.networkId
+                        #             ]["trade"]["confirmFlag"]
+                        #             and not self.ContextMenu.tradeUI.confirmRecvFlag
+                        #         ):
+                        #             self.ContextMenu.tradeUI.confirmRecvFlag = True
 
-                                    if (
-                                        data["players"][
-                                            self.ContextMenu.tradeUI.target.networkId
-                                        ]["trade"]["confirmFlag"]
-                                        and not self.ContextMenu.tradeUI.confirmRecvFlag
-                                    ):
-                                        self.ContextMenu.tradeUI.confirmRecvFlag = True
+                        #         self.ContextMenu.tradeUI.targetAcceptedTrade = data[
+                        #             "players"
+                        #         ][self.ContextMenu.tradeUI.target.networkId][
+                        #             "trade"
+                        #         ][
+                        #             "tradeState"
+                        #         ]
 
-                                    self.ContextMenu.tradeUI.targetAcceptedTrade = data[
-                                        "players"
-                                    ][self.ContextMenu.tradeUI.target.networkId][
-                                        "trade"
-                                    ][
-                                        "tradeState"
-                                    ]
-
-                                    self.ContextMenu.tradeUI.updateStuff(
-                                        self.ContextMenu.tradeUI.target.networkId, data
-                                    )
+                        #         self.ContextMenu.tradeUI.updateStuff(
+                        #             self.ContextMenu.tradeUI.target.networkId, data
+                        #         )
 
         # # --------------------------- TRADE UI -------------- #
         # if self.ContextMenu.tradeUI != None:

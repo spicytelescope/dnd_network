@@ -1,10 +1,10 @@
 # Dnd Networking Project
 
-## Description
+## __Description__
 
 Pyhm World is a 2D RPG made in Python 3.8 for the 3A STI programmation project.
 
-## Installation
+## __Installation__
 
 First of all, you will need python3.8 installed in your machine.
 **A later version of Python does not work for the moment**.

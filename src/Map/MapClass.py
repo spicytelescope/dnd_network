@@ -1,4 +1,4 @@
-from copy import copy, deepcopy
+from copy import deepcopy
 import math
 from network.packet_types import TEMPLATE_POS
 
@@ -19,6 +19,7 @@ from tqdm import tqdm
 from utils.utils import logger
 from multiprocessing import Process
 import random
+
 
 class OpenWorldMap:
 
@@ -610,13 +611,19 @@ class OpenWorldMap:
 
     def transmitPosInfos(self):
 
-        pos_packet = copy.deepcopy(TEMPLATE_POS)
+        logger.debug('Transmitting pos infos !')
+        pos_packet = deepcopy(TEMPLATE_POS)
         pos_packet["sender_id"] = self.Hero.networkId
         pos_packet["chunkPos"] = self.Hero.posMainChunkCenter
         pos_packet["chunkCoor"] = self.Hero.Map.chunkData["currentChunkPos"]
         pos_packet["imagePos"] = self.Hero.imageState["imagePos"]
         pos_packet["direction"] = self.Hero.direction
-        write_to_pipe(IPC_FIFO_OUTPUT, pos_packet)
+        write_to_pipe(
+            IPC_FIFO_OUTPUT_CREA
+            if self.Game.NetworkController.creator_of_session
+            else IPC_FIFO_OUTPUT_JOINER,
+            pos_packet,
+        )
 
     def serializeRect(self, d):
         """d must be a dict containing a "value" dict with a key "rect" and a value of type pygame.Rect"""
@@ -656,7 +663,9 @@ class OpenWorldMap:
                             ):
                                 self.serializeRect(transformedChunkData[j][i])
 
-                data["players"][player_id]["mapInfo"]["chunkData"][chunkCoor] = transformedChunkData
+                data["players"][player_id]["mapInfo"]["chunkData"][
+                    chunkCoor
+                ] = transformedChunkData
 
     # def __getstate__(self):
 

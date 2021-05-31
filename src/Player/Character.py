@@ -1,4 +1,4 @@
-import copy
+from copy import deepcopy
 from UI.UI_utils_text import SelectPopUp
 import string
 import time
@@ -208,7 +208,7 @@ class Character:
                 self.Game.screen,
                 self.Game,
                 (self.Game.resolution // 2, self.Game.resolution // 2),
-                f"{self.name} gain a level ! What characteristic do you want to up ?"
+                f"{self.name} gain a level ! What characteristic do you want to up ?",
             ).show()
 
         if self.Game.isOnline:
@@ -493,7 +493,7 @@ class Character:
                     #     )
 
                     if self.Game.isOnline:
-                        self.Game.NetworkController.transmitPosInfos()
+                        self.Map.transmitPosInfos()
 
                 elif mapName == "building":
                     self.buildingPosX -= DELTA_X
@@ -666,11 +666,16 @@ class Character:
     # -------------------- NETWORK --------------- #
 
     def transmitCharacInfos(self):
-        charac_packet = copy.deepcopy(TEMPLATE_CHARACTER_INFO)
+        charac_packet = deepcopy(TEMPLATE_CHARACTER_INFO)
         charac_packet["sender_id"] = self.networkId
         charac_packet["spellsID"] = self.spellsID
         charac_packet["stats"] = self.stats
-        write_to_pipe(IPC_FIFO_OUTPUT, charac_packet)
+        write_to_pipe(
+            IPC_FIFO_OUTPUT_CREA
+            if self.Game.NetworkController.creator_of_session
+            else IPC_FIFO_OUTPUT_JOINER,
+            charac_packet,
+        )
 
     # def __getstate__(self):
 

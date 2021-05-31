@@ -59,7 +59,11 @@ GEN_MAP_PARAM_NAMES = ["SEED", "BIOMES", "WORLD ELEMENTS GENERATION"]
 
 global BG_WOOD
 
-PAUSE_BUTTON_NAMES = ["PAUSE MENU"] + OPTION_BUTTONS_NAMES + ["OPEN TO LAN", "RETURN TO MENU"]
+PAUSE_BUTTON_NAMES = (
+    ["PAUSE MENU"]
+    + OPTION_BUTTONS_NAMES
+    + ["OPEN TO LAN", "JOIN A GAME", "RETURN TO MENU"]
+)
 
 
 # -------------- LOADING MENU ---------------- #
@@ -105,7 +109,9 @@ OPEN_WORLD_FLAGS = {
     },
     "HUDLoading": {
         "desc": "Generating Player HUD ...",
-        "weight": OPEN_WORLD_FLAGS_WEIGHTS["HUD_LOADING"],  # Divided by 3 as there is 3 players
+        "weight": OPEN_WORLD_FLAGS_WEIGHTS[
+            "HUD_LOADING"
+        ],  # Divided by 3 as there is 3 players
         "checked": False,
         "subflags": None,
     },
