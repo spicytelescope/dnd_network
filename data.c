@@ -20,6 +20,8 @@
 #include <netdb.h>
 #include <time.h>
 
+
+
 typedef struct{
     long long int id;
 }static_packet;
@@ -46,11 +48,7 @@ typedef struct{
 
 }packet_trade;
 
-typedef struct{
-    int type;               //type=0
-    in_addr_t addr;
-    long long int id;
-}newP_packet;
+
 
 typedef struct{
     int type;

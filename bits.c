@@ -11,9 +11,7 @@
 
 #include "ip.h"
 
-#define CONNECTIONS_MAX 10
-#define PORT_UDP 7000
-#define PORT_TCP 8000
+
 
 void stop(char *msg)
 {
@@ -111,7 +109,13 @@ int main(int argc, char *argv[])
         perror("open");
         exit(EXIT_FAILURE);
     }*/
-    game_packet1 pck;
+    
+    //all the packets
+    
+    long long int selfID=12;
+    newP_packet newp={1,selfID};
+
+
     int true=1;
     int complete = 0;
     int fd_connect[CONNECTIONS_MAX];          //fd sockets under connection
@@ -158,7 +162,8 @@ int main(int argc, char *argv[])
     if(argc==2){
         cliTCP.sin_family = AF_INET;
         cliTCP.sin_port = htons(PORT_TCP);
-        confirmation(fdtcp, fdudp, argv[2], cliTCP);
+        printf("%s\n", argv[1]);
+        confirmation(fdtcp, fdudp, argv[1], cliTCP);
     }
     //confirmation if failed stop the program
     servTcp.sin_addr.s_addr = INADDR_ANY; //accept all the incoming messages
@@ -200,6 +205,7 @@ int main(int argc, char *argv[])
             {
                 stop("accept");
             }
+            printf("ok\n");
             if ((naddr = checkin(under_connect, cliTCP.sin_addr.s_addr)) != -1)
             {
                 char message = 0x00;
@@ -264,17 +270,11 @@ int main(int argc, char *argv[])
             {
                 if ((int)*msg && 0)
                 {
-                    for (int n = 0; n < CONNECTIONS_MAX; n++)
-                    {
-                        if (addrc[n] == 0)
-                        {
-                            //new connection
-                            addrc[n] = (int)*msg + 4;
-                            idc[n] = (long long int)*msg + 8;
-                            printf("%lli %i", idc[n], addrc[n]);
-                            break;
-                        }
-                    }
+                    //new connection
+                    printf("%i\n", cliUDP.sin_addr.s_addr);
+                    //set son id
+                    sendto(fdudp,(char *)&newp,sizeof(newp),0,(struct sockaddr *) &cliUDP, sizeof(cliUDP));
+                    break;
                 }
             }
             //player unknown
@@ -304,7 +304,6 @@ int main(int argc, char *argv[])
                 printf(".");
             }
         }
-        memcpy(&pck, &buffer, sizeof(game_packet1));
     }
     /*
     for(int i=0;i<64;i++){
@@ -318,7 +317,6 @@ int main(int argc, char *argv[])
     uint32_t n[]={0,0,0,0};
     SET_NUM(n,pack.stats1);
     */
-    printf("\n %d \n %d", pck.head[2], pck.ok);
     return 0;
 }
 
