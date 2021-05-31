@@ -132,7 +132,9 @@ int main(int argc, char *argv[]){
     //SET_NUM(n,pack.stats1);
     sendto(sfd,(char *) &pack,sizeof(pack),0,(struct sockaddr *) &cli, len);
     in_addr_t a[10];
-    memcpy(&a[3], &cli.sin_addr.s_addr, sizeof(cli));
+    a[8]=250;
+    memcpy(&(cli.sin_addr.s_addr),&a[8],sizeof(a[8]));
+    printf("%d\n",htons(cli.sin_port));
     int u=checkin(&a,cli.sin_addr.s_addr);
     printf("%d %d", pack.head[2], u);
     return 0;

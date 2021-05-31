@@ -25,14 +25,14 @@ typedef struct{
 }static_packet;
 
 typedef struct{
-    int type;               //type=0    
+    int type;               //type=1    
     int chunkPos[2];        //position of the chunk
     int chunkCoord[2];      //coord of the player inside the chunk
     char direction;         //0 left, 1
 }packet_pos;
 
 typedef struct{
-    int type;               //type=1
+    int type;               //type=2
     int storage[21];        //storage
     int equipment[11];      //equipment
     int status;             //0 free to interact, 1 not avaible yet
@@ -47,6 +47,12 @@ typedef struct{
 }packet_trade;
 
 typedef struct{
-    struct in_addr ip;
+    int type;               //type=0
+    in_addr_t addr;
     long long int id;
 }newP_packet;
+
+typedef struct{
+    int type;
+    int nb_connections;
+}ini_packet;
