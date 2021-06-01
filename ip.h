@@ -63,16 +63,17 @@ typedef struct{
 
 
 typedef struct{
-    int type;               //type=0
+    int type;               //type=1
+    int indice;
     long long int selfID;
     in_addr_t players_addr[CONNECTIONS_MAX];
     long long int players_id[CONNECTIONS_MAX];
 }newP_packet;
 
 typedef struct{
-    int type;
-    int nb_connections;
-}ini_packet;
+    int type;   //type=2
+    in_addr_t adrrn;
+}new_packet; //use to send new player to others players 
 
 
 #define 	MMax(x,y) (x>y ? x:y)

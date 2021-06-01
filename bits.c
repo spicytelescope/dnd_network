@@ -11,8 +11,6 @@
 
 #include "ip.h"
 
-
-
 void stop(char *msg)
 {
     perror(msg);
@@ -31,17 +29,20 @@ int is_complete(int *array, int len, int nbNull)
     return 1;
 }
 
-int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote)
+int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, struct sockaddr_in udpcli, in_addr_t *addrcli, long long int *idc, long long int selfID)
 {
     int activity;
-    hote.sin_port=htons(8000);
+    int nb_addr = 0;
+    char message[BUFSIZ];
+    hote.sin_port = htons(8000);
     fd_set fds;
     if (!inet_aton(addressH, &(hote.sin_addr)))
         stop("inet_aton");
     socklen_t lh = sizeof(hote);
-    if (connect(fdt, (struct sockaddr * )&hote, lh)==-1)
+    if (connect(fdt, (struct sockaddr *)&hote, lh) == -1)
         stop("connect");
     int fdmax = MMax(fdt, fdu);
+
     while (1)
     {
         //condition if all the server are find
@@ -49,14 +50,53 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote)
         FD_SET(fdt, &fds);
         FD_SET(fdu, &fds);
         activity = select(fdmax, &fds, NULL, NULL, NULL);
+        int lencli = sizeof(udpcli);
         if (FD_ISSET(fdt, &fds))
         {
+            recv(fdt, &message, BUFSIZ + 1, 0);
+            if ((int)*message == 1)
+            {
+                addrcli[(int)*(message + 4)] = hote.sin_addr.s_addr;
+                idc[(int)*(message + 4)] = (int)*(message + 8);
+                //send id to pipe
+                for (int i = 0; i < CONNECTIONS_MAX + 4; i++)
+                {
+                    if ((in_addr_t) * (message + 4 * i + 16) != 0)
+                    {
+                        addrcli[i] = (in_addr_t) * (message + i * 4 + 16);
+                        idc[i] = (long long int)*(message + 56 + i * 4);
+                        nb_addr++;
+                    }
+                }
+                if (nb_addr == 0)
+                    send(fdt, "ok", 3, 0);
+            }
+            else
+                return -1;
             //first com
             //first->recieve id and the number of the other player with their id
+            //send to pipe id
+            sleep(5);
+            for (int i = 0; i < CONNECTIONS_MAX; i++)
+            {
+                if (addrcli[i] != 0)
+                {
+                    udpcli.sin_addr.s_addr=addrcli[i];
+                    sendto(fdu, (char *)&selfID, sizeof(long long int), 0, (struct sockaddr *)&udpcli, sizeof(udpcli));
+                }
+            }
+            //for() sendto
         }
         if (FD_ISSET(fdu, &fds))
         {
-            //check the reponse of the other server
+            recvfrom(fdu, &message, 3, 0, (struct sockaddr *)&udpcli,(socklen_t *) &lencli);
+            nb_addr--;
+            if (nb_addr == 0)
+            {
+                send(fdt, "ok", 3, 0);
+            }
+            //count (7 for exemple)
+            //check the reponse of the others servers
             // pas oublier de close !!!
         }
     }
@@ -98,7 +138,7 @@ int main(int argc, char *argv[])
         }
     }
     // Open the fifo*/
-    int ind =7, outd;/*
+    int ind = 7, outd; /*
     if ((ind = open(fifo_output_path, O_RDONLY)) == -1)
     {
         perror("open");
@@ -109,14 +149,15 @@ int main(int argc, char *argv[])
         perror("open");
         exit(EXIT_FAILURE);
     }*/
-    
+
     //all the packets
-    
-    long long int selfID=12;
-    newP_packet newp={1,selfID};
 
+    long long int selfID = 12;
+    newP_packet newp;
+    new_packet new;
+    int indice_temp = -1;
 
-    int true=1;
+    int true = 1;
     int complete = 0;
     int fd_connect[CONNECTIONS_MAX];          //fd sockets under connection
     int new_sock;                             //fd socket new connect
@@ -153,17 +194,18 @@ int main(int argc, char *argv[])
     //TCP
     if ((fdtcp = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         stop("socket");
-    if (setsockopt(fdtcp, SOL_SOCKET, SO_REUSEADDR, &true, sizeof(int) ) <0)
+    if (setsockopt(fdtcp, SOL_SOCKET, SO_REUSEADDR, &true, sizeof(int)) < 0)
     {
         stop("setsockopt tcp");
     }
     servTcp.sin_family = AF_INET;
     servTcp.sin_port = htons(PORT_TCP);
-    if(argc==2){
+    if (argc == 2)
+    {
         cliTCP.sin_family = AF_INET;
         cliTCP.sin_port = htons(PORT_TCP);
         printf("%s\n", argv[1]);
-        confirmation(fdtcp, fdudp, argv[1], cliTCP);
+        confirmation(fdtcp, fdudp, argv[1], cliTCP, cliUDP, addrc, idc, selfID);
     }
     //confirmation if failed stop the program
     servTcp.sin_addr.s_addr = INADDR_ANY; //accept all the incoming messages
@@ -234,14 +276,27 @@ int main(int argc, char *argv[])
                             fd_connect[con] = new_sock;
                             under_connect[con] = cliTCP.sin_addr.s_addr;
                             memset(&cliTCP, 0, sizeof(cliTCP));
-                            char msg = 0xff; //plus que ça en vrai
-                            send(new_sock, &msg, 1, 0);
+                            memset(&newp, -1, sizeof(newp));
+                            newp.type = 1;
+                            newp.indice = con;
+                            newp.selfID = selfID;
+                            for (int n; n < CONNECTIONS_MAX; n++)
+                            {
+                                if (addrc[n] != -1)
+                                {
+                                    newp.players_addr[n] = addrc[n];
+                                    newp.players_id[n] = idc[n];
+                                }
+                            }
+                            send(new_sock, &newp, 1, 0);
                             for (int u = 0; u < CONNECTIONS_MAX; u++)
                             {
                                 if (addrc[u] != 0)
                                 {
                                     memcpy(&(cliUDP.sin_addr.s_addr), &addrc[u], sizeof(addrc[u]));
-                                    sendto(fdudp, "packet with adddr", 18, 0, (struct sockaddr *)&cliUDP, (unsigned int) len);
+                                    new.type = 2;
+                                    new.adrrn = under_connect[con];
+                                    sendto(fdudp, (char *)&(new), sizeof(new), 0, (struct sockaddr *)&cliUDP, (unsigned int)len);
                                 }
                             }
                             break;
@@ -255,8 +310,24 @@ int main(int argc, char *argv[])
         {
             if (FD_ISSET(fd_connect[con], &fds))
             {
-                //confirmation message
-                fd_connect[con] = -1;
+                recv(fdudp, &msg, BUFSIZ + 1, 0);
+                if (indice_temp == 0)
+                {
+                    for (int i = 0; i < CONNECTIONS_MAX; i++)
+                    {
+                        if (addrc[i] != 0)
+                        {
+                            memcpy(&cliUDP.sin_addr.s_addr, &addrc[i], sizeof(addrc[i]));
+                            sendto(fdudp, "ok", 3, 0, (struct sockaddr *)&cliUDP, (unsigned int)len);
+                        }
+                    }
+                }
+                for(int i=0; i<CONNECTIONS_MAX; i++){
+                    if(addrc[i]==0){
+                        addrc[i]=under_connect[con];
+                        printf("%d",addrc[i]);
+                    }
+                }
             }
         }
 
@@ -266,15 +337,41 @@ int main(int argc, char *argv[])
             if (recvfrom(fdudp, (char *)&msg, BUFSIZ + 1, 0, (struct sockaddr *)&cliUDP, (unsigned int *)&len) < 0)
                 stop("recvfrom");
             //player already connected
-            if ((naddr = checkin(addrc, cliUDP.sin_addr.s_addr)) >= 0)
+            if ((naddr = checkin(under_connect, cliUDP.sin_addr.s_addr)) >= 0)
             {
-                if ((int)*msg && 0)
+                //new connection
+                if (indice_temp != -1)
                 {
-                    //new connection
-                    printf("%i\n", cliUDP.sin_addr.s_addr);
-                    //set son id
-                    sendto(fdudp,(char *)&newp,sizeof(newp),0,(struct sockaddr *) &cliUDP, sizeof(cliUDP));
-                    break;
+                    addrc[indice_temp] = 0;
+                    idc[indice_temp] = 0;
+                }
+                for (int i = 0; i < CONNECTIONS_MAX; i++)
+                {
+                    if (addrc[i] == 0)
+                    {
+                        indice_temp = i;
+                        addrc[indice_temp] = cliUDP.sin_addr.s_addr;
+                        idc[indice_temp] = (long long int)*msg; //send id
+                    }
+                }
+                sendto(fdudp, "ok", 3, 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
+                //set son id
+            }
+            else if ((naddr = checkin(addrc, cliUDP.sin_addr.s_addr)) >= 0)
+            {
+                if(*msg && "o"){
+                    indice_temp=-1;
+                }
+                else if ((int)*msg && 2)
+                {
+                    for (int n = 0; n < CONNECTIONS_MAX; n++)
+                    {
+                        if (under_connect[n] == 0)
+                        {
+                            under_connect[n] = (int)*(msg + 4);
+                            break;
+                        }
+                    }
                 }
             }
             //player unknown
@@ -282,7 +379,7 @@ int main(int argc, char *argv[])
             {
                 //data deleted
                 char *msgerror = "please connect first";
-                sendto(fdudp, &msgerror, 21, 0, (struct sockaddr *)&cliUDP, (unsigned int) len);
+                sendto(fdudp, &msgerror, 21, 0, (struct sockaddr *)&cliUDP, (unsigned int)len);
             }
         }
         if (FD_ISSET(ind, &fds))
