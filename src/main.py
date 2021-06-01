@@ -139,154 +139,154 @@ while Game.currentState != "quit":
         World_Map.Game = Game
         Hero.Game = Game
         Game.goToOpenWorld()
-
+    
     while Game.currentState == "openWorld":
+            Hero = Hero_group[Game.heroIndex]
 
-        Hero = Hero_group[Game.heroIndex]
+            # ----------------- REST MECHANIC -------------------- #
+            if (time.time() - Hero.lastTimeoutHealed) > TIME_OUT_REST:
+                for H in Hero_group:
+                    H.modifyHP(2)
+                    logger.info(f"HEALING {H.name} DUE TO REST MECHANICS")
+                    H.lastTimeoutHealed = time.time()
 
-        # ----------------- REST MECHANIC -------------------- #
-        if (time.time() - Hero.lastTimeoutHealed) > TIME_OUT_REST:
-            for H in Hero_group:
-                H.modifyHP(2)
-                logger.info(f"HEALING {H.name} DUE TO REST MECHANICS")
-                H.lastTimeoutHealed = time.time()
+            for event in pygame.event.get():
 
-        for event in pygame.event.get():
+                # ------------------- NETWORK HANDLING ----------------- #
+                if Game.isOnline and NetworkController.players != {}:
+                    # NetworkController.handleInteractions(event)
+                    pass
 
-            # ------------------- NETWORK HANDLING ----------------- #
-            if Game.isOnline and NetworkController.players != {}:
-                # NetworkController.handleInteractions(event)
-                pass
+                # ------------------ HUD Handling --------------------- #
 
-            # ------------------ HUD Handling --------------------- #
+                if Hero.Inventory._show:
+                    Hero.Inventory.checkActions(event)
+                if Hero.QuestJournal._show:
+                    Hero.QuestJournal.checkActions(event)
+                if Hero.SpellBook._show:
+                    Hero.SpellBook.checkActions(event)
+                if Player_Map.miniMap._show:
+                    Player_Map.miniMap.checkActions(event)
 
-            if Hero.Inventory._show:
-                Hero.Inventory.checkActions(event)
-            if Hero.QuestJournal._show:
-                Hero.QuestJournal.checkActions(event)
-            if Hero.SpellBook._show:
-                Hero.SpellBook.checkActions(event)
-            if Player_Map.miniMap._show:
-                Player_Map.miniMap.checkActions(event)
+                # -------------------- KEY BINDING HANDLING ----------- #
+                if event.type == pygame.KEYDOWN:
 
-            # -------------------- KEY BINDING HANDLING ----------- #
-            if event.type == pygame.KEYDOWN:
+                    Player_Map.envGenerator.checkInteractableEntities(event)
 
-                Player_Map.envGenerator.checkInteractableEntities(event)
+                    if event.key == Game.KeyBindings["Pick up items"]["value"]:
+                        for i, item in enumerate(Player_Map.envGenerator.items):
+                            item.lootHandler(Hero, Player_Map.envGenerator, i)
 
-                if event.key == Game.KeyBindings["Pick up items"]["value"]:
-                    for i, item in enumerate(Player_Map.envGenerator.items):
-                        item.lootHandler(Hero, Player_Map.envGenerator, i)
+                    elif event.key == Game.KeyBindings["Pause the game"]["value"]:
+                        PauseMenu.captureBackground()
+                        PauseMenu.initPauseMenu()
+                        PauseMenu.mainLoop()
+                        break
 
-                elif event.key == Game.KeyBindings["Pause the game"]["value"]:
-                    PauseMenu.captureBackground()
-                    PauseMenu.initPauseMenu()
-                    PauseMenu.mainLoop()
-                    break
+                    elif (
+                        event.key == Game.KeyBindings["Toggle Inventory"]["value"]
+                        and not Hero.Inventory._show
+                        and not Hero.Inventory.open
+                    ):
+                        Hero.Inventory.open = True
+                        break
 
-                elif (
-                    event.key == Game.KeyBindings["Toggle Inventory"]["value"]
-                    and not Hero.Inventory._show
-                    and not Hero.Inventory.open
+                    elif (
+                        event.key == Game.KeyBindings["Toggle Spell Book"]["value"]
+                        and not Hero.SpellBook._show
+                        and not Hero.SpellBook.open
+                    ):
+                        Hero.SpellBook.open = True
+                        break
+
+                    elif (
+                        event.key == Game.KeyBindings["Open quest's Journal"]["value"]
+                        and not Hero.QuestJournal._show
+                        and not Hero.QuestJournal.open
+                    ):
+                        Hero.QuestJournal.open = True
+
+                    elif event.key == Game.KeyBindings["Toggle Minimap"]["value"]:
+                        Player_Map.miniMap._show = not Player_Map.miniMap._show
+
+                    elif (
+                        event.key
+                        == Game.KeyBindings["Show the connected player (Online mode only)"][
+                            "value"
+                        ]
+                        and Game.isOnline
+                    ):
+                        NetworkController._show = not NetworkController._show
+
+                    elif (
+                        len(Hero_group) > 1
+                        and event.key == Game.KeyBindings["Switch heroes"]["value"]
+                    ):
+                        Game.heroIndex = (Game.heroIndex + 1) % MAX_TEAM_LENGH
+
+                    if event.key == K_SPACE:
+                        Hero.lvlUp()
+
+                # ------------------ MOVEMENTS --------------- #
+                if (
+                    event.type == pygame.MOUSEBUTTONDOWN
+                    and event.button == 3
+                    and not ContextMenu._show
                 ):
-                    Hero.Inventory.open = True
-                    break
+                    Leader.updateClickPoint()
 
-                elif (
-                    event.key == Game.KeyBindings["Toggle Spell Book"]["value"]
-                    and not Hero.SpellBook._show
-                    and not Hero.SpellBook.open
-                ):
-                    Hero.SpellBook.open = True
-                    break
+                # ---------------- WATER ANIM ------------------- #
+                if event.type == ANIMATE_WATER_EVENT_ID and Player_Map.enableWaterAnimation:
+                    Player_Map.updateWaterAnimation()
 
-                elif (
-                    event.key == Game.KeyBindings["Open quest's Journal"]["value"]
-                    and not Hero.QuestJournal._show
-                    and not Hero.QuestJournal.open
-                ):
-                    Hero.QuestJournal.open = True
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
 
-                elif event.key == Game.KeyBindings["Toggle Minimap"]["value"]:
-                    Player_Map.miniMap._show = not Player_Map.miniMap._show
+            Leader.handleMovements("openWorld")
 
-                elif (
-                    event.key
-                    == Game.KeyBindings["Show the connected player (Online mode only)"][
-                        "value"
-                    ]
-                    and Game.isOnline
-                ):
-                    NetworkController._show = not NetworkController._show
-
-                elif (
-                    len(Hero_group) > 1
-                    and event.key == Game.KeyBindings["Switch heroes"]["value"]
-                ):
-                    Game.heroIndex = (Game.heroIndex + 1) % MAX_TEAM_LENGH
-
-                if event.key == K_SPACE:
-                    Hero.lvlUp()
-
-            # ------------------ MOVEMENTS --------------- #
+            # ------------------------------ DRAWING ------------------------------- #
             if (
-                event.type == pygame.MOUSEBUTTONDOWN
-                and event.button == 3
-                and not ContextMenu._show
+                Game.currentState == "openWorld"
+                and not Game.screen.get_locked()
+                and not Player_Map.chunkData["mainChunk"].get_locked()
             ):
-                Leader.updateClickPoint()
+                # -------------- MAP HANDLING ------------- #
 
-            # ---------------- WATER ANIM ------------------- #
-            if event.type == ANIMATE_WATER_EVENT_ID and Player_Map.enableWaterAnimation:
-                Player_Map.updateWaterAnimation()
+                Player_Map.show(Leader)
+                Player_Map.envGenerator.showInfoTipElt()
+                Player_Map.envGenerator.showNpc()
+                Player_Map.envGenerator.showEnnemies()
+                Player_Map.envGenerator.showItems()
 
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+                # -------------- PLAYERS HANDLING ----------- #
+                Hero.show()
 
-        Leader.handleMovements("openWorld")
+                # ------------------- HUD HANDLING ----------- #
 
-        # ------------------------------ DRAWING ------------------------------- #
-        if (
-            Game.currentState == "openWorld"
-            and not Game.screen.get_locked()
-            and not Player_Map.chunkData["mainChunk"].get_locked()
-        ):
-            # -------------- MAP HANDLING ------------- #
+                Hero.CharBar.show()
+                # Player_Map.miniMap.show()
+                Hero.Inventory.draw()
+                Hero.QuestJournal.draw()
+                Hero.SpellBook.draw()
+                Player_Map.miniMap.drawExtendedMap()
+                if Game.isOnline:
+                    # NetworkController.handleConnectedPlayers()
+                    # threading.Thread(target=NetworkController.handleConnectedPlayers).start()
+                    NetworkController.drawPannel()
+                    NetworkController.updateGraphics()
+                    if ContextMenu.tradeUI != None:
+                        ContextMenu.tradeUI.draw()
+                    ContextMenu.draw()
 
-            Player_Map.show(Leader)
-            Player_Map.envGenerator.showInfoTipElt()
-            Player_Map.envGenerator.showNpc()
-            Player_Map.envGenerator.showEnnemies()
-            Player_Map.envGenerator.showItems()
+                Game.show()
+                Game.spaceTransition("Pyhm World")
 
-            # -------------- PLAYERS HANDLING ----------- #
-            Hero.show()
+            if Game.debug_mode:
 
-            # ------------------- HUD HANDLING ----------- #
+                pygame.display.set_caption(
+                    f"Pyhm World - {str(int(Game_Clock.get_fps()))} fps"
+                )
 
-            Hero.CharBar.show()
-            # Player_Map.miniMap.show()
-            Hero.Inventory.draw()
-            Hero.QuestJournal.draw()
-            Hero.SpellBook.draw()
-            Player_Map.miniMap.drawExtendedMap()
-            if Game.isOnline:
-                # NetworkController.handleConnectedPlayers()
-                # threading.Thread(target=NetworkController.handleConnectedPlayers).start()
-                NetworkController.drawPannel()
-                NetworkController.updateGraphics()
-                if ContextMenu.tradeUI != None:
-                    ContextMenu.tradeUI.draw()
-                ContextMenu.draw()
+            Game_Clock.tick(Game.refresh_rate)
 
-            Game.show()
-            Game.spaceTransition("Pyhm World")
-
-        if Game.debug_mode:
-
-            pygame.display.set_caption(
-                f"Pyhm World - {str(int(Game_Clock.get_fps()))} fps"
-            )
-
-        Game_Clock.tick(Game.refresh_rate)

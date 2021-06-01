@@ -332,6 +332,7 @@ class NetworkController:
 
                                     # ---------------- CONNEXION RECV ------------ #
                                     if packet["name"] == "deconnection":
+                                        deconnected_name_player = self.players[packet["sender_id"]].name
                                         self.players = {
                                             k: v
                                             for k, v in self.players.items()
