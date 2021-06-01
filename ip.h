@@ -32,8 +32,8 @@
 #include <time.h>
 
 #define CONNECTIONS_MAX 10
-#define PORT_UDP 7000
-#define PORT_TCP 8000
+#define PORT_UDP 7001
+#define PORT_TCP 8001
 
 typedef struct{
     long long int id;

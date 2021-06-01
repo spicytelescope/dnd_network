@@ -34,26 +34,80 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
     int activity;
     int nb_addr = 0;
     char message[BUFSIZ];
-    hote.sin_port = htons(8000);
+    hote.sin_port = htons(PORT_TCP);
     fd_set fds;
     if (!inet_aton(addressH, &(hote.sin_addr)))
         stop("inet_aton");
     socklen_t lh = sizeof(hote);
     if (connect(fdt, (struct sockaddr *)&hote, lh) == -1)
         stop("connect");
+    recv(fdt, &message, BUFSIZ + 1, 0);
+    if ((int)*message == 1)
+    {
+        printf("ok\n");
+        addrcli[(int)*(message + 4)] = hote.sin_addr.s_addr;
+        idc[(int)*(message + 4)] = (int)*(message + 8);
+        //send id to pipe
+        for (int i = 0; i < CONNECTIONS_MAX + 4; i++)
+        {
+            if ((in_addr_t) * (message + 4 * i + 16) != 0)
+            {
+                addrcli[i] = (in_addr_t) * (message + i * 4 + 16);
+                idc[i] = (long long int)*(message + 56 + i * 4);
+                nb_addr++;
+            }
+        }
+        if (nb_addr == 0)
+            send(fdt, "ok", 3, 0);
+    }
+    else
+        return -1;
+    sleep(5);
+    for (int i = 0; i < CONNECTIONS_MAX; i++)
+    {
+        if (addrcli[i] != 0)
+        {
+            udpcli.sin_addr.s_addr = addrcli[i];
+            sendto(fdu, (char *)&selfID, sizeof(long long int), 0, (struct sockaddr *)&udpcli, sizeof(udpcli));
+        }
+    }
     int fdmax = MMax(fdt, fdu);
-
+    int lencli = sizeof(udpcli);
+    printf("ok\n");
     while (1)
     {
+        if (nb_addr != 0)
+        {
+            recvfrom(fdu, &message, 3, 0, (struct sockaddr *)&udpcli, (socklen_t *)&lencli);
+            nb_addr--;
+        }
+        if (nb_addr == 0)
+        {
+            send(fdt, "ok", 3, 0);
+            close(fdt);
+            return 0;
+        }
+        //count (7 for exemple)
+        //check the reponse of the others servers
+        // pas oublier de close !!!
+    }
+    /*while (1)
+    {
+        printf("ok\n");
         //condition if all the server are find
         FD_ZERO(&fds);
         FD_SET(fdt, &fds);
         FD_SET(fdu, &fds);
+        printf("ok\n");
         activity = select(fdmax, &fds, NULL, NULL, NULL);
+        printf("ok\n");
         int lencli = sizeof(udpcli);
+        printf("ok\n");
         if (FD_ISSET(fdt, &fds))
         {
+            printf("ok\n");
             recv(fdt, &message, BUFSIZ + 1, 0);
+
             if ((int)*message == 1)
             {
                 addrcli[(int)*(message + 4)] = hote.sin_addr.s_addr;
@@ -85,7 +139,6 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
                     sendto(fdu, (char *)&selfID, sizeof(long long int), 0, (struct sockaddr *)&udpcli, sizeof(udpcli));
                 }
             }
-            //for() sendto
         }
         if (FD_ISSET(fdu, &fds))
         {
@@ -99,10 +152,11 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
             //check the reponse of the others servers
             // pas oublier de close !!!
         }
-    }
+    }*/
 
     //connection TCP
     //confirmation UDP
+    return 0;
 }
 
 int checkin(in_addr_t list[], in_addr_t elem)
@@ -200,13 +254,26 @@ int main(int argc, char *argv[])
     }
     servTcp.sin_family = AF_INET;
     servTcp.sin_port = htons(PORT_TCP);
+    //confirmation if failed stop the program
     if (argc == 2)
     {
         cliTCP.sin_family = AF_INET;
         cliTCP.sin_port = htons(PORT_TCP);
         printf("%s\n", argv[1]);
         confirmation(fdtcp, fdudp, argv[1], cliTCP, cliUDP, addrc, idc, selfID);
+        for (int i = 0; i < CONNECTIONS_MAX; i++)
+        {
+            printf("%d\n", addrc[i]);
+        }
     }
+    if ((fdtcp = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        stop("socket");
+    if (setsockopt(fdtcp, SOL_SOCKET, SO_REUSEADDR, &true, sizeof(int)) < 0)
+    {
+        stop("setsockopt tcp");
+    }
+    servTcp.sin_family = AF_INET;
+    servTcp.sin_port = htons(PORT_TCP);
     //confirmation if failed stop the program
     servTcp.sin_addr.s_addr = INADDR_ANY; //accept all the incoming messages
     if (bind(fdtcp, (const struct sockaddr *)&servTcp, sizeof(servTcp)) == -1)
@@ -288,7 +355,8 @@ int main(int argc, char *argv[])
                                     newp.players_id[n] = idc[n];
                                 }
                             }
-                            send(new_sock, &newp, 1, 0);
+                            if (send(new_sock, &newp, sizeof(newp), 0) == -1)
+                                stop("send");
                             for (int u = 0; u < CONNECTIONS_MAX; u++)
                             {
                                 if (addrc[u] != 0)
@@ -310,7 +378,7 @@ int main(int argc, char *argv[])
         {
             if (FD_ISSET(fd_connect[con], &fds))
             {
-                recv(fdudp, &msg, BUFSIZ + 1, 0);
+                recv(fd_connect[con], &msg, BUFSIZ + 1, 0);
                 if (indice_temp == 0)
                 {
                     for (int i = 0; i < CONNECTIONS_MAX; i++)
@@ -322,10 +390,14 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
-                for(int i=0; i<CONNECTIONS_MAX; i++){
-                    if(addrc[i]==0){
-                        addrc[i]=under_connect[con];
-                        printf("%d",addrc[i]);
+                for (int i = 0; i < CONNECTIONS_MAX; i++)
+                {
+                    if (addrc[i] == 0)
+                    {
+                        addrc[i] = under_connect[con];
+                        fd_connect[con] = 0;
+                        printf("%d\n", addrc[i]);
+                        break;
                     }
                 }
             }
@@ -359,8 +431,9 @@ int main(int argc, char *argv[])
             }
             else if ((naddr = checkin(addrc, cliUDP.sin_addr.s_addr)) >= 0)
             {
-                if(*msg && "o"){
-                    indice_temp=-1;
+                if (*msg && "o")
+                {
+                    indice_temp = -1;
                 }
                 else if ((int)*msg && 2)
                 {
