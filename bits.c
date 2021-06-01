@@ -452,7 +452,10 @@ int main(int argc, char *argv[])
                         if (addrc[i] == cliUDP.sin_addr.s_addr)
                         {
                             addrc[i] == 0;
+                            // TODO CREATE JSON PACKET FROM C -> {name:"deconnexion", "sender_id": idc[i]}
+
                             idc[i] == 0;
+
                             break;
                         }
                     }
@@ -469,7 +472,7 @@ int main(int argc, char *argv[])
         if (FD_ISSET(ind, &fds))
         {
             //cas de la déco manuelle
-                char msgdeco = 0Xfc;
+                char msgdeco = 0Xfc; // -> {}
                 for (int n = 0; n < CONNECTIONS_MAX; n++)
                 {
                     if (addrc[n] != 0)
