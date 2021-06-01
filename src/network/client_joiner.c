@@ -113,7 +113,7 @@ int main(int argc, char **argv)
             {
                 // printf("%d \n", rval); //Debuging part
                 buf[rval] = '\0';
-                puts(buf);                                   //Debuging part
+                // puts(buf);                                   //Debuging part
                 if (write(joiner_to_crea, buf, rval) < 0) //transmiting data
                 {
                     perror("Writing to joiner_to_crea fifo");

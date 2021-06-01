@@ -40,7 +40,7 @@ class GameController:
         self.MAX_REFRESH_RATE = 240
         self.WINDOW = pygame.display.set_mode(self.WINDOW_SIZE) #NOFRAME)
 
-        self.enableSound = 1
+        self.enableSound = 0
         self.debug_mode = 1
         self.refresh_rate = 60
         self.resolution = min(self.WINDOW_SIZE)
@@ -83,7 +83,7 @@ class GameController:
         }
 
         self.cursor = Cursor(self)
-        self.musicController = MusicController()
+        self.musicController = MusicController(self)
         self.musicController.setMusic("menu")
 
         # ------ FIGHT ---------- #

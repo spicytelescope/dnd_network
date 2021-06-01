@@ -115,7 +115,7 @@ int main(int argc, char **argv)
             if (rval != 0)
             {
                 buf[rval] = '\0';
-                puts(buf);
+                // puts(buf);
                 if (write(from_crea_to_joiner, buf, BUFFLEN) < 0)
                 {
                     perror("Writing to crea_to_joiner fifo");

@@ -78,6 +78,6 @@ def run_C_client(c_client_name: str, ip_addr: str = "") -> None:
 def dump_network_logs(packet_loss: float) -> None:
 
     header = f'NETWORK SESSION - {datetime.today().strftime("%Y-%m-%d-%H:%M:%S")}'
-    packet_loss_segment = f"\n packet_loss : {packet_loss:.2f}%"
+    packet_loss_segment = f"\n packet_loss : {100*packet_loss:.2f}%"
     with open("session.log", "w") as f:
         f.write(header + packet_loss_segment)

@@ -2,7 +2,7 @@ import json
 from logging import Logger
 import sys
 from math import sqrt
-import threading
+import multiprocessing
 import time
 import os
 import sys
@@ -17,12 +17,15 @@ from config.UIConf import BUTTON_FONT_SIZE, DUNGEON_FONT
 from config.playerConf import CLASSES_NAMES
 from utils.utils import logger
 import uuid
+import select
 
 import config.HUDConf as HUDConf
 from utils.Network_helpers import *
 from .packet_types import *
 from config.netConf import *
 import socket
+
+
 
 
 class NetworkController:
@@ -51,6 +54,16 @@ class NetworkController:
         self.isSessionCreator = False
         self.total_packet_transmitted = 0
         self.packet_transmitted = 0
+        self.threads = {
+            "c_client_crea": multiprocessing.Process(
+                target=run_C_client,
+                args=(f"{CLIENT_BIN_DIR}/client_crea",),
+            ),
+            "c_client_joiner": multiprocessing.Process(
+                target=run_C_client, args=(f"{CLIENT_BIN_DIR}/client_joiner",)
+            ),
+            "connection_handler": multiprocessing.Process(target=self.handleConnectedPlayers),
+        }
 
         # ------------ GRAPHICAL PANNEL --------------- #
 
@@ -84,12 +97,11 @@ class NetworkController:
             os.mkfifo(IPC_FIFO_OUTPUT_JOINER)
 
             logger.info("[+] Starting C Module [JOINER]")
-            threading.Thread(
-                target=run_C_client, args=(f"{CLIENT_BIN_DIR}/client_joiner",)
-            ).start()
+            self.threads["c_client_joiner"].start()
 
-            # logger.info("[+] Starting handle connection thread")
-            threading.Thread(target=self.handleConnectedPlayers).start()
+            logger.info("[+] Starting handle connection thread")
+            self.threads["connection_handler"].start()
+
 
             Dialog(
                 f"Joining {ip_addr}:{DEFAULT_PORT} !",
@@ -179,13 +191,11 @@ class NetworkController:
             os.mkfifo(FIFO_PATH_CREA_TO_JOINER)
             os.mkfifo(FIFO_PATH_JOINER_TO_CREA)
 
-            threading.Thread(
-                target=run_C_client, args=(f"{CLIENT_BIN_DIR}/client_crea",)
-            ).start()
             logger.info("[+] Starting C Module [CREATOR]")
+            self.threads["c_client_crea"].start()
 
-            # logger.info("[+] Starting handle connection thread")
-            threading.Thread(target=self.handleConnectedPlayers).start()
+            logger.info("[+] Starting handle connection thread")
+            self.threads["connection_handler"].start()
 
             Dialog(
                 f"Your game is online, on {self.local_ip_address}:{DEFAULT_PORT} ! Share this adress to someone who wants to join you on your LAN !",
@@ -214,196 +224,228 @@ class NetworkController:
 
         # ------------------ DATA RECV PART ---------------------- #
 
-        str_data = get_raw_data_to_str(self.isSessionCreator)
-        if len(str_data) > 5:
-            self.total_packet_transmitted += 1
-            if str_data[0] != "{":
-                str_data = str_data[1:] if str_data[1] == "{" else "{" + str_data[1:]
-            print(
-                f"Current id : {self.Hero.networkId} and debug : \n[PYTHON] : {str_data}"
-            )
+        # str_data = get_raw_data_to_str(self.isSessionCreator)
+        # Open the pipe in non-blocking mode for reading
+        fifo = os.open(
+            IPC_FIFO_INPUT_CREA if self.isSessionCreator else IPC_FIFO_INPUT_JOINER,
+            os.O_RDONLY | os.O_NONBLOCK,
+        )
+        try:
+            # Create a polling object to monitor the pipe for new data
+            poll = select.poll()
+            poll.register(fifo, select.POLLIN)
             try:
-                packet = json.loads(str_data)
-                self.packet_transmitted += 1
-            except:
-                packet = {"name": "test_packet_bug", "sender_id": "Unknown_id"}
+                while True:
+                    # Check if there's data to read. Timeout after config.netCof.POLLIN_TIMEOUT sec.
+                    if (fifo, select.POLLIN) in poll.poll(POLLIN_TIMEOUT * 10000):
+                        msg_size_bytes = os.read(fifo, 4)
+                        msg_size = decode_msg_size(msg_size_bytes)
+                        str_data = os.read(fifo, msg_size).decode("latin-1")
 
-            # --------------- NEW PLAYER DETECTION -------------------------- #
+                        if len(str_data) > 5:
+                            self.total_packet_transmitted += 1
+                            if str_data[0] != "{":
+                                str_data = (
+                                    str_data[1:]
+                                    if str_data[1] == "{"
+                                    else "{" + str_data[1:]
+                                )
+                            # print(
+                            #     f"Current id : {self.Hero.networkId} and debug : \n[PYTHON] : {str_data}"
+                            # )
+                            try:
+                                packet = json.loads(str_data)
+                                self.packet_transmitted += 1
+                            except:
+                                packet = {
+                                    "name": "test_packet_bug",
+                                    "sender_id": "Unknown_id",
+                                }
 
-            if packet["name"] == "info_pos" and packet["sender_id"] not in list(
-                self.players.keys()
-            ) + [self.Hero.networkId]:
-                self.addPlayer(
-                    packet["sender_id"],
-                    packet["player_name"],
-                )
+                            # --------------- NEW PLAYER DETECTION -------------------------- #
 
-            for player_id, player in self.players.items():
-                if player_id == packet["sender_id"]:
+                            if packet["name"] == "info_pos" and packet[
+                                "sender_id"
+                            ] not in list(self.players.keys()) + [self.Hero.networkId]:
+                                self.addPlayer(
+                                    packet["sender_id"],
+                                    packet["player_name"],
+                                )
 
-                    # -------------- MAP RECV ------------ #
-                    if packet["name"] == "info_pos":
+                            for player_id, player in self.players.items():
+                                if player_id == packet["sender_id"]:
 
-                        # if packet["chunkCoor"] not in self.sessionChunks:
-                        #     self.sessionChunks[packet["chunkCoor"]] = []  # TODO
+                                    # -------------- MAP RECV ------------ #
+                                    if packet["name"] == "info_pos":
 
-                        # Check wether the player and the other connected are on the same chunk or not
-                        player.posMainChunkCenter = packet["chunkPos"]
+                                        # if packet["chunkCoor"] not in self.sessionChunks:
+                                        #     self.sessionChunks[packet["chunkCoor"]] = []  # TODO
 
-                        player.imageState = {
-                            "image": playerConf.CLASSES[player.classId]["directions"][
-                                player.direction
-                            ][packet["imagePos"]],
-                            "imagePos": packet["imagePos"],
-                        }
+                                        # Check wether the player and the other connected are on the same chunk or not
+                                        player.posMainChunkCenter = packet["chunkPos"]
+                                        player.direction = packet["direction"]
+                                        player.imageState = {
+                                            "image": playerConf.CLASSES[player.classId][
+                                                "directions"
+                                            ][player.direction][packet["imagePos"]],
+                                            "imagePos": packet["imagePos"],
+                                        }
 
-                        logger.debug(f"[+] Updating pos for player {player_id}")
+                                        # logger.debug(
+                                        #     f"[+] Updating pos for player {player_id}"
+                                        # )
 
-                        # Chunk rendering optimisation TODO
-                        # if (
-                        #     sqrt(
-                        #         sum(
-                        #             [
-                        #                 (p1coor - p2coor) ** 2
-                        #                 for p1coor, p2coor in zip(
-                        #                     data["players"][player_id]["chunkPos"],
-                        #                     self.Hero.Map.chunkData["currentChunkPos"],
-                        #                 )
-                        #             ]
-                        #         )
-                        #     )
-                        # ) <= self.Map.renderDistance :
+                                        # Chunk rendering optimisation TODO
+                                        # if (
+                                        #     sqrt(
+                                        #         sum(
+                                        #             [
+                                        #                 (p1coor - p2coor) ** 2
+                                        #                 for p1coor, p2coor in zip(
+                                        #                     data["players"][player_id]["chunkPos"],
+                                        #                     self.Hero.Map.chunkData["currentChunkPos"],
+                                        #                 )
+                                        #             ]
+                                        #         )
+                                        #     )
+                                        # ) <= self.Map.renderDistance :
 
-                    # ------------------ INVENTORY RECV ------------------- #
-                    if packet["name"] == "info_inv":
-                        player.Inventory.updateInventory(
-                            packet["storage"],
-                            packet["equipment"],
-                        )
+                                    # ------------------ INVENTORY RECV ------------------- #
+                                    if packet["name"] == "info_inv":
+                                        player.Inventory.updateInventory(
+                                            packet["storage"],
+                                            packet["equipment"],
+                                        )
 
-                    # ----------------- CHARAC INFO RECV ------------------ #
-                    if packet["name"] == "info_charac":
-                        player.classId = packet["classId"]
-                        player.direction = packet["direction"]
-                        player.stats = packet["stats"]
+                                    # ----------------- CHARAC INFO RECV ------------------ #
+                                    if packet["name"] == "info_charac":
+                                        player.classId = packet["classId"]
+                                        player.direction = packet["direction"]
+                                        player.stats = packet["stats"]
 
-                        p_spells = sorted(player.spellsID[::])
-                        d_spells = sorted(packet["spellsID"][::])
-                        if p_spells != d_spells:
-                            player.spellsID = packet["spellsID"]
-                            player.SpellBook.updateSpellBook()
+                                        p_spells = sorted(player.spellsID[::])
+                                        d_spells = sorted(packet["spellsID"][::])
+                                        if p_spells != d_spells:
+                                            player.spellsID = packet["spellsID"]
+                                            player.SpellBook.updateSpellBook()
 
-                    # ------------------ TRADE RECV ----------- #
-                    if packet["name"] == "trade":
-                        pass
-                        # if data["players"][self.Hero.networkId]["trade"][
-                        #     "tradeInvitation"
-                        # ]["refused"]:
-                        #     self.ContextMenu.tradeUI.hide()
+                                    # ------------------ TRADE RECV ----------- #
+                                    if packet["name"] == "trade":
+                                        pass
 
-                        # for player_id, player in self.players.items():
+            finally:
+                poll.unregister(fifo)
+        finally:
+            os.close(fifo)
 
-                        #     # ----------------------------- TRADES HANDLING ------------------ #
+            # if data["players"][self.Hero.networkId]["trade"][
+            #     "tradeInvitation"
+            # ]["refused"]:
+            #     self.ContextMenu.tradeUI.hide()
 
-                        #     # Invitation to trade handling
-                        #     if not self.inTrade:
-                        #         for _player_id, _player in data["players"].items():
-                        #             if (
-                        #                 _player["trade"]["tradeInvitation"]["to"]
-                        #                 == self.Hero.networkId
-                        #             ):
-                        #                 SelectPopUp(
-                        #                     {
-                        #                         "Yes": lambda: self.acceptTradeInv(
-                        #                             _player_id
-                        #                         ),
-                        #                         "No": lambda: self.refuseTradeInv(
-                        #                             _player_id
-                        #                         ),
-                        #                     },
-                        #                     self.Game.screen,
-                        #                     self.Game,
-                        #                     (
-                        #                         self.Game.resolution // 2,
-                        #                         self.Game.resolution // 2,
-                        #                     ),
-                        #                     f"{self.players[_player_id].name} wants to trade with you, do you accept ?",
-                        #                 ).show()
-                        #                 break
+            # for player_id, player in self.players.items():
 
-                        #     if self.ContextMenu.tradeUI != None:
+            #     # ----------------------------- TRADES HANDLING ------------------ #
 
-                        #         if (
-                        #             data["players"][
-                        #                 self.ContextMenu.tradeUI.target.networkId
-                        #             ]["trade"]["confirmFlag"]
-                        #             and not self.ContextMenu.tradeUI.confirmRecvFlag
-                        #         ):
-                        #             self.ContextMenu.tradeUI.confirmRecvFlag = True
+            #     # Invitation to trade handling
+            #     if not self.inTrade:
+            #         for _player_id, _player in data["players"].items():
+            #             if (
+            #                 _player["trade"]["tradeInvitation"]["to"]
+            #                 == self.Hero.networkId
+            #             ):
+            #                 SelectPopUp(
+            #                     {
+            #                         "Yes": lambda: self.acceptTradeInv(
+            #                             _player_id
+            #                         ),
+            #                         "No": lambda: self.refuseTradeInv(
+            #                             _player_id
+            #                         ),
+            #                     },
+            #                     self.Game.screen,
+            #                     self.Game,
+            #                     (
+            #                         self.Game.resolution // 2,
+            #                         self.Game.resolution // 2,
+            #                     ),
+            #                     f"{self.players[_player_id].name} wants to trade with you, do you accept ?",
+            #                 ).show()
+            #                 break
 
-                        #         self.ContextMenu.tradeUI.targetAcceptedTrade = data[
-                        #             "players"
-                        #         ][self.ContextMenu.tradeUI.target.networkId][
-                        #             "trade"
-                        #         ][
-                        #             "tradeState"
-                        #         ]
+            #     if self.ContextMenu.tradeUI != None:
 
-                        #         self.ContextMenu.tradeUI.updateStuff(
-                        #             self.ContextMenu.tradeUI.target.networkId, data
-                        #         )
+            #         if (
+            #             data["players"][
+            #                 self.ContextMenu.tradeUI.target.networkId
+            #             ]["trade"]["confirmFlag"]
+            #             and not self.ContextMenu.tradeUI.confirmRecvFlag
+            #         ):
+            #             self.ContextMenu.tradeUI.confirmRecvFlag = True
 
-            # # --------------------------- TRADE UI -------------- #
-            # if self.ContextMenu.tradeUI != None:
-            #     self.ContextMenu.tradeUI.transmitItems(self.Hero.networkId, data)
+            #         self.ContextMenu.tradeUI.targetAcceptedTrade = data[
+            #             "players"
+            #         ][self.ContextMenu.tradeUI.target.networkId][
+            #             "trade"
+            #         ][
+            #             "tradeState"
+            #         ]
 
-            # if self.resetTradeSettings:
-            #     self.resetTradeSettings = False
-            #     resetDict = {
-            #         "state": False,
-            #         "to": None,
-            #         "refused": False,
-            #     }
-            #     #     },
-            #     #     "tradedItems": []
-            #     #     "confirmFlag": False,  # Flag send when player 1 lock and ask for confirmation
-            #     #     "tradeState": "UNDEFINED",  # Flag send when player 2 accept the trade
-            #     # }
-            #     data["players"][self.Hero.networkId]["trade"]["tradeInvitation"] = resetDict
-            #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "UNDEFINED"
+            #         self.ContextMenu.tradeUI.updateStuff(
+            #             self.ContextMenu.tradeUI.target.networkId, data
+            #         )
 
-            #     data["players"][self.Hero.networkId]["trade"][
-            #         "tradeInvitation"
-            #     ] = "UNDEFINED"
-            #     data["players"][self.ContextMenu.tradeUI.target.networkId]["trade"][
-            #         "tradeInvitation"
-            #     ] = resetDict
+        # # --------------------------- TRADE UI -------------- #
+        # if self.ContextMenu.tradeUI != None:
+        #     self.ContextMenu.tradeUI.transmitItems(self.Hero.networkId, data)
 
-            # if self.sendTradeDestId != None:
-            #     data["players"][self.Hero.networkId]["trade"]["tradeInvitation"] = {
-            #         "state": True,
-            #         "to": self.sendTradeDestId,
-            #         "refused": False,
-            #     }
-            #     self.sendTradeDestId = None
+        # if self.resetTradeSettings:
+        #     self.resetTradeSettings = False
+        #     resetDict = {
+        #         "state": False,
+        #         "to": None,
+        #         "refused": False,
+        #     }
+        #     #     },
+        #     #     "tradedItems": []
+        #     #     "confirmFlag": False,  # Flag send when player 1 lock and ask for confirmation
+        #     #     "tradeState": "UNDEFINED",  # Flag send when player 2 accept the trade
+        #     # }
+        #     data["players"][self.Hero.networkId]["trade"]["tradeInvitation"] = resetDict
+        #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "UNDEFINED"
 
-            # if self.tradeInvRefused != None:
-            #     data["players"][self.tradeInvRefused]["trade"]["tradeInvitation"][
-            #         "refused"
-            #     ] = True
-            #     self.tradeInvRefused = None
+        #     data["players"][self.Hero.networkId]["trade"][
+        #         "tradeInvitation"
+        #     ] = "UNDEFINED"
+        #     data["players"][self.ContextMenu.tradeUI.target.networkId]["trade"][
+        #         "tradeInvitation"
+        #     ] = resetDict
 
-            # if self.sendTradeConf:
-            #     self.sendTradeConf = False
-            #     data["players"][self.Hero.networkId]["trade"]["confirmFlag"] = True
+        # if self.sendTradeDestId != None:
+        #     data["players"][self.Hero.networkId]["trade"]["tradeInvitation"] = {
+        #         "state": True,
+        #         "to": self.sendTradeDestId,
+        #         "refused": False,
+        #     }
+        #     self.sendTradeDestId = None
 
-            # if self.acceptTradeState == "ACCEPTED":
-            #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "ACCEPTED"
-            #     self.acceptTradeState = "UNDEFINED"
+        # if self.tradeInvRefused != None:
+        #     data["players"][self.tradeInvRefused]["trade"]["tradeInvitation"][
+        #         "refused"
+        #     ] = True
+        #     self.tradeInvRefused = None
 
-            # elif self.acceptTradeState == "REFUSED":
-            #     self.acceptTradeState = "UNDEFINED"
-            #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "REFUSED"
+        # if self.sendTradeConf:
+        #     self.sendTradeConf = False
+        #     data["players"][self.Hero.networkId]["trade"]["confirmFlag"] = True
+
+        # if self.acceptTradeState == "ACCEPTED":
+        #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "ACCEPTED"
+        #     self.acceptTradeState = "UNDEFINED"
+
+        # elif self.acceptTradeState == "REFUSED":
+        #     self.acceptTradeState = "UNDEFINED"
+        #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "REFUSED"
 
     def updateGraphics(self):
 
@@ -422,7 +464,7 @@ class NetworkController:
                     player.posMainChunkCenter, self.Hero.posMainChunkCenter
                 )
             ]
-            logger.debug(f"[+] Bliting image pos for player")
+            # logger.debug(f"[+] Bliting image pos for player")
             self.Game.screen.blit(
                 player.imageState["image"],
                 player.imageState["image"].get_rect(
@@ -510,6 +552,42 @@ class NetworkController:
                     ),
                 )
             self.Game.screen.blit(layout, layoutRect)
+
+    def quitOnline(self):
+
+        """Whether you are the creator of the game or a joiner, you can leave a game the same way"""
+
+        dump_network_logs(
+            self.packet_transmitted / self.total_packet_transmitted
+            if self.total_packet_transmitted != 0
+            else 1
+        )
+
+        self.players = {}  # Contains only the other players
+        self.monsters = []
+        self.Hero.networkId = str(uuid.uuid4())
+        self.total_packet_transmitted = 0
+        self.packet_transmitted = 0
+
+        os.remove(
+            IPC_FIFO_INPUT_CREA if self.isSessionCreator else IPC_FIFO_INPUT_JOINER
+        )
+        os.remove(
+            IPC_FIFO_OUTPUT_CREA if self.isSessionCreator else IPC_FIFO_OUTPUT_JOINER
+        )
+        self.isSessionCreator = False
+        self.Game.isOnline = False
+
+        for t in self.threads.values():
+            t.terminate()
+
+        Dialog(
+            "You left the party, you can now see the logs of your session in /src/network/net_session.log",
+            (self.Game.resolution // 2, self.Game.resolution // 2),
+            self.Game.screen,
+            (0, 0, 0),
+            self.Game,
+        ).mainShow()
 
     # ------------------------------- TRADE UI ------------------------- #
 

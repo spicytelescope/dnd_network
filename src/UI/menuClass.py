@@ -936,20 +936,37 @@ class PauseMenu(OptionMenu):
             self.Game.resolution // 2,
             self.menuRect.topleft[1] * 1.05,
         ]
-        self.buttonSpacing = self.menuRect.height // len(PAUSE_BUTTON_NAMES)
+
+        self.setButtons()
+
+    def setButtons(self):
+
+        self.buttonSpacing = self.menuRect.height // len(
+            OFFLINE_PAUSE_BUTTON_NAMES
+            if not self.Game.isOnline
+            else ONLINE_PAUSE_BUTTON_NAMES
+        )
 
         self.buttons = [
             Button(
                 self.initButtonPos[0],
                 self.initButtonPos[1] + self.buttonSpacing * i,
                 (
-                    PAUSE_BUTTON_NAMES[i],
+                    OFFLINE_PAUSE_BUTTON_NAMES[i]
+                    if not self.Game.isOnline
+                    else ONLINE_PAUSE_BUTTON_NAMES[i],
                     BUTTON_FONT_NAME,
                     (255, 255, 255),
                     BUTTON_FONT_SIZE,
                 ),
             )
-            for i in range(len(PAUSE_BUTTON_NAMES))
+            for i in range(
+                len(
+                    OFFLINE_PAUSE_BUTTON_NAMES
+                    if not self.Game.isOnline
+                    else ONLINE_PAUSE_BUTTON_NAMES
+                )
+            )
         ]
 
         # --------------------- MENU SURFACE -------------- #
@@ -959,19 +976,24 @@ class PauseMenu(OptionMenu):
         self.buttons[1].action = self.showVideoSettings
         self.buttons[2].action = self.showControlSettings
         self.buttons[3].action = self.resumeGame
-        self.buttons[4].action = self.openToLan
-        self.buttons[5].action = self.joinLan
-        self.buttons[6].action = self.backToMenu
+        if not self.Game.isOnline:
+            self.buttons[4].action = self.openToLan
+            self.buttons[5].action = self.joinLan
+        else:
+            self.buttons[4].action = self.Game.NetworkController.quitOnline
+        self.buttons[6 if not self.Game.isOnline else 5].action = self.backToMenu
 
     def openToLan(self):
 
         self.NetworkController.createConnection()
         self.open = False
+        self.setButtons()
 
     def joinLan(self):
 
         self.NetworkController.joinConnection()
         self.open = False
+        self.setButtons()
 
     def showSaves(self):
 

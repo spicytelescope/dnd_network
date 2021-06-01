@@ -33,13 +33,14 @@ from utils.utils import logger
 
 NoContact = lambda: None
 
+
 def loadMusicRessources():
 
     logger.info("LOADING MUSIC RESSOURCES")
-    # musicConf.SOUNDS_BANK = {
-    #     songName: pygame.mixer.Sound(songPath)
-    #     for songName, songPath in musicConf.SOUNDS_PATH.items()
-    # }
+    musicConf.SOUNDS_BANK = {
+        songName: pygame.mixer.Sound(songPath)
+        for songName, songPath in musicConf.SOUNDS_PATH.items()
+    }
 
 
 def loadItemRessources():
@@ -469,7 +470,9 @@ def loadLandscapeRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
                     )
 
 
-def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION"], debug = False):
+def loadOpenWorldRessources(
+    stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION"], debug=False
+):
 
     logger.info("LOADING OPEN WORLD RESSOURCES")
 
@@ -480,7 +483,12 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
     ]
 
     textureConf.DUNGEON_PORTAL_IDLE = [
-        pygame.transform.scale(pygame.image.load(f"./assets/world_textures/buildings/dungeon/portal/idle/{f}"), (stepGeneration, stepGeneration)).convert_alpha()
+        pygame.transform.scale(
+            pygame.image.load(
+                f"./assets/world_textures/buildings/dungeon/portal/idle/{f}"
+            ),
+            (stepGeneration, stepGeneration),
+        ).convert_alpha()
         for f in listdir("./assets/world_textures/buildings/dungeon/portal/idle/")
         if isfile(join("./assets/world_textures/buildings/dungeon/portal/idle/", f))
     ]
@@ -791,7 +799,9 @@ def loadOpenWorldRessources(stepGeneration: int = PLAYER_CONFIG["STEP_GENERATION
     ennemyList = listdir("./assets/world_textures/ennemy")
     ennemyList.remove("stateBubble")
     for i, ennemyName in enumerate(ennemyList):
-        textureConf.WORLD_ELEMENTS["Ennemy"][ennemyName]["loots"] = [itemConf.ITEM_DB[134 + i]]
+        textureConf.WORLD_ELEMENTS["Ennemy"][ennemyName]["loots"] = [
+            itemConf.ITEM_DB[134 + i]
+        ]
 
     textureConf.WORLD_ELEMENTS_STRUCTURE = {
         "Village": {

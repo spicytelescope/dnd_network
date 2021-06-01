@@ -273,7 +273,7 @@ while Game.currentState != "quit":
             Player_Map.miniMap.drawExtendedMap()
             if Game.isOnline:
                 # NetworkController.handleConnectedPlayers()
-                threading.Thread(target=NetworkController.handleConnectedPlayers).start()
+                # threading.Thread(target=NetworkController.handleConnectedPlayers).start()
                 NetworkController.drawPannel()
                 NetworkController.updateGraphics()
                 if ContextMenu.tradeUI != None:

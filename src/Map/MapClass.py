@@ -611,7 +611,7 @@ class OpenWorldMap:
 
     def transmitPosInfos(self):
 
-        logger.debug('Transmitting pos infos !')
+        # logger.debug('Transmitting pos infos !')
         pos_packet = deepcopy(TEMPLATE_POS)
         pos_packet["sender_id"] = self.Hero.networkId
         pos_packet["chunkPos"] = self.Hero.posMainChunkCenter
