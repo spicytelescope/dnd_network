@@ -355,8 +355,6 @@ int main(int argc, char *argv[])
                                     newp.players_id[n] = idc[n];
                                 }
                             }
-                            if (send(new_sock, &newp, sizeof(newp), 0) == -1)
-                                stop("send");
                             for (int u = 0; u < CONNECTIONS_MAX; u++)
                             {
                                 if (addrc[u] != 0)
@@ -367,6 +365,8 @@ int main(int argc, char *argv[])
                                     sendto(fdudp, (char *)&(new), sizeof(new), 0, (struct sockaddr *)&cliUDP, (unsigned int)len);
                                 }
                             }
+                            if (send(new_sock, &newp, sizeof(newp), 0) == -1)
+                                stop("send");
                             break;
                         }
                     }
@@ -431,7 +431,7 @@ int main(int argc, char *argv[])
             }
             else if ((naddr = checkin(addrc, cliUDP.sin_addr.s_addr)) >= 0)
             {
-                if (*msg && "o")
+                if (*msg && 'o')
                 {
                     indice_temp = -1;
                 }
