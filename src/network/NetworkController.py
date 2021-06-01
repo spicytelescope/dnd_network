@@ -37,7 +37,7 @@ class NetworkController:
 
         self.players = {}  # Contains only the other players
         self.monsters = []
-        self.Hero.networkId = str(uuid.uuid4())
+        self.Hero.networkId = str(uuid.uuid2())
         self.LoadingMenu = None
 
         self.sessionChunks = (

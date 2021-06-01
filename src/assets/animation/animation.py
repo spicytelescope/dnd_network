@@ -19,8 +19,9 @@ PY2 = sys.version_info[0] == 2
 string_types = None
 text_type = None
 if PY2:
-    string_types = basestring
-    text_type = unicode
+    # string_types = basestring
+    # text_type = unicode
+    pass
 else:
     string_types = text_type = str
 
