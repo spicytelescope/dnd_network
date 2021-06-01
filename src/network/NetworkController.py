@@ -33,23 +33,27 @@ class NetworkController:
         self.Map = Map
         self.Hero = Hero
         self.ContextMenu = ContextMenu
+        self.LoadingMenu = None
         ContextMenu.networkController = self
 
+        # ------------- PLAYERS HANDLING -------------- #
         self.players = {}  # Contains only the other players
         self.monsters = []
         self.Hero.networkId = str(uuid.uuid2())
-        self.LoadingMenu = None
-
         self.sessionChunks = (
             {}
         )  # Contains the chunkCoors/elementsTab discovered by ALL the players in the game
+        self.players_timeout = {}
 
+        # --------------- SESSION SETTINGS -------------- #
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 1))  # connect() for UDP doesn't send packets
         self.local_ip_address = s.getsockname()[0]
         s.close()
-
         self.isSessionCreator = False
+
+        # ------------------- THREAD HANDLING ---------------#
+
         self.total_packet_transmitted = 0
         self.packet_transmitted = 0
         self.threads = {
@@ -84,6 +88,8 @@ class NetworkController:
         self.players[new_id].initHUD()
         self.players[new_id].name = name
         self.players[new_id].networkId = new_id
+
+        self.players_timeout[new_id] = time.time()
 
     def joinConnection(self, ip_addr="127.0.0.1"):
 
@@ -261,6 +267,21 @@ class NetworkController:
 
                             # --------------- NEW PLAYER DETECTION -------------------------- #
 
+                            # --------------- TIMEOUT HANDLING ---------------- #
+                            self.players_timeout[
+                                packet["sender_id"]
+                            ] = time.time()  # reset the timer
+                            for (
+                                player_id,
+                                current_timer,
+                            ) in self.players_timeout.items():
+                                if (
+                                    current_timer - time.time()
+                                ) >= PLAYER_DECONNECTION_TIMEOUT * 60:
+                                    fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
+                                    os.write(fifo, DECONNECTION_TIMEOUT_BYTES)
+                                    os.close(fifo)
+
                             if packet["name"] == "info_pos" and packet[
                                 "sender_id"
                             ] not in list(self.players.keys()) + [self.Hero.networkId]:
@@ -332,7 +353,9 @@ class NetworkController:
 
                                     # ---------------- CONNEXION RECV ------------ #
                                     if packet["name"] == "deconnection":
-                                        deconnected_name_player = self.players[packet["sender_id"]].name
+                                        deconnected_name_player = self.players[
+                                            packet["sender_id"]
+                                        ].name
                                         self.players = {
                                             k: v
                                             for k, v in self.players.items()
@@ -567,17 +590,12 @@ class NetworkController:
         dump_network_logs(
             self.packet_transmitted / self.total_packet_transmitted
             if self.total_packet_transmitted != 0
-            else 1
+            else 0
         )
 
-        deco_packet = TEMPLATE_DECONNEXION
-        deco_packet["sender_id"] = self.Hero.networkId
-        deco_packet["player_name"] = self.Hero.name
-        write_to_pipe(
-            IPC_FIFO_OUTPUT_CREA
-            if self.isSessionCreator
-            else IPC_FIFO_OUTPUT_JOINER, deco_packet
-        )
+        fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
+        os.write(fifo, DECONNECTION_MANUAL_BYTES)
+        os.close(fifo)
 
         # for t in self.threads.values():
         #     if t.is_alive:

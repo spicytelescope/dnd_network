@@ -15,6 +15,9 @@ POLLIN_TIMEOUT = 2 # seconds
 
 # 2 Clients way (localhost only)
 
+IPC_FIFO_OUTPUT = "/tmp/info_output"
+IPC_FIFO_INPUT = "/tmp/info_input"
+
 IPC_FIFO_INPUT_CREA = "/tmp/info_input_creator"
 IPC_FIFO_OUTPUT_CREA = "/tmp/info_output_creator"
 
@@ -24,4 +27,6 @@ IPC_FIFO_OUTPUT_JOINER = "/tmp/info_output_joiner"
 FIFO_PATH_CREA_TO_JOINER = "/tmp/crea_to_joiner"
 FIFO_PATH_JOINER_TO_CREA = "/tmp/joiner_to_crea"
 
+DECONNECTION_TIMEOUT_BYTES = b'\xfb'
+DECONNECTION_MANUAL_BYTES = b'\xfc'
 # Client double pipes ways nomenclature : (in | out)put_fifo_{id}
