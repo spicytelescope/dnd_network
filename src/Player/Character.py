@@ -211,8 +211,8 @@ class Character:
                 f"{self.name} gain a level ! What characteristic do you want to up ?",
             ).show()
 
-        if self.Game.isOnline:
-            self.transmitCharacInfos()
+        # if self.Game.isOnline:
+        #     self.transmitCharacInfos()
 
     def modifyStat(self, stat, value):
         self.stats[stat] += value
@@ -672,7 +672,7 @@ class Character:
         charac_packet["stats"] = self.stats
         write_to_pipe(
             IPC_FIFO_OUTPUT_CREA
-            if self.Game.NetworkController.creator_of_session
+            if self.Game.NetworkController.isSessionCreator
             else IPC_FIFO_OUTPUT_JOINER,
             charac_packet,
         )

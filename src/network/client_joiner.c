@@ -61,11 +61,12 @@ int main(int argc, char **argv)
             perror("open");
             exit(EXIT_FAILURE);
         }
-        if ((joiner_to_crea = open(joiner_to_crea_path, O_WRONLY)) == -1)
+        if ((crea_to_joiner = open(crea_to_joiner_path, O_RDONLY)) == -1)
         {
             perror("open");
             exit(EXIT_FAILURE);
         }
+
         while (TRUE)
         {
             bzero(child_buf, BUFFLEN);
@@ -76,7 +77,11 @@ int main(int argc, char **argv)
             }
             if (rval != 0)
             {
-                write(to_python_client, child_buf, strlen(child_buf)); //transmiting data
+                if (write(to_python_client, child_buf, BUFFLEN) < 0) //transmiting data
+                {
+                    perror("Writing to to_python_client fifo");
+                    exit(EXIT_FAILURE);
+                } //transmiting data
             }
         }
         close(to_python_client);
@@ -91,7 +96,7 @@ int main(int argc, char **argv)
             perror("open");
             exit(EXIT_FAILURE);
         }
-        if ((crea_to_joiner = open(crea_to_joiner_path, O_RDONLY)) == -1)
+        if ((joiner_to_crea = open(joiner_to_crea_path, O_WRONLY)) == -1)
         {
             perror("open");
             exit(EXIT_FAILURE);
@@ -106,8 +111,14 @@ int main(int argc, char **argv)
             }
             if (rval != 0)
             {
-                puts(buf);                               //Debuging part
-                write(joiner_to_crea, buf, strlen(buf)); //transmiting data
+                // printf("%d \n", rval); //Debuging part
+                buf[rval] = '\0';
+                puts(buf);                                   //Debuging part
+                if (write(joiner_to_crea, buf, rval) < 0) //transmiting data
+                {
+                    perror("Writing to joiner_to_crea fifo");
+                    exit(EXIT_FAILURE);
+                } //transmiting data
             }
         }
         close(from_python_descriptor);

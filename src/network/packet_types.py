@@ -3,6 +3,7 @@
 
 TEMPLATE_POS = {
     "name": "info_pos",
+    "player_name": "Unknown_name",
     "sender_id": "Unknown_id",
     "chunkPos": [],  # [1562, 1556]
     "chunkCoor": [],  # [0, 0]
@@ -59,15 +60,10 @@ TEMPLATE_NEW_CONNECTION = {
 }
 
 # //TODO
-TEMPLATE_TRADE_OFFER = {
-    "name": "trade"
-}
+TEMPLATE_TRADE_OFFER = {"name": "trade"}
 
 
-
-
-
-# OLD : 
+# OLD :
 
 # BASE SCHEME
 # data["players"][self.Hero.networkId] = {

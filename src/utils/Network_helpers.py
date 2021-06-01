@@ -1,3 +1,4 @@
+from datetime import datetime
 import struct
 import os
 import json
@@ -11,7 +12,9 @@ def encode_msg_size(size: int) -> bytes:
 
 
 def decode_msg_size(size_bytes: bytes) -> int:
-    return struct.unpack("<I", size_bytes)[0]
+    # return struct.unpack("<I", size_bytes)[0]
+    # FIFO's output are in little endian
+    return int.from_bytes(size_bytes, byteorder="little")
 
 
 def create_msg(content: bytes) -> bytes:
@@ -19,32 +22,62 @@ def create_msg(content: bytes) -> bytes:
     return encode_msg_size(size) + content
 
 
-def get_raw_data_to_str(fifo: int) -> str:
-    """Get a message from the named pipe."""
+def get_raw_data_to_str(isCreator: bool) -> str:
+    """Get a message from a named pipe.
 
+    ---
+    ## Args
+        - isCreator (boolean): Wether the user joins or creates a game
+    """
     #  Handling non-blocking mode
-    try:
-        msg_size_bytes = os.read(fifo, 4)
-    except OSError as err:
-        if err.errno == errno.EAGAIN or err.errno == errno.EWOULDBLOCK:
-            msg_size_bytes = b""
-        else:
-            raise  # something else has happened -- better reraise
+    # try:
+    fifo = os.open(
+        IPC_FIFO_INPUT_CREA if isCreator else IPC_FIFO_INPUT_JOINER,
+        os.O_RDONLY,
+    )
+    msg_size_bytes = os.read(fifo, 4)
+    os.close(fifo)
+    msg_size = decode_msg_size(msg_size_bytes)
 
-    if msg_size_bytes == b"":
-        return ""
-    else:
-        msg_size = decode_msg_size(msg_size_bytes)
-        msg_content = os.read(fifo, msg_size)#.decode("utf8")
-        return msg_content
+    # except OSError as err:
+    #     if err.errno == errno.EAGAIN or err.errno == errno.EWOULDBLOCK:
+    #         return ""
+    #     else:
+    #         print("Unknown error :/")
+    #         raise  # something else has happened -- better reraise
+
+    # try:
+    fifo = os.open(
+        IPC_FIFO_INPUT_CREA if isCreator else IPC_FIFO_INPUT_JOINER,
+        os.O_RDONLY,
+    )
+    msg_content = os.read(fifo, msg_size).decode("latin-1")
+    os.close(fifo)
+    return msg_content
+
+    # except OSError as err:
+    #     if err.errno == errno.EAGAIN or err.errno == errno.EWOULDBLOCK:
+    #         return ""
+    #     else:
+    #         print("Unknown error :/")
+    #         raise  # something else has happened -- better reraise
 
 
 def write_to_pipe(fifo_path: str, packet: dict) -> None:
 
     fifo = os.open(fifo_path, os.O_WRONLY)
-    user_encode_data = json.dumps(packet, indent=2).encode("utf-8")
+    user_encode_data = json.dumps(packet, indent=2).encode("latin-1")
     os.write(fifo, create_msg(user_encode_data))
     os.close(fifo)
 
-def run_C_client(c_client_name: str) -> None:
-    call
+
+def run_C_client(c_client_name: str, ip_addr: str = "") -> None:
+    call([c_client_name]) if ip_addr != "" else call([c_client_name, ip_addr])
+
+
+def dump_network_logs(packet_loss: float) -> None:
+
+    header = f'NETWORK SESSION - {datetime.today().strftime("%Y-%m-%d-%H:%M:%S")}'
+    packet_loss_segment = f"\n packet_loss : {packet_loss:.2f}%"
+    with open("session.log", "w") as f:
+        f.write(header + packet_loss_segment)

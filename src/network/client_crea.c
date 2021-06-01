@@ -43,7 +43,7 @@ int main(int argc, char **argv)
     bzero(child_buf, BUFFLEN);
     int rval = 0;
 
-        // Listenning the fifo
+    // Listenning the fifo
     // Forking to make two listening possible, 1 from the python client, the other from the joiner pipe -> protoype of a select
 
     pid_t status;
@@ -78,7 +78,11 @@ int main(int argc, char **argv)
             }
             if (rval != 0)
             {
-                write(to_python_client, child_buf, strlen(child_buf)); //transmiting data
+                if (write(to_python_client, child_buf, rval) < 0) //transmiting data
+                {
+                    perror("Writing to to_python_client fifo");
+                    exit(EXIT_FAILURE);
+                } //transmiting data
             }
         }
         close(to_python_client);
@@ -110,8 +114,9 @@ int main(int argc, char **argv)
             }
             if (rval != 0)
             {
-                puts(buf); //Debuging part
-                if (write(from_crea_to_joiner, buf, strlen(buf)) < 0)
+                buf[rval] = '\0';
+                puts(buf);
+                if (write(from_crea_to_joiner, buf, BUFFLEN) < 0)
                 {
                     perror("Writing to crea_to_joiner fifo");
                     exit(EXIT_FAILURE);

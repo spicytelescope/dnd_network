@@ -35,7 +35,6 @@ class NetworkController:
         ContextMenu.networkController = self
 
         self.players = {}  # Contains only the other players
-        self.cache_data = {}
         self.monsters = []
         self.Hero.networkId = str(uuid.uuid4())
         self.LoadingMenu = None
@@ -47,8 +46,11 @@ class NetworkController:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 1))  # connect() for UDP doesn't send packets
         self.local_ip_address = s.getsockname()[0]
+        s.close()
 
-        self.creator_of_session = False
+        self.isSessionCreator = False
+        self.total_packet_transmitted = 0
+        self.packet_transmitted = 0
 
         # ------------ GRAPHICAL PANNEL --------------- #
 
@@ -80,6 +82,14 @@ class NetworkController:
             # Local version
             os.mkfifo(IPC_FIFO_INPUT_JOINER)
             os.mkfifo(IPC_FIFO_OUTPUT_JOINER)
+
+            logger.info("[+] Starting C Module [JOINER]")
+            threading.Thread(
+                target=run_C_client, args=(f"{CLIENT_BIN_DIR}/client_joiner",)
+            ).start()
+
+            # logger.info("[+] Starting handle connection thread")
+            threading.Thread(target=self.handleConnectedPlayers).start()
 
             Dialog(
                 f"Joining {ip_addr}:{DEFAULT_PORT} !",
@@ -160,7 +170,7 @@ class NetworkController:
     def createConnection(self):
 
         self.Game.isOnline = True
-        self.creator_of_session = True
+        self.isSessionCreator = True
 
         try:
             # Local version
@@ -168,6 +178,14 @@ class NetworkController:
             os.mkfifo(IPC_FIFO_OUTPUT_CREA)
             os.mkfifo(FIFO_PATH_CREA_TO_JOINER)
             os.mkfifo(FIFO_PATH_JOINER_TO_CREA)
+
+            threading.Thread(
+                target=run_C_client, args=(f"{CLIENT_BIN_DIR}/client_crea",)
+            ).start()
+            logger.info("[+] Starting C Module [CREATOR]")
+
+            # logger.info("[+] Starting handle connection thread")
+            threading.Thread(target=self.handleConnectedPlayers).start()
 
             Dialog(
                 f"Your game is online, on {self.local_ip_address}:{DEFAULT_PORT} ! Share this adress to someone who wants to join you on your LAN !",
@@ -196,17 +214,23 @@ class NetworkController:
 
         # ------------------ DATA RECV PART ---------------------- #
 
-        fifo = os.open(
-            IPC_FIFO_INPUT_CREA if self.creator_of_session else IPC_FIFO_INPUT_JOINER,
-            os.O_RDONLY | os.O_NONBLOCK,
-        )
-        str_data = get_raw_data_to_str(fifo)
-        if str_data != "":
-            packet = json.loads(str_data, indent=2)
+        str_data = get_raw_data_to_str(self.isSessionCreator)
+        if len(str_data) > 5:
+            self.total_packet_transmitted += 1
+            if str_data[0] != "{":
+                str_data = str_data[1:] if str_data[1] == "{" else "{" + str_data[1:]
+            print(
+                f"Current id : {self.Hero.networkId} and debug : \n[PYTHON] : {str_data}"
+            )
+            try:
+                packet = json.loads(str_data)
+                self.packet_transmitted += 1
+            except:
+                packet = {"name": "test_packet_bug", "sender_id": "Unknown_id"}
 
             # --------------- NEW PLAYER DETECTION -------------------------- #
 
-            if packet["name"] == "discovery" and packet["sender_id"] not in list(
+            if packet["name"] == "info_pos" and packet["sender_id"] not in list(
                 self.players.keys()
             ) + [self.Hero.networkId]:
                 self.addPlayer(
@@ -220,8 +244,8 @@ class NetworkController:
                     # -------------- MAP RECV ------------ #
                     if packet["name"] == "info_pos":
 
-                        if packet["chunkCoor"] not in self.sessionChunks:
-                            self.sessionChunks[packet["chunkCoor"]] = []  # TODO
+                        # if packet["chunkCoor"] not in self.sessionChunks:
+                        #     self.sessionChunks[packet["chunkCoor"]] = []  # TODO
 
                         # Check wether the player and the other connected are on the same chunk or not
                         player.posMainChunkCenter = packet["chunkPos"]
@@ -232,6 +256,8 @@ class NetworkController:
                             ][packet["imagePos"]],
                             "imagePos": packet["imagePos"],
                         }
+
+                        logger.debug(f"[+] Updating pos for player {player_id}")
 
                         # Chunk rendering optimisation TODO
                         # if (
@@ -247,6 +273,7 @@ class NetworkController:
                         #         )
                         #     )
                         # ) <= self.Map.renderDistance :
+
                     # ------------------ INVENTORY RECV ------------------- #
                     if packet["name"] == "info_inv":
                         player.Inventory.updateInventory(
@@ -326,65 +353,67 @@ class NetworkController:
                         #             self.ContextMenu.tradeUI.target.networkId, data
                         #         )
 
-        # # --------------------------- TRADE UI -------------- #
-        # if self.ContextMenu.tradeUI != None:
-        #     self.ContextMenu.tradeUI.transmitItems(self.Hero.networkId, data)
+            # # --------------------------- TRADE UI -------------- #
+            # if self.ContextMenu.tradeUI != None:
+            #     self.ContextMenu.tradeUI.transmitItems(self.Hero.networkId, data)
 
-        # if self.resetTradeSettings:
-        #     self.resetTradeSettings = False
-        #     resetDict = {
-        #         "state": False,
-        #         "to": None,
-        #         "refused": False,
-        #     }
-        #     #     },
-        #     #     "tradedItems": []
-        #     #     "confirmFlag": False,  # Flag send when player 1 lock and ask for confirmation
-        #     #     "tradeState": "UNDEFINED",  # Flag send when player 2 accept the trade
-        #     # }
-        #     data["players"][self.Hero.networkId]["trade"]["tradeInvitation"] = resetDict
-        #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "UNDEFINED"
+            # if self.resetTradeSettings:
+            #     self.resetTradeSettings = False
+            #     resetDict = {
+            #         "state": False,
+            #         "to": None,
+            #         "refused": False,
+            #     }
+            #     #     },
+            #     #     "tradedItems": []
+            #     #     "confirmFlag": False,  # Flag send when player 1 lock and ask for confirmation
+            #     #     "tradeState": "UNDEFINED",  # Flag send when player 2 accept the trade
+            #     # }
+            #     data["players"][self.Hero.networkId]["trade"]["tradeInvitation"] = resetDict
+            #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "UNDEFINED"
 
-        #     data["players"][self.Hero.networkId]["trade"][
-        #         "tradeInvitation"
-        #     ] = "UNDEFINED"
-        #     data["players"][self.ContextMenu.tradeUI.target.networkId]["trade"][
-        #         "tradeInvitation"
-        #     ] = resetDict
+            #     data["players"][self.Hero.networkId]["trade"][
+            #         "tradeInvitation"
+            #     ] = "UNDEFINED"
+            #     data["players"][self.ContextMenu.tradeUI.target.networkId]["trade"][
+            #         "tradeInvitation"
+            #     ] = resetDict
 
-        # if self.sendTradeDestId != None:
-        #     data["players"][self.Hero.networkId]["trade"]["tradeInvitation"] = {
-        #         "state": True,
-        #         "to": self.sendTradeDestId,
-        #         "refused": False,
-        #     }
-        #     self.sendTradeDestId = None
+            # if self.sendTradeDestId != None:
+            #     data["players"][self.Hero.networkId]["trade"]["tradeInvitation"] = {
+            #         "state": True,
+            #         "to": self.sendTradeDestId,
+            #         "refused": False,
+            #     }
+            #     self.sendTradeDestId = None
 
-        # if self.tradeInvRefused != None:
-        #     data["players"][self.tradeInvRefused]["trade"]["tradeInvitation"][
-        #         "refused"
-        #     ] = True
-        #     self.tradeInvRefused = None
+            # if self.tradeInvRefused != None:
+            #     data["players"][self.tradeInvRefused]["trade"]["tradeInvitation"][
+            #         "refused"
+            #     ] = True
+            #     self.tradeInvRefused = None
 
-        # if self.sendTradeConf:
-        #     self.sendTradeConf = False
-        #     data["players"][self.Hero.networkId]["trade"]["confirmFlag"] = True
+            # if self.sendTradeConf:
+            #     self.sendTradeConf = False
+            #     data["players"][self.Hero.networkId]["trade"]["confirmFlag"] = True
 
-        # if self.acceptTradeState == "ACCEPTED":
-        #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "ACCEPTED"
-        #     self.acceptTradeState = "UNDEFINED"
+            # if self.acceptTradeState == "ACCEPTED":
+            #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "ACCEPTED"
+            #     self.acceptTradeState = "UNDEFINED"
 
-        # elif self.acceptTradeState == "REFUSED":
-        #     self.acceptTradeState = "UNDEFINED"
-        #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "REFUSED"
+            # elif self.acceptTradeState == "REFUSED":
+            #     self.acceptTradeState = "UNDEFINED"
+            #     data["players"][self.Hero.networkId]["trade"]["tradeState"] = "REFUSED"
+
+    def updateGraphics(self):
 
         # --------------------------------- GRAPHICAL UPDATING ------------------------- #
 
         for player in self.players.values():
 
             # HUD Updating
-            player.Inventory.draw()
-            player.SpellBook.draw()
+            # player.Inventory.draw()
+            # player.SpellBook.draw()
 
             # Map pos updating
             playersDist = [
@@ -393,6 +422,7 @@ class NetworkController:
                     player.posMainChunkCenter, self.Hero.posMainChunkCenter
                 )
             ]
+            logger.debug(f"[+] Bliting image pos for player")
             self.Game.screen.blit(
                 player.imageState["image"],
                 player.imageState["image"].get_rect(

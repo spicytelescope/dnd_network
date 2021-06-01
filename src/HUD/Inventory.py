@@ -181,9 +181,9 @@ class Inventory:
             pygame.quit()
             exit()
 
-        if self.Game.isOnline:
-            self.Hero.transmitCharacInfos()
-            self.transmitInvInfos()
+        # if self.Game.isOnline:
+        #     self.Hero.transmitCharacInfos()
+        #     self.transmitInvInfos()
 
     def checkSellItem(self, event, Seller):
 
@@ -891,7 +891,7 @@ class Inventory:
             for slot, slot_item in self.equipment.items()
             if slot_item["item"] != None
         }
-        write_to_pipe(IPC_FIFO_OUTPUT_CREA if self.Game.NetworkController.creator_of_session else IPC_FIFO_OUTPUT_JOINER, inv_packet)
+        write_to_pipe(IPC_FIFO_OUTPUT_CREA if self.Game.NetworkController.isSessionCreator else IPC_FIFO_OUTPUT_JOINER, inv_packet)
 
     # def __getstate__(self):
 

@@ -1,8 +1,10 @@
 # Network setup
+DEFAULT_ADDR = "127.0.0.1"
 DEFAULT_PORT = 3000
 ONLINE_DIALOG_COLOR = (75,181,67)
 
-
+# Client setup
+CLIENT_BIN_DIR = './network/bin'
 
 # 2 Clients way - localhost only
 

@@ -618,9 +618,10 @@ class OpenWorldMap:
         pos_packet["chunkCoor"] = self.Hero.Map.chunkData["currentChunkPos"]
         pos_packet["imagePos"] = self.Hero.imageState["imagePos"]
         pos_packet["direction"] = self.Hero.direction
+        pos_packet["player_name"] = self.Hero.name
         write_to_pipe(
             IPC_FIFO_OUTPUT_CREA
-            if self.Game.NetworkController.creator_of_session
+            if self.Game.NetworkController.isSessionCreator
             else IPC_FIFO_OUTPUT_JOINER,
             pos_packet,
         )

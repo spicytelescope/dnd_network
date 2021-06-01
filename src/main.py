@@ -155,7 +155,8 @@ while Game.currentState != "quit":
 
             # ------------------- NETWORK HANDLING ----------------- #
             if Game.isOnline and NetworkController.players != {}:
-                NetworkController.handleInteractions(event)
+                # NetworkController.handleInteractions(event)
+                pass
 
             # ------------------ HUD Handling --------------------- #
 
@@ -271,8 +272,10 @@ while Game.currentState != "quit":
             Hero.SpellBook.draw()
             Player_Map.miniMap.drawExtendedMap()
             if Game.isOnline:
-                NetworkController.handleConnectedPlayers()
+                # NetworkController.handleConnectedPlayers()
+                threading.Thread(target=NetworkController.handleConnectedPlayers).start()
                 NetworkController.drawPannel()
+                NetworkController.updateGraphics()
                 if ContextMenu.tradeUI != None:
                     ContextMenu.tradeUI.draw()
                 ContextMenu.draw()
