@@ -59,6 +59,12 @@ TEMPLATE_NEW_CONNECTION = {
     "player_name": "Unknown_name",
 }
 
+TEMPLATE_DECONNEXION = {
+    "name": "deconnection",
+    "sender_id": "Unknown_id",
+    "player_name": "Unknown_name"
+}
+
 # //TODO
 TEMPLATE_TRADE_OFFER = {"name": "trade"}
 

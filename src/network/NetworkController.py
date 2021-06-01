@@ -2,7 +2,7 @@ import json
 from logging import Logger
 import sys
 from math import sqrt
-import multiprocessing
+import threading
 import time
 import os
 import sys
@@ -24,8 +24,6 @@ from utils.Network_helpers import *
 from .packet_types import *
 from config.netConf import *
 import socket
-
-
 
 
 class NetworkController:
@@ -55,14 +53,14 @@ class NetworkController:
         self.total_packet_transmitted = 0
         self.packet_transmitted = 0
         self.threads = {
-            "c_client_crea": multiprocessing.Process(
+            "c_client_crea": threading.Thread(
                 target=run_C_client,
                 args=(f"{CLIENT_BIN_DIR}/client_crea",),
             ),
-            "c_client_joiner": multiprocessing.Process(
+            "c_client_joiner": threading.Thread(
                 target=run_C_client, args=(f"{CLIENT_BIN_DIR}/client_joiner",)
             ),
-            "connection_handler": multiprocessing.Process(target=self.handleConnectedPlayers),
+            "connection_handler": threading.Thread(target=self.handleConnectedPlayers),
         }
 
         # ------------ GRAPHICAL PANNEL --------------- #
@@ -101,7 +99,6 @@ class NetworkController:
 
             logger.info("[+] Starting handle connection thread")
             self.threads["connection_handler"].start()
-
 
             Dialog(
                 f"Joining {ip_addr}:{DEFAULT_PORT} !",
@@ -333,6 +330,15 @@ class NetworkController:
                                     if packet["name"] == "trade":
                                         pass
 
+                                    # ---------------- CONNEXION RECV ------------ #
+                                    if packet["name"] == "deconnection":
+                                        self.players = {
+                                            k: v
+                                            for k, v in self.players.items()
+                                            if k != packet["sender_id"]
+                                        }
+                                        # chat.addMessage(f'{packet["player_name"]} left the game !')
+
             finally:
                 poll.unregister(fifo)
         finally:
@@ -563,11 +569,27 @@ class NetworkController:
             else 1
         )
 
+        deco_packet = TEMPLATE_DECONNEXION
+        deco_packet["sender_id"] = self.Hero.networkId
+        deco_packet["player_name"] = self.Hero.name
+        write_to_pipe(
+            IPC_FIFO_OUTPUT_CREA
+            if self.isSessionCreator
+            else IPC_FIFO_OUTPUT_JOINER, deco_packet
+        )
+
+        # for t in self.threads.values():
+        #     if t.is_alive:
+        #         t.join(0.5)
+
         self.players = {}  # Contains only the other players
         self.monsters = []
         self.Hero.networkId = str(uuid.uuid4())
         self.total_packet_transmitted = 0
         self.packet_transmitted = 0
+
+        self.isSessionCreator = False
+        self.Game.isOnline = False
 
         os.remove(
             IPC_FIFO_INPUT_CREA if self.isSessionCreator else IPC_FIFO_INPUT_JOINER
@@ -575,11 +597,6 @@ class NetworkController:
         os.remove(
             IPC_FIFO_OUTPUT_CREA if self.isSessionCreator else IPC_FIFO_OUTPUT_JOINER
         )
-        self.isSessionCreator = False
-        self.Game.isOnline = False
-
-        for t in self.threads.values():
-            t.terminate()
 
         Dialog(
             "You left the party, you can now see the logs of your session in /src/network/net_session.log",
