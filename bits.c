@@ -71,7 +71,6 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
             sendto(fdu, (char *)&selfID, sizeof(long long int), 0, (struct sockaddr *)&udpcli, sizeof(udpcli));
         }
     }
-    int fdmax = MMax(fdt, fdu);
     int lencli = sizeof(udpcli);
     printf("ok\n");
     while (1)
@@ -359,7 +358,7 @@ int main(int argc, char *argv[])
                             {
                                 if (addrc[u] != 0)
                                 {
-                                    memcpy(&(cliUDP.sin_addr.s_addr), &addrc[u], sizeof(addrc[u]));
+                                    cliUDP.sin_addr.s_addr = addrc[u];
                                     new.type = 2;
                                     new.adrrn = under_connect[con];
                                     sendto(fdudp, (char *)&(new), sizeof(new), 0, (struct sockaddr *)&cliUDP, (unsigned int)len);
@@ -446,6 +445,18 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
+                else if (*msg && 0xfc)
+                {
+                    for (int i = 0; i < CONNECTIONS_MAX; i++)
+                    {
+                        if (addrc[i] == cliUDP.sin_addr.s_addr)
+                        {
+                            addrc[i] == 0;
+                            idc[i] == 0;
+                            break;
+                        }
+                    }
+                }
             }
             //player unknown
             else if (naddr == -1)
@@ -457,6 +468,29 @@ int main(int argc, char *argv[])
         }
         if (FD_ISSET(ind, &fds))
         {
+            //cas de la déco manuelle
+                char msgdeco = 0Xfc;
+                for (int n = 0; n < CONNECTIONS_MAX; n++)
+                {
+                    if (addrc[n] != 0)
+                    {
+                        cliUDP.sin_addr.s_addr = addrc[n];
+                        sendto(fdudp, &msgdeco, 1, 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
+                    }
+                }
+                return 0;
+
+            //déco timeout
+                int id;
+                for (int i = 0; i < CONNECTIONS_MAX; i++)
+                { 
+                    if (idc[i] == id)
+                    {
+                        addrc[i] = 0;
+                        idc[i] = 0;
+                        break;
+                    }
+                }
         }
     }
 
