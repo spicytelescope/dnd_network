@@ -7,16 +7,17 @@ PLAYER_DECONNECTION_TIMEOUT = 10 #min
 
 # ------------ C CLIENTS --------------- #
 
-CLIENT_BIN_DIR = "./network/bin"
+C_CLIENT_PATH = "./network/bin/client"
 
 # --------------- GENERAL SYSTEM SETTINGS -------------- #
 
 POLLIN_TIMEOUT = 2 # seconds
 
-# 2 Clients way (localhost only)
-
 IPC_FIFO_OUTPUT = "/tmp/info_output"
 IPC_FIFO_INPUT = "/tmp/info_input"
+
+# 2 Clients way (localhost only)
+
 
 IPC_FIFO_INPUT_CREA = "/tmp/info_input_creator"
 IPC_FIFO_OUTPUT_CREA = "/tmp/info_output_creator"

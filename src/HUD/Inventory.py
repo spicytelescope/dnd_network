@@ -891,7 +891,10 @@ class Inventory:
             for slot, slot_item in self.equipment.items()
             if slot_item["item"] != None
         }
-        write_to_pipe(IPC_FIFO_OUTPUT_CREA if self.Game.NetworkController.isSessionCreator else IPC_FIFO_OUTPUT_JOINER, inv_packet)
+        write_to_pipe(
+            IPC_FIFO_OUTPUT,
+            inv_packet,
+        )
 
     # def __getstate__(self):
 

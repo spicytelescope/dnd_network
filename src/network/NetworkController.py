@@ -39,7 +39,7 @@ class NetworkController:
         # ------------- PLAYERS HANDLING -------------- #
         self.players = {}  # Contains only the other players
         self.monsters = []
-        self.Hero.networkId = str(uuid.uuid2())
+        self.Hero.networkId = str(uuid.uuid4())
         self.sessionChunks = (
             {}
         )  # Contains the chunkCoors/elementsTab discovered by ALL the players in the game
@@ -57,12 +57,8 @@ class NetworkController:
         self.total_packet_transmitted = 0
         self.packet_transmitted = 0
         self.threads = {
-            "c_client_crea": threading.Thread(
+            "C_client": threading.Thread(
                 target=run_C_client,
-                args=(f"{CLIENT_BIN_DIR}/client_crea",),
-            ),
-            "c_client_joiner": threading.Thread(
-                target=run_C_client, args=(f"{CLIENT_BIN_DIR}/client_joiner",)
             ),
             "connection_handler": threading.Thread(target=self.handleConnectedPlayers),
         }
@@ -97,14 +93,7 @@ class NetworkController:
 
         try:
             # Local version
-            os.mkfifo(IPC_FIFO_INPUT_JOINER)
-            os.mkfifo(IPC_FIFO_OUTPUT_JOINER)
-
-            logger.info("[+] Starting C Module [JOINER]")
-            self.threads["c_client_joiner"].start()
-
-            logger.info("[+] Starting handle connection thread")
-            self.threads["connection_handler"].start()
+            self.setupNetworkSettings()
 
             Dialog(
                 f"Joining {ip_addr}:{DEFAULT_PORT} !",
@@ -123,9 +112,6 @@ class NetworkController:
                 self.Game,
                 error=True,
             ).mainShow()
-            logger.debug("FIFOs already created !")
-            os.remove(IPC_FIFO_INPUT_JOINER)
-            os.remove(IPC_FIFO_OUTPUT_JOINER)
 
         # with open(IPC_FIFO_OUTPUT_JOINER) as fifo:
         #     # data = fifo.read()
@@ -184,21 +170,11 @@ class NetworkController:
 
     def createConnection(self):
 
-        self.Game.isOnline = True
-        self.isSessionCreator = True
-
         try:
             # Local version
-            os.mkfifo(IPC_FIFO_INPUT_CREA)
-            os.mkfifo(IPC_FIFO_OUTPUT_CREA)
-            os.mkfifo(FIFO_PATH_CREA_TO_JOINER)
-            os.mkfifo(FIFO_PATH_JOINER_TO_CREA)
-
-            logger.info("[+] Starting C Module [CREATOR]")
-            self.threads["c_client_crea"].start()
-
-            logger.info("[+] Starting handle connection thread")
-            self.threads["connection_handler"].start()
+            self.setupNetworkSettings()
+            self.Game.isOnline = True
+            self.isSessionCreator = True
 
             Dialog(
                 f"Your game is online, on {self.local_ip_address}:{DEFAULT_PORT} ! Share this adress to someone who wants to join you on your LAN !",
@@ -217,11 +193,29 @@ class NetworkController:
                 self.Game,
                 error=True,
             ).mainShow()
-            logger.debug("FIFOs already created !")
-            os.remove(IPC_FIFO_INPUT_CREA)
-            os.remove(IPC_FIFO_OUTPUT_CREA)
-            os.remove(FIFO_PATH_CREA_TO_JOINER)
-            os.remove(FIFO_PATH_JOINER_TO_CREA)
+
+    def setupNetworkSettings(self) -> None:
+        """
+        Setting up the network by doing the following :
+        - creating the 2 system pipes for python/C two-waay communication
+        - running the C client
+        - running the thread for handling input data from the C client (through the input pipe)
+        """
+
+        try:
+            logger.info("[+] Creating the pipes")
+
+            os.mkfifo(IPC_FIFO_INPUT)
+            os.mkfifo(IPC_FIFO_OUTPUT)
+        except:
+
+            logger.warn("[x] FIFOs are already created, proceeding ...")
+
+        logger.info("[+] Starting C Module ")
+        self.threads["C_client"].start()
+
+        logger.info("[+] Starting handle connection thread")
+        self.threads["connection_handler"].start()
 
     def handleConnectedPlayers(self):
 
@@ -230,7 +224,7 @@ class NetworkController:
         # str_data = get_raw_data_to_str(self.isSessionCreator)
         # Open the pipe in non-blocking mode for reading
         fifo = os.open(
-            IPC_FIFO_INPUT_CREA if self.isSessionCreator else IPC_FIFO_INPUT_JOINER,
+            IPC_FIFO_INPUT,
             os.O_RDONLY | os.O_NONBLOCK,
         )
         try:
@@ -610,12 +604,8 @@ class NetworkController:
         self.isSessionCreator = False
         self.Game.isOnline = False
 
-        os.remove(
-            IPC_FIFO_INPUT_CREA if self.isSessionCreator else IPC_FIFO_INPUT_JOINER
-        )
-        os.remove(
-            IPC_FIFO_OUTPUT_CREA if self.isSessionCreator else IPC_FIFO_OUTPUT_JOINER
-        )
+        os.remove(IPC_FIFO_INPUT)
+        os.remove(IPC_FIFO_OUTPUT)
 
         Dialog(
             "You left the party, you can now see the logs of your session in /src/network/net_session.log",

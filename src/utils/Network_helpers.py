@@ -32,7 +32,7 @@ def get_raw_data_to_str(isCreator: bool) -> str:
     #  Handling non-blocking mode
     # try:
     fifo = os.open(
-        IPC_FIFO_INPUT_CREA if isCreator else IPC_FIFO_INPUT_JOINER,
+        IPC_FIFO_INPUT,
         os.O_RDONLY,
     )
     msg_size_bytes = os.read(fifo, 4)
@@ -48,7 +48,7 @@ def get_raw_data_to_str(isCreator: bool) -> str:
 
     # try:
     fifo = os.open(
-        IPC_FIFO_INPUT_CREA if isCreator else IPC_FIFO_INPUT_JOINER,
+        IPC_FIFO_OUTPUT,
         os.O_RDONLY,
     )
     msg_content = os.read(fifo, msg_size).decode("latin-1")
@@ -71,8 +71,8 @@ def write_to_pipe(fifo_path: str, packet: dict) -> None:
     os.close(fifo)
 
 
-def run_C_client(c_client_name: str, ip_addr: str = "") -> None:
-    call([c_client_name]) if ip_addr != "" else call([c_client_name, ip_addr])
+def run_C_client(ip_addr: str = "") -> None:
+    call(C_CLIENT_PATH) if ip_addr != "" else call([C_CLIENT_PATH, ip_addr])
 
 
 def dump_network_logs(packet_loss: float) -> None:

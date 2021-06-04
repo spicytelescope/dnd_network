@@ -671,9 +671,7 @@ class Character:
         charac_packet["spellsID"] = self.spellsID
         charac_packet["stats"] = self.stats
         write_to_pipe(
-            IPC_FIFO_OUTPUT_CREA
-            if self.Game.NetworkController.isSessionCreator
-            else IPC_FIFO_OUTPUT_JOINER,
+            IPC_FIFO_OUTPUT,
             charac_packet,
         )
 

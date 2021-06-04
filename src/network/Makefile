@@ -2,8 +2,7 @@ OUTPUT_DIR := ./bin
 
 all:
 
-	gcc -o $(OUTPUT_DIR)/client_crea client_crea.c -Wall \
-	gcc -o $(OUTPUT_DIR)/client_joiner client_joiner.c -Wall
+	gcc -o $(OUTPUT_DIR)/client client.c -Wall
 
 clean:
 

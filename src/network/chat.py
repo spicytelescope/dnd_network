@@ -1,5 +1,4 @@
 import pygame
-from pygame import color
 from pygame.constants import *
 from UI.UI_utils_fonc import formatDialogContent
 from config.UIConf import *

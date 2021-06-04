@@ -492,7 +492,7 @@ class OpenWorldMap:
     #     self.screen.blit(surface, (0, 0))
 
     def updateWaterAnimation(self):
-        """ Method going through all the surrouding chunks and updating the surface of the water to make an animation """
+        """Method going through all the surrouding chunks and updating the surface of the water to make an animation"""
 
         assert (
             self.id == 1
@@ -620,9 +620,7 @@ class OpenWorldMap:
         pos_packet["direction"] = self.Hero.direction
         pos_packet["player_name"] = self.Hero.name
         write_to_pipe(
-            IPC_FIFO_OUTPUT_CREA
-            if self.Game.NetworkController.isSessionCreator
-            else IPC_FIFO_OUTPUT_JOINER,
+            IPC_FIFO_OUTPUT,
             pos_packet,
         )
 
