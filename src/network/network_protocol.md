@@ -1,6 +1,6 @@
 #  Network Protocols and IPC Handling
 
-## **Connexion protocol**
+## __New Connexion protocol__
 
 **The new player** needs an IP adress to enter the game.
 
@@ -13,7 +13,17 @@ This selected player among the connected on will gives the two primary informati
 ```mermaid
 sequenceDiagram
 autonumber
+    participant Python Client
+    participant New Player
+    participant InGame Player
+    participant Other InGame Players
     New Player-->>InGame Player: Initial connexion
-    InGame Player-->>New Player: Return the id of the new player + a list of tuples (ip_addr, game_i)
+    InGame Player-->>New Player: list of tuples (ip_addr, game_i)
+    New Player -->> Python Client: list of ids
     New Player -->> Other InGame Players: discovery packet containing his game_id + basic informations (stats, playe name, ...)
+    Other InGame Players -->> New Player: game_id ACK
+    New Player -->> InGame Player : game_id
+    InGame Player -->> Other InGame Players: New Player Confirmed
 ```
+
+## 

@@ -211,7 +211,7 @@ class NetworkController:
 
             logger.warn("[x] FIFOs are already created, proceeding ...")
 
-        logger.info("[+] Starting C Module ")
+        # logger.info("[+] Starting C Module ")
         self.threads["C_client"].start()
 
         logger.info("[+] Starting handle connection thread")
@@ -259,12 +259,11 @@ class NetworkController:
                                     "sender_id": "Unknown_id",
                                 }
 
-                            # --------------- NEW PLAYER DETECTION -------------------------- #
-
                             # --------------- TIMEOUT HANDLING ---------------- #
                             self.players_timeout[
                                 packet["sender_id"]
                             ] = time.time()  # reset the timer
+
                             for (
                                 player_id,
                                 current_timer,
@@ -276,7 +275,9 @@ class NetworkController:
                                     os.write(fifo, DECONNECTION_TIMEOUT_BYTES)
                                     os.close(fifo)
 
-                            if packet["name"] == "info_pos" and packet[
+                            # --------------- NEW PLAYER DETECTION -------------------------- #
+
+                            if packet["type"] == "info_pos" and packet[
                                 "sender_id"
                             ] not in list(self.players.keys()) + [self.Hero.networkId]:
                                 self.addPlayer(
@@ -288,7 +289,7 @@ class NetworkController:
                                 if player_id == packet["sender_id"]:
 
                                     # -------------- MAP RECV ------------ #
-                                    if packet["name"] == "info_pos":
+                                    if packet["type"] == "info_pos":
 
                                         # if packet["chunkCoor"] not in self.sessionChunks:
                                         #     self.sessionChunks[packet["chunkCoor"]] = []  # TODO
@@ -323,14 +324,14 @@ class NetworkController:
                                         # ) <= self.Map.renderDistance :
 
                                     # ------------------ INVENTORY RECV ------------------- #
-                                    if packet["name"] == "info_inv":
+                                    if packet["type"] == "info_inv":
                                         player.Inventory.updateInventory(
                                             packet["storage"],
                                             packet["equipment"],
                                         )
 
                                     # ----------------- CHARAC INFO RECV ------------------ #
-                                    if packet["name"] == "info_charac":
+                                    if packet["type"] == "info_charac":
                                         player.classId = packet["classId"]
                                         player.direction = packet["direction"]
                                         player.stats = packet["stats"]
@@ -342,21 +343,36 @@ class NetworkController:
                                             player.SpellBook.updateSpellBook()
 
                                     # ------------------ TRADE RECV ----------- #
-                                    if packet["name"] == "trade":
+                                    if packet["type"] == "trade":
                                         pass
 
-                                    # ---------------- CONNEXION RECV ------------ #
-                                    if packet["name"] == "deconnection":
-                                        deconnected_name_player = self.players[
-                                            packet["sender_id"]
-                                        ].name
+                                    # ------------------ MESSAGE RECV ----------- #
+                                    if packet["type"] == "message":
+                                        self.chat.addText(
+                                            (
+                                                self.players[packet["sender_id"]].name,
+                                                packet["content"],
+                                                packet["italic"],
+                                                packet["color_code"],
+                                            )
+                                        )
+
+                                    # ---------------- DECONNEXION RECV ------------ #
+                                    if packet["type"] == "deconnection":
+
+                                        self.chat.addText(
+                                            (
+                                                self.players[packet["sender_id"]].name,
+                                                "left the game !",
+                                                True,
+                                                CHAT_COLORS["DECONNEXION"],
+                                            )
+                                        )
                                         self.players = {
                                             k: v
                                             for k, v in self.players.items()
                                             if k != packet["sender_id"]
                                         }
-                                        # chat.addMessage(f'{packet["player_name"]} left the game !')
-
             finally:
                 poll.unregister(fifo)
         finally:

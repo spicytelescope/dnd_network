@@ -8,7 +8,7 @@ from pygame.locals import *
 from assets.animation import *
 from config.mapConf import *
 from config.UIConf import *
-from config.UIConf import DUNGEON_FONT
+from config.defaultConf import *
 from UI.Cursor import Cursor
 from utils.MusicController import MusicController
 
@@ -34,10 +34,10 @@ class GameController:
         self.heroIndex = 0
 
         # Pygame General Setting
-        self.WINDOW_SIZE = [1024, 1024]
-        self.MAX_RESOLUTION = 1920
-        self.MAX_RENDER_DISTANCE = 10
-        self.MAX_REFRESH_RATE = 240
+        self.WINDOW_SIZE = WINDOW_SIZE
+        self.MAX_RESOLUTION = MAX_RESOLUTION
+        self.MAX_RENDER_DISTANCE = MAX_RENDER_DISTANCE
+        self.MAX_REFRESH_RATE = MAX_REFRESH_RATE
         self.WINDOW = pygame.display.set_mode(self.WINDOW_SIZE) #NOFRAME)
 
         self.enableSound = 0

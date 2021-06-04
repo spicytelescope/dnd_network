@@ -1,8 +1,10 @@
+from config.netConf import CHAT_COLORS
+
 # UPDATE : The already putted values are meant to be use by default, e.g there is a default direction for example
 # This is done to avoid the trace of None, which are unusable by other python client and provokes bugs
 
 TEMPLATE_POS = {
-    "name": "info_pos",
+    "type": "info_pos",
     "player_name": "Unknown_name",
     "sender_id": "Unknown_id",
     "chunkPos": [],  # [1562, 1556]
@@ -13,7 +15,7 @@ TEMPLATE_POS = {
 }
 
 TEMPLATE_INVENTORY = {
-    "name": "info_inv",
+    "type": "info_inv",
     "sender_id": "Unknown_id",
     "storage": {
         # "50": [2, 4]
@@ -26,7 +28,7 @@ TEMPLATE_INVENTORY = {
 }
 
 TEMPLATE_CHARACTER_INFO = {
-    "name": "info_charac",
+    "type": "info_charac",
     "sender_id": "Unknown_id",
     "spellsID": [
         # 2,
@@ -51,7 +53,7 @@ TEMPLATE_CHARACTER_INFO = {
 
 # This packet must be the first one to be send, when joining a LAN -> Discovery packet
 TEMPLATE_NEW_CONNECTION = {
-    "name": "discovery",
+    "type": "discovery",
     "classId": 0,  # 0
     "sender_id": "Unknown_id",  # sample : 92a3c27f-4ee7-4d94-b72d-f29b501fadf4
     "map_seed": 1,
@@ -60,13 +62,21 @@ TEMPLATE_NEW_CONNECTION = {
 }
 
 TEMPLATE_DECONNEXION = {
-    "name": "deconnection",
+    "type": "deconnection",
     "sender_id": "Unknown_id",
-    "player_name": "Unknown_name"
+    "player_name": "Unknown_name",
+}
+
+TEMPLATE_MESSAGE = {
+    "type": "message",
+    "sender_id": "Unknown_id",  # To retrieve the type afterward, and display it in the chat;
+    "content": "",
+    "color_code": CHAT_COLORS["DEFAULT"],
+    "italic": False,
 }
 
 # //TODO
-TEMPLATE_TRADE_OFFER = {"name": "trade"}
+TEMPLATE_TRADE_OFFER = {"type": "trade"}
 
 
 # OLD :
@@ -84,7 +94,7 @@ TEMPLATE_TRADE_OFFER = {"name": "trade"}
 #         "imagePos": self.Hero.imageState["imagePos"],
 #         "direction": self.Hero.direction,
 #         "spellsID": self.Hero.spellsID,
-#         "name": self.Hero.name,
+#         "type": self.Hero.type,
 #         "stats": self.Hero.stats,
 #     },
 #     "mapInfo": {
