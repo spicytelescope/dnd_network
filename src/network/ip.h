@@ -32,8 +32,8 @@
 #include <time.h>
 
 #define CONNECTIONS_MAX 10
-#define PORT_UDP 5000
-#define PORT_TCP 6000
+#define PORT_UDP 7000
+#define PORT_TCP 8000
 #define host_ip "127.0.0.1"
 #define ID_LEN 16
 #define BUFSIZE 1024

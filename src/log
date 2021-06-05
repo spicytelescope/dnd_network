@@ -2,7 +2,7 @@ INFO:PHYM_LOGGER:Loading itemConf
 INFO:PHYM_LOGGER:Loading eventConf
 INFO:PHYM_LOGGER:Loading mapConf
 INFO:PHYM_LOGGER:Loading playerConf
-DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 18, 'DEX': 14, 'CON': 13, 'INT': 10, 'WIS': 18, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 15, 'DEF': 1, 'ATK': 1}, 'Wizard': {'STR': 10, 'DEX': 14, 'CON': 16, 'INT': 15, 'WIS': 16, 'CHA': 14, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 20, 'DEF': 3, 'ATK': 1}, 'Hunter': {'STR': 11, 'DEX': 14, 'CON': 19, 'INT': 15, 'WIS': 13, 'CHA': 18, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 23, 'DEF': 4, 'ATK': 3}}
+DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 14, 'DEX': 10, 'CON': 16, 'INT': 8, 'WIS': 19, 'CHA': 16, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 23, 'DEF': 4, 'ATK': 2}, 'Wizard': {'STR': 11, 'DEX': 11, 'CON': 19, 'INT': 13, 'WIS': 14, 'CHA': 13, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 17, 'DEF': 4, 'ATK': 4}, 'Hunter': {'STR': 11, 'DEX': 15, 'CON': 19, 'INT': 13, 'WIS': 17, 'CHA': 15, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 18, 'DEF': 1, 'ATK': 1}}
 INFO:PHYM_LOGGER:Loading UI Conf
 INFO:PHYM_LOGGER:Loading musicConf
 INFO:PHYM_LOGGER:Loading menuConf

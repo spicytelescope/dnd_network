@@ -25,6 +25,9 @@ int is_complete(int *array, int len, int nbNull)
 
 int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, struct sockaddr_in udpcli, in_addr_t *addrcli, char idc[CONNECTIONS_MAX][ID_LEN], char *selfID, int to_python_descriptor)
 {
+    // if (inet_aton(addressH, &(udpcli.sin_addr)) == 0)
+    //     stop("inet_aton");
+    // sendto(fdu, "yo", 3, 0, &udpcli, sizeof(udpcli));
     int nb_addr = 0;
     char message[BUFSIZE];
     hote.sin_port = htons(PORT_TCP);
@@ -276,7 +279,7 @@ int main(int argc, char *argv[])
     servTcp.sin_addr.s_addr = INADDR_ANY; //accept all the incoming messages
     if (bind(fdtcp, (const struct sockaddr *)&servTcp, sizeof(servTcp)) == -1)
         stop("bind tcp");
-    if (listen(fdtcp, 10) < 0)
+    if (listen(fdtcp, 10) == -1)
     {
         stop("listen");
     }
@@ -289,6 +292,7 @@ int main(int argc, char *argv[])
     //select loop
     while (1)
     {
+        // printf("Entering in the loop ... \n");
         //set of sockets intialisation for the select
         FD_ZERO(&fds);
         for (int con = 0; con < CONNECTIONS_MAX; con++)
@@ -300,9 +304,9 @@ int main(int argc, char *argv[])
             }
         }
         FD_SET(fdudp, &fds);
-        FD_SET(from_python_descriptor, &fds);
+        // FD_SET(from_python_descriptor, &fds);
         FD_SET(fdtcp, &fds);
-        select(fdmax, &fds, NULL, NULL, NULL);
+        select(fdmax + 1, &fds, NULL, NULL, NULL);
         int addrlen = sizeof(cliTCP);
         bzero(msg, BUFSIZE);
 
@@ -483,11 +487,13 @@ int main(int argc, char *argv[])
             //player unknown
             else if (naddr == -1)
             {
+                printf("zebi oui le random \n");
                 //data deleted
                 char *msgerror = "please connect first";
                 sendto(fdudp, &msgerror, 21, 0, (struct sockaddr *)&cliUDP, (unsigned int)len);
             }
         }
+        /*
         if (FD_ISSET(from_python_descriptor, &fds))
         {
             bzero(buffer, BUFSIZE);
@@ -496,64 +502,68 @@ int main(int argc, char *argv[])
                 perror("read - from_python_descriptor");
                 exit(EXIT_FAILURE);
             }
-
+            if (rval != 0)
+            {
+                printf("%d\n", rval);
+                printf("%s\n", buffer);
+            }
             if (rval != 0)
             {
 
                 // //cas de la déco manuelle
-                // if (*buffer == DECONNECTION_MANUAL_BYTES)
-                // {
-                //     char msgdeco = DECONNECTION_MANUAL_BYTES;
-                //     for (int n = 0; n < CONNECTIONS_MAX; n++)
-                //     {
-                //         if (addrc[n] != 0)
-                //         {
-                //             cliUDP.sin_addr.s_addr = addrc[n];
-                //             sendto(fdudp, &msgdeco, 1, 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
-                //         }
-                //     }
-                //     return EXIT_SUCCESS;
-                // }
+                if (*buffer == DECONNECTION_MANUAL_BYTES)
+                {
+                    char msgdeco = DECONNECTION_MANUAL_BYTES;
+                    for (int n = 0; n < CONNECTIONS_MAX; n++)
+                    {
+                        if (addrc[n] != 0)
+                        {
+                            cliUDP.sin_addr.s_addr = addrc[n];
+                            sendto(fdudp, &msgdeco, 1, 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
+                        }
+                    }
+                    return EXIT_SUCCESS;
+                }
 
                 // // //déco timeout
-                // else if (*buffer == DECONNECTION_TIMEOUT_BYTES)
-                // {
-                //     printf("DECONNECTION_TIMEOUT_BYTES \n");
-                //     int deco_val;
-                //     char deco_id[ID_LEN];
-                //     if ((deco_val = read(from_python_descriptor, deco_id, ID_LEN + 1)) < 0)
-                //     {
-                //         perror("read");
-                //         exit(EXIT_FAILURE);
-                //     }
-                //     if (deco_id != 0)
-                //     {
-                //         for (int i = 0; i < CONNECTIONS_MAX; i++)
-                //         {
-                //             if (strcmp(idc[i], deco_id) == 0)
-                //             {
-                //                 addrc[i] = 0;
-                //                 strncpy(idc[i], UNKNOWN_ID, strlen(UNKNOWN_ID) + 1);
-                //                 break;
-                //             }
-                //         }
-                //     }
-                // }
-                // else
-                // {
-                // Default case - Transmitting packets to every players
-                for (int n = 0; n < CONNECTIONS_MAX; n++)
+                else if (*buffer == DECONNECTION_TIMEOUT_BYTES)
                 {
-                    if (addrc[n] != 0)
+                    printf("DECONNECTION_TIMEOUT_BYTES \n");
+                    int deco_val;
+                    char deco_id[ID_LEN];
+                    if ((deco_val = read(from_python_descriptor, deco_id, ID_LEN + 1)) < 0)
                     {
-                        cliUDP.sin_addr.s_addr = addrc[n];
-                        sendto(fdudp, &buffer, 1, 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
-                        printf("Transmitting packet to network \n");
+                        perror("read");
+                        exit(EXIT_FAILURE);
+                    }
+                    if (deco_id != 0)
+                    {
+                        for (int i = 0; i < CONNECTIONS_MAX; i++)
+                        {
+                            if (strcmp(idc[i], deco_id) == 0)
+                            {
+                                addrc[i] = 0;
+                                strncpy(idc[i], UNKNOWN_ID, strlen(UNKNOWN_ID) + 1);
+                                break;
+                            }
+                        }
                     }
                 }
-                // }
+                else
+                {
+                    // Default case - Transmitting packets to every players
+                    for (int n = 0; n < CONNECTIONS_MAX; n++)
+                    {
+                        if (addrc[n] != 0)
+                        {
+                            cliUDP.sin_addr.s_addr = addrc[n];
+                            sendto(fdudp, &buffer, 1, 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
+                            printf("Transmitting packet to network \n");
+                        }
+                    }
+                }
             }
-        }
+        }*/
     }
 
     return EXIT_SUCCESS;

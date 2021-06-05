@@ -63,7 +63,7 @@ class NetworkController:
                 args=(self.Hero.networkId, )
             ),
             "C_client_joiner": threading.Thread(
-                target=run_C_client, args=(self.Hero.networkId, "192.168.1.22")
+                target=run_C_client, args=(self.Hero.networkId, "192.168.1.23")
             ),
             "connection_handler": threading.Thread(target=self.handleConnectedPlayers),
         }
