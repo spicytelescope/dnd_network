@@ -71,8 +71,11 @@ def write_to_pipe(fifo_path: str, packet: dict) -> None:
     os.close(fifo)
 
 
-def run_C_client(ip_addr: str = "") -> None:
-    call(C_CLIENT_PATH) if ip_addr != "" else call([C_CLIENT_PATH, ip_addr])
+def run_C_client(game_id: str = "", ip_addr: str = "") -> None:
+    print(f"Ca m'as pété les couilles : {[game_id, ip_addr]}")
+    call([C_CLIENT_PATH, game_id]) if ip_addr == "" else call(
+        [C_CLIENT_PATH, game_id, ip_addr]
+    )
 
 
 def dump_network_logs(packet_loss: float) -> None:

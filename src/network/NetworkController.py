@@ -57,8 +57,12 @@ class NetworkController:
         self.total_packet_transmitted = 0
         self.packet_transmitted = 0
         self.threads = {
-            "C_client": threading.Thread(
+            "C_client_creation": threading.Thread(
                 target=run_C_client,
+                args=(self.Hero.networkId, )
+            ),
+            "C_client_joiner": threading.Thread(
+                target=run_C_client, args=(self.Hero.networkId, "127.0.0.1")
             ),
             "connection_handler": threading.Thread(target=self.handleConnectedPlayers),
         }
@@ -93,7 +97,7 @@ class NetworkController:
 
         try:
             # Local version
-            self.setupNetworkSettings()
+            self.setupNetworkSettings(join=True)
 
             Dialog(
                 f"Joining {ip_addr}:{DEFAULT_PORT} !",
@@ -194,7 +198,7 @@ class NetworkController:
                 error=True,
             ).mainShow()
 
-    def setupNetworkSettings(self) -> None:
+    def setupNetworkSettings(self, join=False) -> None:
         """
         Setting up the network by doing the following :
         - creating the 2 system pipes for python/C two-waay communication
@@ -211,8 +215,12 @@ class NetworkController:
 
             logger.warn("[x] FIFOs are already created, proceeding ...")
 
-        # logger.info("[+] Starting C Module ")
-        self.threads["C_client"].start()
+        logger.info(
+            f"[+] Starting C Module [{'PARTY OWNER' if not join else 'PARTY JOINER'}] "
+        )
+        self.threads["C_client_creation"].start() if not join else self.threads[
+            "C_client_joiner"
+        ].start()
 
         logger.info("[+] Starting handle connection thread")
         self.threads["connection_handler"].start()
@@ -247,9 +255,6 @@ class NetworkController:
                                     if str_data[1] == "{"
                                     else "{" + str_data[1:]
                                 )
-                            # print(
-                            #     f"Current id : {self.Hero.networkId} and debug : \n[PYTHON] : {str_data}"
-                            # )
                             try:
                                 packet = json.loads(str_data)
                                 self.packet_transmitted += 1
@@ -273,6 +278,7 @@ class NetworkController:
                                 ) >= PLAYER_DECONNECTION_TIMEOUT * 60:
                                     fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
                                     os.write(fifo, DECONNECTION_TIMEOUT_BYTES)
+                                    os.write(fifo, player_id.encode("utf-8"))
                                     os.close(fifo)
 
                             # --------------- NEW PLAYER DETECTION -------------------------- #

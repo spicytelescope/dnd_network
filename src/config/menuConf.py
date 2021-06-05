@@ -37,7 +37,6 @@ OPTION_LABELS = [
     "Enable sound",
 ]
 MIN_SIZE_FRAME = (len(OPTION_LABELS) * 50 * 2, len(OPTION_LABELS) * 50)
-
 # -------------- GAME MENU -------------------- #
 
 

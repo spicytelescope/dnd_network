@@ -400,8 +400,8 @@ class OptionMenu(MainMenu):
         # ---------------------- MENU GUI SETTINGS ----------------- #
 
         self.root = Tk(className="Control settings")
-        self.root.minsize(MIN_SIZE_FRAME[0], MIN_SIZE_FRAME[1])
-        self.root.geometry(f"{MIN_SIZE_FRAME[0]}x{MIN_SIZE_FRAME[1]}")
+        self.root.minsize(400, len(self.Game.KeyBindings) * 40)
+        self.root.geometry(f"400x{len(self.Game.KeyBindings) * 40}")
 
         # bg_image = PhotoImage("./assets/menus/wood_background.png")
         # canvas = Canvas(

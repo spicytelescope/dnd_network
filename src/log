@@ -2,7 +2,7 @@ INFO:PHYM_LOGGER:Loading itemConf
 INFO:PHYM_LOGGER:Loading eventConf
 INFO:PHYM_LOGGER:Loading mapConf
 INFO:PHYM_LOGGER:Loading playerConf
-DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 13, 'DEX': 15, 'CON': 15, 'INT': 13, 'WIS': 18, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 26, 'DEF': 4, 'ATK': 1}, 'Wizard': {'STR': 9, 'DEX': 15, 'CON': 13, 'INT': 16, 'WIS': 17, 'CHA': 13, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 19, 'DEF': 1, 'ATK': 3}, 'Hunter': {'STR': 14, 'DEX': 13, 'CON': 15, 'INT': 13, 'WIS': 14, 'CHA': 17, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 28, 'DEF': 1, 'ATK': 2}}
+DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 13, 'DEX': 10, 'CON': 15, 'INT': 13, 'WIS': 15, 'CHA': 16, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 15, 'DEF': 3, 'ATK': 4}, 'Wizard': {'STR': 10, 'DEX': 11, 'CON': 17, 'INT': 17, 'WIS': 13, 'CHA': 15, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 15, 'DEF': 1, 'ATK': 3}, 'Hunter': {'STR': 12, 'DEX': 17, 'CON': 14, 'INT': 15, 'WIS': 14, 'CHA': 14, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 17, 'DEF': 3, 'ATK': 4}}
 INFO:PHYM_LOGGER:Loading UI Conf
 INFO:PHYM_LOGGER:Loading musicConf
 INFO:PHYM_LOGGER:Loading menuConf
@@ -109,6 +109,3 @@ INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/fire/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/ice/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/wind/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/earth/weak/icon.png
-INFO:PHYM_LOGGER:[+] Creating the pipes
-WARNING:PHYM_LOGGER:[x] FIFOs are already created, proceeding ...
-INFO:PHYM_LOGGER:[+] Starting handle connection thread
