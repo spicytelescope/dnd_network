@@ -70,6 +70,7 @@ PauseMenu = PauseMenu(
 )
 LoadingMenu = LoadingMenu(Game, Player_Map)
 NetworkController.LoadingMenu = LoadingMenu
+NetworkController.PauseMenu = PauseMenu
 
 # ------------------ SAVES -------------------- #
 

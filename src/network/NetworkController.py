@@ -34,6 +34,7 @@ class NetworkController:
         self.Hero = Hero
         self.ContextMenu = ContextMenu
         self.LoadingMenu = None
+        self.PauseMenu = None
         ContextMenu.networkController = self
 
         # ------------- PLAYERS HANDLING -------------- #
@@ -62,7 +63,7 @@ class NetworkController:
                 args=(self.Hero.networkId, )
             ),
             "C_client_joiner": threading.Thread(
-                target=run_C_client, args=(self.Hero.networkId, "127.0.0.1")
+                target=run_C_client, args=(self.Hero.networkId, "192.168.1.22")
             ),
             "connection_handler": threading.Thread(target=self.handleConnectedPlayers),
         }
@@ -625,6 +626,8 @@ class NetworkController:
 
         self.isSessionCreator = False
         self.Game.isOnline = False
+
+        self.PauseMenu.setButtons()
 
         os.remove(IPC_FIFO_INPUT)
         os.remove(IPC_FIFO_OUTPUT)
