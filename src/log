@@ -2,11 +2,7 @@ INFO:PHYM_LOGGER:Loading itemConf
 INFO:PHYM_LOGGER:Loading eventConf
 INFO:PHYM_LOGGER:Loading mapConf
 INFO:PHYM_LOGGER:Loading playerConf
-<<<<<<< HEAD
-DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 19, 'DEX': 12, 'CON': 13, 'INT': 12, 'WIS': 16, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 18, 'DEF': 4, 'ATK': 3}, 'Wizard': {'STR': 11, 'DEX': 13, 'CON': 19, 'INT': 16, 'WIS': 17, 'CHA': 16, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 18, 'DEF': 4, 'ATK': 3}, 'Hunter': {'STR': 10, 'DEX': 15, 'CON': 19, 'INT': 17, 'WIS': 16, 'CHA': 17, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 22, 'DEF': 2, 'ATK': 3}}
-=======
-DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 17, 'DEX': 15, 'CON': 13, 'INT': 10, 'WIS': 16, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 24, 'DEF': 2, 'ATK': 3}, 'Wizard': {'STR': 8, 'DEX': 12, 'CON': 17, 'INT': 16, 'WIS': 17, 'CHA': 15, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 26, 'DEF': 1, 'ATK': 4}, 'Hunter': {'STR': 15, 'DEX': 18, 'CON': 13, 'INT': 16, 'WIS': 19, 'CHA': 17, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 15, 'DEF': 1, 'ATK': 1}}
->>>>>>> 4204b218541186289b87dbc2c46abf446c5c19ad
+DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 13, 'DEX': 10, 'CON': 13, 'INT': 10, 'WIS': 14, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 24, 'DEF': 3, 'ATK': 1}, 'Wizard': {'STR': 7, 'DEX': 10, 'CON': 14, 'INT': 15, 'WIS': 13, 'CHA': 13, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 27, 'DEF': 4, 'ATK': 3}, 'Hunter': {'STR': 15, 'DEX': 16, 'CON': 14, 'INT': 13, 'WIS': 17, 'CHA': 19, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 21, 'DEF': 1, 'ATK': 2}}
 INFO:PHYM_LOGGER:Loading UI Conf
 INFO:PHYM_LOGGER:Loading musicConf
 INFO:PHYM_LOGGER:Loading menuConf
@@ -117,15 +113,3 @@ INFO:PHYM_LOGGER:[+] Creating the pipes
 WARNING:PHYM_LOGGER:[x] FIFOs are already created, proceeding ...
 INFO:PHYM_LOGGER:[+] Starting C Module [PARTY OWNER] 
 INFO:PHYM_LOGGER:[+] Starting handle connection thread
-INFO:PHYM_LOGGER:HEALING Lqeje DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING Trwzte DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING Dvk DUE TO REST MECHANICS
-<<<<<<< HEAD
-=======
-DEBUG:PHYM_LOGGER:ADDING to chunk_1 : 1.67 
-DEBUG:PHYM_LOGGER:ADDING to chunk_2 : 1.67 
-DEBUG:PHYM_LOGGER:ADDING to chunk_3 : 1.67 
-INFO:PHYM_LOGGER:Generating Danger Zone
-DEBUG:PHYM_LOGGER:ADDING to worldElements : 15 
-DEBUG:PHYM_LOGGER:ADDING to worldElements : 15 
->>>>>>> 4204b218541186289b87dbc2c46abf446c5c19ad

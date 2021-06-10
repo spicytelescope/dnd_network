@@ -226,8 +226,8 @@ class NetworkController:
         logger.info("[+] Starting handle connection thread")
         self.threads["connection_handler"].start()
 
-        fifo = os.open(IPC_FIFO_OUTPUT)
         # Packet send to "wake up" the client with the pipe file descriptor e.g add in in the select's active fd 
+        fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
         os.write(fifo, OPEN_CONNEXION_BYTE)
         os.close(fifo)
 
