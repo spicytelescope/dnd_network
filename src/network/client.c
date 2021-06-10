@@ -33,7 +33,6 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
     hote.sin_port = htons(PORT_TCP);
     if (inet_aton(addressH, &(hote.sin_addr)) == 0)
         stop("inet_aton");
-
     socklen_t lh = sizeof(hote);
     if (connect(fdt, (struct sockaddr *)&hote, lh) == -1)
         stop("connect [1]");
@@ -261,7 +260,7 @@ int main(int argc, char *argv[])
         cliTCP.sin_family = AF_INET;
         cliTCP.sin_port = htons(PORT_TCP);
         // printf("%s\n", argv[1]);
-        confirmation(fdtcp, fdudp, argv[2], cliTCP, cliUDP, addrc, idc, selfID, to_python_descriptor);
+        confirmation(fdtcp, fdudp, "192.168.1.23", cliTCP, cliUDP, addrc, idc, selfID, to_python_descriptor);
         for (int i = 0; i < CONNECTIONS_MAX; i++)
         {
             printf("%d\n", addrc[i]);
@@ -493,19 +492,14 @@ int main(int argc, char *argv[])
                 sendto(fdudp, &msgerror, 21, 0, (struct sockaddr *)&cliUDP, (unsigned int)len);
             }
         }
-        /*
-        if (FD_ISSET(from_python_descriptor, &fds))
+
+        /*if (FD_ISSET(from_python_descriptor, &fds))
         {
             bzero(buffer, BUFSIZE);
             if ((rval = read(from_python_descriptor, buffer, BUFSIZE)) < 0)
             {
                 perror("read - from_python_descriptor");
                 exit(EXIT_FAILURE);
-            }
-            if (rval != 0)
-            {
-                printf("%d\n", rval);
-                printf("%s\n", buffer);
             }
             if (rval != 0)
             {

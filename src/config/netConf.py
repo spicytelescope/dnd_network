@@ -30,15 +30,15 @@ IPC_FIFO_OUTPUT_JOINER = "/tmp/info_output_joiner"
 FIFO_PATH_CREA_TO_JOINER = "/tmp/crea_to_joiner"
 FIFO_PATH_JOINER_TO_CREA = "/tmp/joiner_to_crea"
 
+OPEN_CONNEXION_BYTE = b"\xfa"
 DECONNECTION_TIMEOUT_BYTES = b"\xfb"
 DECONNECTION_MANUAL_BYTES = b"\xfc"
 # Client double pipes ways nomenclature : (in | out)put_fifo_{id}
 
+# ------------------ CHAT ----------------- #
 
 ACCEPTED = string.ascii_letters + string.digits + string.punctuation + " " + "éè"
 KEY_REPEAT_SETTING = (200, 70)
-
-# ------------------ CHAT ----------------- #
 
 CHAT_WINDOW_DIM = (int(WINDOW_SIZE[0] * 0.6), WINDOW_SIZE[1] // 4)
 CHAT_TEXTBOX_DIM = (CHAT_WINDOW_DIM[0], CHAT_WINDOW_DIM[1] // 6)

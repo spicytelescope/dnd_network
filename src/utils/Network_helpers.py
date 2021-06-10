@@ -65,6 +65,7 @@ def get_raw_data_to_str(isCreator: bool) -> str:
 
 def write_to_pipe(fifo_path: str, packet: dict) -> None:
 
+
     fifo = os.open(fifo_path, os.O_WRONLY)
     user_encode_data = json.dumps(packet, indent=2).encode("latin-1")
     os.write(fifo, create_msg(user_encode_data))
