@@ -204,6 +204,7 @@ int main(int argc, char *argv[])
     new_packet new;
     int indice_temp = -1;
 
+    int activity=0;
     int true = 1;
     int complete = 0;
     int fd_connect[CONNECTIONS_MAX];          //fd sockets under connection
@@ -281,10 +282,11 @@ int main(int argc, char *argv[])
     }
     //connection(ip dest)
     //fdmax is the maximum number in the fd set fds
+    int addrlen = sizeof(cliTCP);
     int fdmax = MMax(fdudp, from_python_descriptor);
     fdmax = MMax(fdmax, fdtcp);
     int len = sizeof(cliTCP);
-
+    int nactivity=0;
     //select loop
     while (1)
     {
@@ -301,13 +303,14 @@ int main(int argc, char *argv[])
         FD_SET(fdudp, &fds);
         FD_SET(from_python_descriptor, &fds);
         FD_SET(fdtcp, &fds);
-        select(fdmax, &fds, NULL, NULL, NULL);
-        int addrlen = sizeof(cliTCP);
+        activity=select(fdmax+1, &fds, NULL, NULL, NULL);
+        nactivity=0;
         bzero(msg, BUFSIZE);
-
         //TCP socket for the new connections
+        while(nactivity<activity){
         if (FD_ISSET(fdtcp, &fds))
         {
+            nactivity++;
             if ((new_sock = accept(fdtcp, (struct sockaddr *)&cliTCP, (socklen_t *)&addrlen)) < 0)
             {
                 stop("accept");
@@ -376,6 +379,7 @@ int main(int argc, char *argv[])
         {
             if (FD_ISSET(fd_connect[con], &fds))
             {
+                nactivity++;
                 recv(fd_connect[con], &msg, BUFSIZE + 1, 0);
                 if (indice_temp == 0)
                 {
@@ -411,6 +415,7 @@ int main(int argc, char *argv[])
         //UDP socket for the registered players
         if (FD_ISSET(fdudp, &fds))
         {
+            nactivity++;
             if (recvfrom(fdudp, (char *)&msg, BUFSIZE + 1, 0, (struct sockaddr *)&cliUDP, (unsigned int *)&len) < 0)
                 stop("recvfrom");
             //player already connected
@@ -488,6 +493,7 @@ int main(int argc, char *argv[])
         }
         if (FD_ISSET(from_python_descriptor, &fds))
         {
+            nactivity++;
             bzero(buffer, BUFSIZE);
             if ((rval = read(from_python_descriptor, buffer, BUFSIZE)) < 0)
             {
@@ -552,6 +558,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
+       }
     }
 
     return EXIT_SUCCESS;
