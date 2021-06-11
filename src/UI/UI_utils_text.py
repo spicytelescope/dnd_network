@@ -104,7 +104,7 @@ class Dialog(GameController):
                 self.fontSurf.set_alpha(0)
                 self.Game.screen.blit(self.bg, (0, 0))
 
-    def mainShow(self):
+    def mainShow(self, textbox=False):
 
         self.bg = self.Game.screen.copy()
         self.open = True

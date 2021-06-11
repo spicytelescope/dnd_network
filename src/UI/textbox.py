@@ -3,6 +3,8 @@ import pygame as pg
 
 
 ACCEPTED = string.ascii_letters + string.digits + string.punctuation + " " + "éè"
+
+
 class TextBox(object):
     def __init__(self, rect, **kwargs):
         self.rect = pg.Rect(rect)
@@ -13,6 +15,7 @@ class TextBox(object):
         self.render_area = None
         self.blink = True
         self.blink_timer = 0.0
+        self._show = False
         self.process_kwargs(kwargs)
 
     def process_kwargs(self, kwargs):
@@ -43,7 +46,9 @@ class TextBox(object):
                     self.buffer.pop()
             elif event.unicode in ACCEPTED:
                 self.buffer.append(event.unicode)
-            self.command(self.buffer)
+            if event.key == pg.K_RETURN:
+                self.command(self.buffer)
+                self._show = False
         elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             self.active = self.rect.collidepoint(event.pos)
 

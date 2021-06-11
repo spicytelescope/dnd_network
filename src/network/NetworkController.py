@@ -11,7 +11,7 @@ import copy
 
 from pygame.constants import KEYDOWN, MOUSEBUTTONDOWN, MOUSEBUTTONUP
 from Player.Character import Character
-from UI.UI_utils_text import Dialog, SelectPopUp
+from UI.UI_utils_text import Dialog, SelectPopUp, TextBoxControl
 from config import playerConf
 from config.UIConf import BUTTON_FONT_SIZE, DUNGEON_FONT
 from config.playerConf import CLASSES_NAMES
@@ -59,11 +59,10 @@ class NetworkController:
         self.packet_transmitted = 0
         self.threads = {
             "C_client_creation": threading.Thread(
-                target=run_C_client,
-                args=(self.Hero.networkId, )
+                target=run_C_client, args=(self.Hero.networkId,)
             ),
             "C_client_joiner": threading.Thread(
-                target=run_C_client, args=(self.Hero.networkId, "192.168.1.23")
+                target=run_C_client, args=(self.Hero.networkId, "")
             ),
             "connection_handler": threading.Thread(target=self.handleConnectedPlayers),
         }
@@ -79,6 +78,12 @@ class NetworkController:
         self.sendTradeConf = False
         self.acceptTradeState = "UNDEFINED"
         self.resetTradeSettings = False
+
+        # -------------- NETWORK ---------------- #
+
+        self.textBox = TextBoxControl(
+            (self.Game.resolution // 2, self.Game.resolution // 3)
+        )
 
     def addPlayer(self, new_id, name):
         """Create a Character Instance based of the informations given by the connexion of the player"""
@@ -97,11 +102,28 @@ class NetworkController:
         self.Game.isOnline = True
 
         try:
-            # Local version
-            self.setupNetworkSettings(join=True)
-
             Dialog(
-                f"Joining {ip_addr}:{DEFAULT_PORT} !",
+                f"Enter the host's ip : ",
+                (self.Game.resolution // 2, self.Game.resolution // 2),
+                self.Game.screen,
+                ONLINE_DIALOG_COLOR,
+                self.Game,
+            ).mainShow()
+
+            self.textBox.input._show = True
+            self.bg = self.Game.screen.copy()
+            while self.textBox.input._show:
+                self.Game.screen.blit(self.bg, (0, 0))
+                for e in pygame.event.get():
+                    self.textBox.checkEvent(e)
+
+                self.textBox.show(self.Game.screen)
+                self.Game.show()
+
+            self.setupNetworkSettings(join=True, ip_addr=self.textBox.name)
+            
+            Dialog(
+                f"Joining {self.textBox.name}:{DEFAULT_PORT} !",
                 (self.Game.resolution // 2, self.Game.resolution // 2),
                 self.Game.screen,
                 ONLINE_DIALOG_COLOR,
@@ -110,7 +132,7 @@ class NetworkController:
 
         except:
             Dialog(
-                f"The game at {ip_addr}:{DEFAULT_PORT} cannot be joined.",
+                f"The game cannot be joined.",
                 (self.Game.resolution // 2, self.Game.resolution // 2),
                 self.Game.screen,
                 ONLINE_DIALOG_COLOR,
@@ -120,7 +142,6 @@ class NetworkController:
 
         # with open(IPC_FIFO_OUTPUT_JOINER) as fifo:
         #     # data = fifo.read()
-
         #     str_data = get_raw_data_to_str(fifo)
         #     data = json.loads(str_data, indent=2)
 
@@ -199,7 +220,7 @@ class NetworkController:
                 error=True,
             ).mainShow()
 
-    def setupNetworkSettings(self, join=False) -> None:
+    def setupNetworkSettings(self, join=False, ip_addr="") -> None:
         """
         Setting up the network by doing the following :
         - creating the 2 system pipes for python/C two-waay communication
@@ -219,14 +240,18 @@ class NetworkController:
         logger.info(
             f"[+] Starting C Module [{'PARTY OWNER' if not join else 'PARTY JOINER'}] "
         )
-        self.threads["C_client_creation"].start() if not join else self.threads[
-            "C_client_joiner"
-        ].start()
+        if not join:
+            self.threads["C_client_creation"].start()
+        else:
+            self.threads["C_client_joiner"] = threading.Thread(
+                target=run_C_client, args=(self.Hero.networkId, ip_addr)
+            )
+            self.threads["C_client_joiner"].start()
 
         logger.info("[+] Starting handle connection thread")
         self.threads["connection_handler"].start()
 
-        # Packet send to "wake up" the client with the pipe file descriptor e.g add in in the select's active fd 
+        # Packet send to "wake up" the client with the pipe file descriptor e.g add in in the select's active fd
         fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
         os.write(fifo, OPEN_CONNEXION_BYTE)
         os.close(fifo)
@@ -366,7 +391,8 @@ class NetworkController:
                                                 packet["content"],
                                                 packet["italic"],
                                                 packet["color_code"],
-                                            )
+                                            ),
+                                            recv=True,
                                         )
 
                                     # ---------------- DECONNEXION RECV ------------ #

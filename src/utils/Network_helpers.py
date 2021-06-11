@@ -16,7 +16,6 @@ def decode_msg_size(size_bytes: bytes) -> int:
     # FIFO's output are in little endian
     return int.from_bytes(size_bytes, byteorder="little")
 
-
 def create_msg(content: bytes) -> bytes:
     size = len(content)
     return encode_msg_size(size) + content
@@ -65,7 +64,6 @@ def get_raw_data_to_str(isCreator: bool) -> str:
 
 def write_to_pipe(fifo_path: str, packet: dict) -> None:
 
-
     fifo = os.open(fifo_path, os.O_WRONLY)
     user_encode_data = json.dumps(packet, indent=2).encode("latin-1")
     os.write(fifo, create_msg(user_encode_data))
@@ -73,7 +71,6 @@ def write_to_pipe(fifo_path: str, packet: dict) -> None:
 
 
 def run_C_client(game_id: str = "", ip_addr: str = "") -> None:
-    print(f"Ca m'as pété les couilles : {[game_id, ip_addr]}")
     call([C_CLIENT_PATH, game_id]) if ip_addr == "" else call(
         [C_CLIENT_PATH, game_id, ip_addr]
     )

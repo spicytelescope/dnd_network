@@ -2,5 +2,6 @@
     "python.formatting.provider": "black",
     "files.associations": {
         "ip.h": "c"
-    }
+    },
+    "python.pythonPath": "/bin/python3"
 }

@@ -68,9 +68,10 @@ class ChatWindow:
                 True,
             )
 
-    def updateTextSurf(self):
+    def updateTextSurf(self, received = False):
 
-        self.process_command()
+        if not received:
+            self.process_command()
 
         self.textSurf = pg.Surface(
             (self.rect.width, len(self.text) * VERTICAL_SPACING), SRCALPHA
@@ -93,7 +94,7 @@ class ChatWindow:
 
         self.textRect.bottom = self.rect.height
 
-    def addText(self, sender_name, text, italic=False, color_code="DEFAULT", send=False):
+    def addText(self, sender_name, text, italic=False, color_code="DEFAULT", send=False, recv=False):
 
         textList = []
         textList += formatDialogContent(text)
@@ -110,7 +111,7 @@ class ChatWindow:
             fTextList.append((sender_name, text, CHAT_COLORS[color_code], italic))
 
         self.text += fTextList
-        self.updateTextSurf()
+        self.updateTextSurf(received=recv)
 
     def reset(self):
 

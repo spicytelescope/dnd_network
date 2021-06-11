@@ -921,6 +921,7 @@ class PauseMenu(OptionMenu):
         self.upButtons = []
         self.selecters = []
 
+
         # --------------- MENU SURFACE  ------------- #
 
         self.menuSurface = pygame.transform.scale(

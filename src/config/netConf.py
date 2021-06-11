@@ -4,7 +4,7 @@ from config.defaultConf import *
 # ------------- GENERAL NETWORK SETTINGS ----------#
 
 DEFAULT_ADDR = "127.0.0.1"
-DEFAULT_PORT = 3000
+DEFAULT_PORT = 8000
 ONLINE_DIALOG_COLOR = (75, 181, 67)
 PLAYER_DECONNECTION_TIMEOUT = 10  # min
 
