@@ -121,7 +121,7 @@ class NetworkController:
                 self.Game.show()
 
             self.setupNetworkSettings(join=True, ip_addr=self.textBox.name)
-            
+
             Dialog(
                 f"Joining {self.textBox.name}:{DEFAULT_PORT} !",
                 (self.Game.resolution // 2, self.Game.resolution // 2),
@@ -278,7 +278,7 @@ class NetworkController:
                         msg_size = decode_msg_size(msg_size_bytes)
                         str_data = os.read(fifo, msg_size).decode("latin-1")
 
-                        if len(str_data) > 5:
+                        if len(str_data) > 2:
                             self.total_packet_transmitted += 1
                             if str_data[0] != "{":
                                 str_data = (
@@ -287,6 +287,8 @@ class NetworkController:
                                     else "{" + str_data[1:]
                                 )
                             try:
+                                print(str_data)
+
                                 packet = json.loads(str_data)
                                 self.packet_transmitted += 1
                             except:

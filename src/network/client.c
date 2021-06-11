@@ -31,6 +31,7 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
     int nb_addr = 0;
     char message[BUFSIZE];
     hote.sin_port = htons(PORT_TCP);
+    printf("%s\n", addressH);
     if (inet_aton(addressH, &(hote.sin_addr)) == 0)
         stop("inet_aton");
     socklen_t lh = sizeof(hote);
@@ -187,6 +188,7 @@ int main(int argc, char *argv[])
     // Open the fifo
     int from_python_descriptor,
         to_python_descriptor;
+    char size[5];
     if ((from_python_descriptor = open(fifo_output_path, O_RDONLY)) == -1)
     {
         perror("open - from_python_descriptor");
@@ -261,7 +263,7 @@ int main(int argc, char *argv[])
         cliTCP.sin_family = AF_INET;
         cliTCP.sin_port = htons(PORT_TCP);
         // printf("%s\n", argv[1]);
-        confirmation(fdtcp, fdudp, "192.168.1.23", cliTCP, cliUDP, addrc, idc, selfID, to_python_descriptor);
+        confirmation(fdtcp, fdudp, argv[2], cliTCP, cliUDP, addrc, idc, selfID, to_python_descriptor);
         for (int i = 0; i < CONNECTIONS_MAX; i++)
         {
             printf("%d\n", addrc[i]);
@@ -305,7 +307,7 @@ int main(int argc, char *argv[])
             }
         }
         FD_SET(fdudp, &fds);
-        // FD_SET(from_python_descriptor, &fds);
+        FD_SET(from_python_descriptor, &fds);
         FD_SET(fdtcp, &fds);
         activity = select(fdmax + 1, &fds, NULL, NULL, NULL);
         nactivity = 0;
@@ -503,14 +505,24 @@ int main(int argc, char *argv[])
             {
                 nactivity++;
                 bzero(buffer, BUFSIZE);
-                if ((rval = read(from_python_descriptor, buffer, BUFSIZE)) < 0)
+                bzero(size, 4);
+                printf("zebi \n");  
+
+                if ((rval = read(from_python_descriptor, size, 4)) < 0)
                 {
-                    perror("read - from_python_descriptor");
+                    perror("read - from_python_descriptor - size");
                     exit(EXIT_FAILURE);
                 }
+                printf("size: %d \n", atoi(size));
+
+                if ((rval = read(from_python_descriptor, buffer, 4 + atoi(size)))< 0)
+                {
+                    perror("read - from_python_descriptor - read");
+                    exit(EXIT_FAILURE);
+                }
+
                 if (rval != 0)
                 {
-
                     // //cas de la déco manuelle
                     if (*buffer == DECONNECTION_MANUAL_BYTES)
                     {
@@ -558,7 +570,7 @@ int main(int argc, char *argv[])
                             if (addrc[n] != 0)
                             {
                                 cliUDP.sin_addr.s_addr = addrc[n];
-                                sendto(fdudp, &buffer, 1, 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
+                                sendto(fdudp, &buffer, strlen(buffer), 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
                                 printf("Transmitting packet to network \n");
                             }
                         }
