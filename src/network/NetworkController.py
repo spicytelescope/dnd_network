@@ -70,7 +70,7 @@ class NetworkController:
         # ------------ GRAPHICAL PANNEL --------------- #
 
         self._show = False
-        
+
         # Chat
         self.chat = Chat(self.Game, self.Hero)
 
@@ -213,7 +213,7 @@ class NetworkController:
                 self.Game,
             ).mainShow()
 
-            # INSERT HERE DISCOVERY PACKET            
+            # INSERT HERE DISCOVERY PACKET
             self.Hero.transmitCharacInfos()
 
         except:
@@ -284,18 +284,21 @@ class NetworkController:
                         # msg_size = decode_msg_size(msg_size_bytes)
                         # print(f"Reading {msg_size} bytes !")
                         str_data = os.read(fifo, 2048).decode("utf-8")
-                        
+
                         if len(str_data) > 2:
                             self.total_packet_transmitted += 1
                             print("receved from python : ", str_data)
 
                             try:
                                 if "}{" in str_data:
-                                    str_data = str_data[0, str_data.index("}{" + 1)]
+                                    str_data = str_data[0 : str_data.index("}{") + 1]
+                                    print("corrected : ", str_data)
 
                                 packet = json.loads(str_data)
                                 self.packet_transmitted += 1
-                                
+
+                                print("packet", packet)
+
                                 # --------------- TIMEOUT HANDLING ---------------- #
                                 self.players_timeout[
                                     packet["sender_id"]
@@ -326,6 +329,9 @@ class NetworkController:
                                     )
 
                                 for player_id, player in self.players.items():
+                                    print(
+                                        f'{player_id} comparing with {packet["sender_id"]}'
+                                    )
                                     if player_id == packet["sender_id"]:
 
                                         # -------------- MAP RECV ------------ #
@@ -392,22 +398,22 @@ class NetworkController:
 
                                         # ------------------ MESSAGE RECV ----------- #
                                         if packet["type"] == "message":
-                                            self.chat.addText(
-                                                (
-                                                    self.players[
-                                                        packet["sender_id"]
-                                                    ].name,
-                                                    packet["content"],
-                                                    packet["italic"],
-                                                    packet["color_code"],
-                                                ),
+                                            print(
+                                                "OUI LE MESSAGE : ", packet["content"]
+                                            )
+
+                                            self.chat.chatWindow.addText(
+                                                self.players[packet["sender_id"]].name,
+                                                packet["content"],
+                                                packet["italic"],
+                                                packet["color_code"],
                                                 recv=True,
                                             )
 
                                         # ---------------- DECONNEXION RECV ------------ #
                                         if packet["type"] == "deconnection":
 
-                                            self.chat.addText(
+                                            self.chat.chatWindow.addText(
                                                 (
                                                     self.players[
                                                         packet["sender_id"]
@@ -549,7 +555,11 @@ class NetworkController:
         for player in self.players.values():
 
             # HUD Updating
-            if player.Inventory != None and player.SpellBook != None and player.CharBar != None:
+            if (
+                player.Inventory != None
+                and player.SpellBook != None
+                and player.CharBar != None
+            ):
                 player.Inventory.draw()
                 player.SpellBook.draw()
 
@@ -583,7 +593,7 @@ class NetworkController:
 
         for player in self.players.values():
             # Handle thread
-            if player.SpellBook != None and player.Inventory != None:  
+            if player.SpellBook != None and player.Inventory != None:
                 if player.SpellBook._show:
                     player.SpellBook.checkActions(event)
                 if player.Inventory._show:
@@ -655,7 +665,7 @@ class NetworkController:
         """Whether you are the creator of the game or a joiner, you can leave a game the same way"""
 
         dump_network_logs(
-            (1- (self.packet_transmitted / self.total_packet_transmitted))
+            (1 - (self.packet_transmitted / self.total_packet_transmitted))
             if self.total_packet_transmitted != 0
             else 0
         )

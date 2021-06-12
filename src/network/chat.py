@@ -115,14 +115,14 @@ class ChatWindow:
                 msg_packet = deepcopy(TEMPLATE_MESSAGE)
                 msg_packet["sender_id"] = self.Game.NetworkController.Hero.networkId
                 msg_packet["content"] = text
-                msg_packet["color_code"] = CHAT_COLORS[color_code]
+                msg_packet["color_code"] = color_code
                 msg_packet["italic"] = italic
                 write_to_pipe(IPC_FIFO_OUTPUT, msg_packet)
 
             fTextList.append((sender_name, text, CHAT_COLORS[color_code], italic))
 
         self.text += fTextList
-        self.updateTextSurf(received=recv)
+        self.updateTextSurf()
 
     def reset(self):
 
