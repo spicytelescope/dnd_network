@@ -214,6 +214,9 @@ class NetworkController:
                 self.Game,
             ).mainShow()
 
+            # INSERT HERE DISCOVERY PACKET            
+            self.Hero.transmitCharacInfos()
+
         except:
             Dialog(
                 f"The game can't be ported on LAN.",
@@ -278,7 +281,7 @@ class NetworkController:
                 while True:
                     # Check if there's data to read. Timeout after config.netCof.POLLIN_TIMEOUT sec.
                     if (fifo, select.POLLIN) in poll.poll(POLLIN_TIMEOUT * 10000):
-                        msg_size_bytes = os.read(fifo, 3)
+                        msg_size_bytes = os.read(fifo, 4)
                         msg_size = decode_msg_size(msg_size_bytes)
                         str_data = os.read(fifo, msg_size).decode("utf-8")
                         print(f"Reading {msg_size} bytes !")

@@ -173,7 +173,7 @@ class Chat:
             ),
             command=self.add_text_to_chatWindow,
             clear_on_enter=True,
-            inactive_on_enter=True,
+            inactive_on_enter=False,
         )
         self.isTyping = False
         self.color = (100, 100, 100)
@@ -206,6 +206,7 @@ class TextBox(object):
         self.blink = True
         self.blink_timer = 0.0
         self.process_kwargs(kwargs)
+        self.active = False
 
     def process_kwargs(self, kwargs):
         defaults = {

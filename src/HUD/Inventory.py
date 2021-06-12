@@ -182,7 +182,6 @@ class Inventory:
             exit()
 
         # if self.Game.isOnline:
-        #     self.Hero.transmitCharacInfos()
         #     self.transmitInvInfos()
 
     def checkSellItem(self, event, Seller):
@@ -791,7 +790,8 @@ class Inventory:
         for statName in self.Hero.stats:
 
             fontText = str(self.Hero.stats[statName])
-
+            
+            cache_stats = self.Hero.stats.copy()
             if statName == "HP":
                 fontText = f"{self.Hero.stats[statName]}/{self.Hero.stats['HP_max']}"
             elif statName == "Mana":
@@ -812,6 +812,11 @@ class Inventory:
                 fontText = str(DEFTotal) if statName == "DEF" else str(ATKTotal)
             elif statName in ["HP_max", "Mana_max"]:
                 continue
+
+            # Checking wether the information of the player changed, then transmiting charac infos if needed
+            if self.Game.isOnline and cache_stats != self.Hero.stats:
+                self.Hero.transmitCharacInfos()
+
 
             statFont = pygame.font.Font(DUNGEON_FONT, BUTTON_FONT_SIZE).render(
                 fontText, True, (255, 255, 255)

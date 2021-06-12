@@ -435,7 +435,7 @@ int main(int argc, char *argv[])
 
                 // printf("buffer (size=%d) recv : %s\n", strlen(msg), msg);
                 // Sending packet size first :
-                sprintf(udp_to_python_packet, "%d%s", strlen(msg), msg);
+                sprintf(udp_to_python_packet, "%ld%s", strlen(msg), msg);
                 printf("%s\n", udp_to_python_packet);
                 if (write(to_python_descriptor, udp_to_python_packet, strlen(udp_to_python_packet)) < 0) //transmiting data
                 {

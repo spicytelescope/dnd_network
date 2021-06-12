@@ -30,7 +30,7 @@ WORLD_MAP_CONFIG = {
     "CIRCULAR_MAP": False,
     "STEP_GENERATION": 1,
     "ANIMATE_WATER": {
-        "enabled": False,
+        "enabled": True,
     },
 }
 
