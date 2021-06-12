@@ -154,9 +154,12 @@ while Game.currentState != "quit":
             for event in pygame.event.get():
 
                 # ------------------- NETWORK HANDLING ----------------- #
-                if Game.isOnline and NetworkController.players != {}:
-                    # NetworkController.handleInteractions(event)
-                    pass
+                if Game.isOnline:
+                    if NetworkController.players != {}:
+                        # NetworkController.handleInteractions(event)
+                        pass
+                    NetworkController.chat.chatWindow.update(event)
+                    NetworkController.chat.checkEvent(event)
 
                 # ------------------ HUD Handling --------------------- #
 
@@ -170,7 +173,7 @@ while Game.currentState != "quit":
                     Player_Map.miniMap.checkActions(event)
 
                 # -------------------- KEY BINDING HANDLING ----------- #
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN and not NetworkController.chat.isTyping:
 
                     Player_Map.envGenerator.checkInteractableEntities(event)
 
@@ -274,6 +277,7 @@ while Game.currentState != "quit":
                 if Game.isOnline:
                     # NetworkController.handleConnectedPlayers()
                     # threading.Thread(target=NetworkController.handleConnectedPlayers).start()
+                    NetworkController.chat.show()
                     NetworkController.drawPannel()
                     NetworkController.updateGraphics()
                     if ContextMenu.tradeUI != None:

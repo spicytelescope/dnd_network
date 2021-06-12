@@ -1,5 +1,6 @@
 import json
 from logging import Logger
+from network.chat import Chat
 import sys
 from math import sqrt
 import threading
@@ -70,6 +71,9 @@ class NetworkController:
         # ------------ GRAPHICAL PANNEL --------------- #
 
         self._show = False
+        
+        # Chat
+        self.chat = Chat(self.Game, self.Hero)
 
         # Trade UI
         self.inTrade = False
@@ -643,7 +647,7 @@ class NetworkController:
         """Whether you are the creator of the game or a joiner, you can leave a game the same way"""
 
         dump_network_logs(
-            self.packet_transmitted / self.total_packet_transmitted
+            (1- (self.packet_transmitted / self.total_packet_transmitted))
             if self.total_packet_transmitted != 0
             else 0
         )

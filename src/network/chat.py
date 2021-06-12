@@ -37,17 +37,19 @@ class ChatWindow:
     def __init__(self, gameController, Hero) -> None:
 
         self.Game = gameController
-
+        self.Hero = Hero
         # ------------------ TEXTURES ---------- #
 
         self.surf = pg.Surface(CHAT_WINDOW_DIM, SRCALPHA)
-        self.rect = self.surf.get_rect(topright=(1024, 0))
+        self.rect = self.surf.get_rect(
+            bottomleft=(0, self.Game.WINDOW_SIZE[1] - CHAT_TEXTBOX_DIM[1])
+        )
 
         # ---------------- FIGHT ATTR ------------- #
 
         self.turn = 0
         self.text = [
-            ("Jordan", "just joined the chat !", CHAT_COLORS["CONNEXION"], True),
+            (self.Hero.name, "just joined the chat !", CHAT_COLORS["CONNEXION"], True),
             WELCOME_MESSAGE,
         ]
         self.textSurf = None
@@ -68,8 +70,9 @@ class ChatWindow:
                 True,
             )
 
-    def updateTextSurf(self, received = False):
+    def updateTextSurf(self, received=False):
 
+        # Dead code, but can be useful to prevent packet injection
         if not received:
             self.process_command()
 
@@ -94,15 +97,23 @@ class ChatWindow:
 
         self.textRect.bottom = self.rect.height
 
-    def addText(self, sender_name, text, italic=False, color_code="DEFAULT", send=False, recv=False):
+    def addText(
+        self,
+        sender_name,
+        text,
+        italic=False,
+        color_code="DEFAULT",
+        send=False,
+        recv=False,
+    ):
 
         textList = []
         textList += formatDialogContent(text)
         fTextList = []
         for text in textList:
-            if send:
+            if send and text[0] != "/":
                 msg_packet = deepcopy(TEMPLATE_MESSAGE)
-                msg_packet["sender_id"] = self.Game.networkController.Hero.networkId
+                msg_packet["sender_id"] = self.Game.NetworkController.Hero.networkId
                 msg_packet["content"] = text
                 msg_packet["color_code"] = CHAT_COLORS[color_code]
                 msg_packet["italic"] = italic
@@ -149,21 +160,22 @@ class ChatWindow:
                 ]
 
 
-class Chat(object):
-    def __init__(self):
-        self.chatWindow = ChatWindow()
-        self.name = "Jordan"
+class Chat:
+    def __init__(self, gameController, Hero):
+
+        self.Game = gameController
+        self.Hero = Hero
+        self.chatWindow = ChatWindow(gameController, Hero)
+        self.name = Hero.name
         self.input = TextBox(
             pg.Surface(CHAT_TEXTBOX_DIM).get_rect(
-                center=(
-                    self.chatWindow.rect.topleft[0] + self.chatWindow.rect.width // 2,
-                    self.chatWindow.rect.height + CHAT_TEXTBOX_DIM[1] // 2,
-                )
+                topleft=self.chatWindow.rect.bottomleft
             ),
             command=self.add_text_to_chatWindow,
             clear_on_enter=True,
-            inactive_on_enter=False,
+            inactive_on_enter=True,
         )
+        self.isTyping = False
         self.color = (100, 100, 100)
         pg.key.set_repeat(*KEY_REPEAT_SETTING)
 
@@ -173,10 +185,11 @@ class Chat(object):
     def checkEvent(self, event):
         self.input.get_event(event)
 
-    def show(self, surface):
+    def show(self):
+        self.isTyping = self.input.active
         self.chatWindow.show()
         self.input.update()
-        self.input.draw(surface)
+        self.input.draw(self.Game.screen)
 
     def reset(self):
         self.input.buffer = []

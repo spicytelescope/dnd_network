@@ -441,7 +441,7 @@ int main(int argc, char *argv[])
                 {
                     perror("Writing to to_python_client fifo");
                     exit(EXIT_FAILURE);
-                }//transmiting data
+                } //transmiting data
 
                 //player already connected
                 /*if ((naddr = checkin(under_connect, cliUDP.sin_addr.s_addr)) >= 0)
@@ -550,7 +550,7 @@ int main(int argc, char *argv[])
                 else
                 {
                     if (bytesAvailable != 0)
-                        printf("possible packet size : %d\n", bytesAvailable);
+                        printf("Packet size : %d\n", bytesAvailable);
                 }
 
                 if ((rval = read(from_python_descriptor, buffer, bytesAvailable)) < 0)
@@ -562,7 +562,8 @@ int main(int argc, char *argv[])
                 if (rval != 0)
                 {
                     //printf("Transmitting : %s\n", buffer);
-                    // //cas de la déco manuelle
+
+                    //cas de la déco manuelle
                     if (*buffer == DECONNECTION_MANUAL_BYTES)
                     {
                         char msgdeco = DECONNECTION_MANUAL_BYTES;

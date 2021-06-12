@@ -2,7 +2,7 @@ INFO:PHYM_LOGGER:Loading itemConf
 INFO:PHYM_LOGGER:Loading eventConf
 INFO:PHYM_LOGGER:Loading mapConf
 INFO:PHYM_LOGGER:Loading playerConf
-DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 14, 'DEX': 11, 'CON': 19, 'INT': 12, 'WIS': 13, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 21, 'DEF': 1, 'ATK': 4}, 'Wizard': {'STR': 10, 'DEX': 11, 'CON': 19, 'INT': 19, 'WIS': 13, 'CHA': 13, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 17, 'DEF': 4, 'ATK': 3}, 'Hunter': {'STR': 13, 'DEX': 19, 'CON': 15, 'INT': 14, 'WIS': 15, 'CHA': 18, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 15, 'DEF': 2, 'ATK': 1}}
+DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 16, 'DEX': 14, 'CON': 16, 'INT': 9, 'WIS': 14, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 25, 'DEF': 3, 'ATK': 4}, 'Wizard': {'STR': 12, 'DEX': 15, 'CON': 14, 'INT': 14, 'WIS': 18, 'CHA': 14, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 18, 'DEF': 4, 'ATK': 4}, 'Hunter': {'STR': 15, 'DEX': 18, 'CON': 17, 'INT': 16, 'WIS': 17, 'CHA': 15, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 21, 'DEF': 2, 'ATK': 2}}
 INFO:PHYM_LOGGER:Loading UI Conf
 INFO:PHYM_LOGGER:Loading musicConf
 INFO:PHYM_LOGGER:Loading menuConf
@@ -63,11 +63,11 @@ INFO:PHYM_LOGGER:LOADING ITEM RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to ItemDBLoading : 20 
 INFO:PHYM_LOGGER:LOADING SPELL RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to spellDBLoading : 20 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/IronArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Militiaman.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortSword_Paint.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/PeasantClothing.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Shields/MilitiamanShield.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon2H/OldPoleaxe.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/ExpertBowmanHat.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/HunterHat2.png
 INFO:PHYM_LOGGER:Current player's spell's ID : [1, 3, 6, 9, 12]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/fire/weak/icon.png
@@ -90,19 +90,19 @@ INFO:PHYM_LOGGER:Generating Init_Zone
 INFO:PHYM_LOGGER:BLITED AT CHUNK : [(0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)]
 INFO:PHYM_LOGGER:Generating Danger Zone
 DEBUG:PHYM_LOGGER:ADDING to worldElements : 15 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortIronKatana_Paint.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Slave.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/PeasantClothing.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/EliteGuardArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Slave.png
 INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/IronArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Militiaman.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortSword_Paint.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/PeasantClothing.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Shields/MilitiamanShield.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon2H/OldPoleaxe.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/ExpertBowmanHat.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/HunterHat2.png
 INFO:PHYM_LOGGER:Current player's spell's ID : [1, 3, 6, 9, 12]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/fire/weak/icon.png
@@ -111,20 +111,5 @@ INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/wind/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/earth/weak/icon.png
 INFO:PHYM_LOGGER:[+] Creating the pipes
 WARNING:PHYM_LOGGER:[x] FIFOs are already created, proceeding ...
-INFO:PHYM_LOGGER:[+] Starting C Module [PARTY JOINER] 
+INFO:PHYM_LOGGER:[+] Starting C Module [PARTY OWNER] 
 INFO:PHYM_LOGGER:[+] Starting handle connection thread
-INFO:PHYM_LOGGER:#400dcdff-9f21-420c-a6d4-599d539a060e joined the party !
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortIronKatana_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Slave.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/PeasantClothing.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/EliteGuardArmor_Paint.png
-INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
-INFO:PHYM_LOGGER:HEALING Lqeje DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING Trwzte DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING Dvk DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING Lqeje DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING Trwzte DUE TO REST MECHANICS
-INFO:PHYM_LOGGER:HEALING Dvk DUE TO REST MECHANICS
