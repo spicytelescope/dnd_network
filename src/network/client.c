@@ -191,6 +191,7 @@ int main(int argc, char *argv[])
     char size[5];
     int err;
     int bytesAvailable;
+    char udp_to_python_packet[BUFSIZE];
     if ((from_python_descriptor = open(fifo_output_path, O_RDONLY)) == -1)
     {
         perror("open - from_python_descriptor");
@@ -427,11 +428,22 @@ int main(int argc, char *argv[])
             {
                 nactivity++;
                 bzero(msg, BUFSIZE);
-                if (recvfrom(fdudp, (char *)&msg, BUFSIZE + 1, 0, (struct sockaddr *)&cliUDP, (unsigned int *)&len) < 0)
+                bzero(udp_to_python_packet, BUFSIZE);
+                rval = 0;
+                if (rval = recvfrom(fdudp, (char *)&msg, BUFSIZE + 1, 0, (struct sockaddr *)&cliUDP, (unsigned int *)&len) < 0)
                     stop("recvfrom");
 
+                // printf("buffer (size=%d) recv : %s\n", strlen(msg), msg);
+                // Sending packet size first :
+                sprintf(udp_to_python_packet, "%d%s", strlen(msg), msg);
+                if (write(to_python_descriptor, udp_to_python_packet, strlen(udp_to_python_packet)) < 0) //transmiting data
+                {
+                    perror("Writing to to_python_client fifo");
+                    exit(EXIT_FAILURE);
+                }//transmiting data
+
                 //player already connected
-                if ((naddr = checkin(under_connect, cliUDP.sin_addr.s_addr)) >= 0)
+                /*if ((naddr = checkin(under_connect, cliUDP.sin_addr.s_addr)) >= 0)
                 {
                     //new connection
                     if (indice_temp != -1)
@@ -453,7 +465,7 @@ int main(int argc, char *argv[])
                 }
                 else if ((naddr = checkin(addrc, cliUDP.sin_addr.s_addr)) >= 0)
                 {
-                    if (*msg == 'o')
+                    /*if (*msg == 'o')
                     {
                         if (write(to_python_descriptor, idc[indice_temp], ID_LEN) < 0) //transmiting data
                         {
@@ -502,11 +514,17 @@ int main(int argc, char *argv[])
                 //player unknown
                 else if (naddr == -1)
                 {
+			printf("buffer recv : %s", msg);
+                        if (write(to_python_descriptor, msg, strlen(msg)) < 0) //transmiting data
+                        {
+                            perror("Writing to to_python_client fifo");
+                            exit(EXIT_FAILURE);
+                        } //transmiting data
                     printf("zebi oui le random \n");
                     //data deleted
                     char *msgerror = "please connect first";
                     sendto(fdudp, &msgerror, 21, 0, (struct sockaddr *)&cliUDP, (unsigned int)len);
-                }
+                }*/
             }
 
             if (FD_ISSET(from_python_descriptor, &fds))
@@ -542,7 +560,7 @@ int main(int argc, char *argv[])
 
                 if (rval != 0)
                 {
-                    printf("%s\n", buffer);
+                    //printf("Transmitting : %s\n", buffer);
                     // //cas de la déco manuelle
                     if (*buffer == DECONNECTION_MANUAL_BYTES)
                     {

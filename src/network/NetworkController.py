@@ -276,142 +276,153 @@ class NetworkController:
                     if (fifo, select.POLLIN) in poll.poll(POLLIN_TIMEOUT * 10000):
                         msg_size_bytes = os.read(fifo, 4)
                         msg_size = decode_msg_size(msg_size_bytes)
-                        str_data = os.read(fifo, msg_size).decode("latin-1")
-
+                        str_data = os.read(fifo, msg_size).decode("utf-8")
+                        print(f"Reading {msg_size} bytes !")
+                        
                         if len(str_data) > 2:
                             self.total_packet_transmitted += 1
-                            if str_data[0] != "{":
-                                str_data = (
-                                    str_data[1:]
-                                    if str_data[1] == "{"
-                                    else "{" + str_data[1:]
-                                )
+                            print("receved from python : ", str_data)
+                            if "}{" in str_data:
+                                print("Correcting !")
+                                str_data = str_data[0 : str_data.find("}{") + 1]
+                            # if str_data[-1] != "}":
+                            #     str_data += "}"
                             try:
                                 packet = json.loads(str_data)
                                 self.packet_transmitted += 1
+                                
+                                # --------------- TIMEOUT HANDLING ---------------- #
+                                self.players_timeout[
+                                    packet["sender_id"]
+                                ] = time.time()  # reset the timer
+
+                                for (
+                                    player_id,
+                                    current_timer,
+                                ) in self.players_timeout.items():
+                                    if (
+                                        current_timer - time.time()
+                                    ) >= PLAYER_DECONNECTION_TIMEOUT * 60:
+                                        fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
+                                        os.write(fifo, DECONNECTION_TIMEOUT_BYTES)
+                                        os.write(fifo, player_id.encode("utf-8"))
+                                        os.close(fifo)
+
+                                # --------------- NEW PLAYER DETECTION -------------------------- #
+
+                                if packet["type"] == "info_pos" and packet[
+                                    "sender_id"
+                                ] not in list(self.players.keys()) + [
+                                    self.Hero.networkId
+                                ]:
+                                    self.addPlayer(
+                                        packet["sender_id"],
+                                        packet["player_name"],
+                                    )
+
+                                for player_id, player in self.players.items():
+                                    if player_id == packet["sender_id"]:
+
+                                        # -------------- MAP RECV ------------ #
+                                        if packet["type"] == "info_pos":
+
+                                            # if packet["chunkCoor"] not in self.sessionChunks:
+                                            #     self.sessionChunks[packet["chunkCoor"]] = []  # TODO
+
+                                            # Check wether the player and the other connected are on the same chunk or not
+                                            player.posMainChunkCenter = packet[
+                                                "chunkPos"
+                                            ]
+                                            player.direction = packet["direction"]
+                                            player.imageState = {
+                                                "image": playerConf.CLASSES[
+                                                    player.classId
+                                                ]["directions"][player.direction][
+                                                    packet["imagePos"]
+                                                ],
+                                                "imagePos": packet["imagePos"],
+                                            }
+
+                                            # logger.debug(
+                                            #     f"[+] Updating pos for player {player_id}"
+                                            # )
+
+                                            # Chunk rendering optimisation TODO
+                                            # if (
+                                            #     sqrt(
+                                            #         sum(
+                                            #             [
+                                            #                 (p1coor - p2coor) ** 2
+                                            #                 for p1coor, p2coor in zip(
+                                            #                     data["players"][player_id]["chunkPos"],
+                                            #                     self.Hero.Map.chunkData["currentChunkPos"],
+                                            #                 )
+                                            #             ]
+                                            #         )
+                                            #     )
+                                            # ) <= self.Map.renderDistance :
+
+                                        # ------------------ INVENTORY RECV ------------------- #
+                                        if packet["type"] == "info_inv":
+                                            player.Inventory.updateInventory(
+                                                packet["storage"],
+                                                packet["equipment"],
+                                            )
+
+                                        # ----------------- CHARAC INFO RECV ------------------ #
+                                        if packet["type"] == "info_charac":
+                                            player.classId = packet["classId"]
+                                            player.direction = packet["direction"]
+                                            player.stats = packet["stats"]
+
+                                            p_spells = sorted(player.spellsID[::])
+                                            d_spells = sorted(packet["spellsID"][::])
+                                            if p_spells != d_spells:
+                                                player.spellsID = packet["spellsID"]
+                                                player.SpellBook.updateSpellBook()
+
+                                        # ------------------ TRADE RECV ----------- #
+                                        if packet["type"] == "trade":
+                                            pass
+
+                                        # ------------------ MESSAGE RECV ----------- #
+                                        if packet["type"] == "message":
+                                            self.chat.addText(
+                                                (
+                                                    self.players[
+                                                        packet["sender_id"]
+                                                    ].name,
+                                                    packet["content"],
+                                                    packet["italic"],
+                                                    packet["color_code"],
+                                                ),
+                                                recv=True,
+                                            )
+
+                                        # ---------------- DECONNEXION RECV ------------ #
+                                        if packet["type"] == "deconnection":
+
+                                            self.chat.addText(
+                                                (
+                                                    self.players[
+                                                        packet["sender_id"]
+                                                    ].name,
+                                                    "left the game !",
+                                                    True,
+                                                    CHAT_COLORS["DECONNEXION"],
+                                                )
+                                            )
+                                            self.players = {
+                                                k: v
+                                                for k, v in self.players.items()
+                                                if k != packet["sender_id"]
+                                            }
                             except:
                                 print("error on this packet : ", str_data)
                                 packet = {
                                     "name": "test_packet_bug",
                                     "sender_id": "Unknown_id",
                                 }
-
-                            # --------------- TIMEOUT HANDLING ---------------- #
-                            self.players_timeout[
-                                packet["sender_id"]
-                            ] = time.time()  # reset the timer
-
-                            for (
-                                player_id,
-                                current_timer,
-                            ) in self.players_timeout.items():
-                                if (
-                                    current_timer - time.time()
-                                ) >= PLAYER_DECONNECTION_TIMEOUT * 60:
-                                    fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
-                                    os.write(fifo, DECONNECTION_TIMEOUT_BYTES)
-                                    os.write(fifo, player_id.encode("utf-8"))
-                                    os.close(fifo)
-
-                            # --------------- NEW PLAYER DETECTION -------------------------- #
-
-                            if packet["type"] == "info_pos" and packet[
-                                "sender_id"
-                            ] not in list(self.players.keys()) + [self.Hero.networkId]:
-                                self.addPlayer(
-                                    packet["sender_id"],
-                                    packet["player_name"],
-                                )
-
-                            for player_id, player in self.players.items():
-                                if player_id == packet["sender_id"]:
-
-                                    # -------------- MAP RECV ------------ #
-                                    if packet["type"] == "info_pos":
-
-                                        # if packet["chunkCoor"] not in self.sessionChunks:
-                                        #     self.sessionChunks[packet["chunkCoor"]] = []  # TODO
-
-                                        # Check wether the player and the other connected are on the same chunk or not
-                                        player.posMainChunkCenter = packet["chunkPos"]
-                                        player.direction = packet["direction"]
-                                        player.imageState = {
-                                            "image": playerConf.CLASSES[player.classId][
-                                                "directions"
-                                            ][player.direction][packet["imagePos"]],
-                                            "imagePos": packet["imagePos"],
-                                        }
-
-                                        # logger.debug(
-                                        #     f"[+] Updating pos for player {player_id}"
-                                        # )
-
-                                        # Chunk rendering optimisation TODO
-                                        # if (
-                                        #     sqrt(
-                                        #         sum(
-                                        #             [
-                                        #                 (p1coor - p2coor) ** 2
-                                        #                 for p1coor, p2coor in zip(
-                                        #                     data["players"][player_id]["chunkPos"],
-                                        #                     self.Hero.Map.chunkData["currentChunkPos"],
-                                        #                 )
-                                        #             ]
-                                        #         )
-                                        #     )
-                                        # ) <= self.Map.renderDistance :
-
-                                    # ------------------ INVENTORY RECV ------------------- #
-                                    if packet["type"] == "info_inv":
-                                        player.Inventory.updateInventory(
-                                            packet["storage"],
-                                            packet["equipment"],
-                                        )
-
-                                    # ----------------- CHARAC INFO RECV ------------------ #
-                                    if packet["type"] == "info_charac":
-                                        player.classId = packet["classId"]
-                                        player.direction = packet["direction"]
-                                        player.stats = packet["stats"]
-
-                                        p_spells = sorted(player.spellsID[::])
-                                        d_spells = sorted(packet["spellsID"][::])
-                                        if p_spells != d_spells:
-                                            player.spellsID = packet["spellsID"]
-                                            player.SpellBook.updateSpellBook()
-
-                                    # ------------------ TRADE RECV ----------- #
-                                    if packet["type"] == "trade":
-                                        pass
-
-                                    # ------------------ MESSAGE RECV ----------- #
-                                    if packet["type"] == "message":
-                                        self.chat.addText(
-                                            (
-                                                self.players[packet["sender_id"]].name,
-                                                packet["content"],
-                                                packet["italic"],
-                                                packet["color_code"],
-                                            ),
-                                            recv=True,
-                                        )
-
-                                    # ---------------- DECONNEXION RECV ------------ #
-                                    if packet["type"] == "deconnection":
-
-                                        self.chat.addText(
-                                            (
-                                                self.players[packet["sender_id"]].name,
-                                                "left the game !",
-                                                True,
-                                                CHAT_COLORS["DECONNEXION"],
-                                            )
-                                        )
-                                        self.players = {
-                                            k: v
-                                            for k, v in self.players.items()
-                                            if k != packet["sender_id"]
-                                        }
             finally:
                 poll.unregister(fifo)
         finally:
