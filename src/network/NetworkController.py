@@ -115,7 +115,7 @@ class NetworkController:
 
             self.textBox.input._show = True
             self.bg = self.Game.screen.copy()
-            while self.textBox.input._show:
+            while 1:
                 self.Game.screen.blit(self.bg, (0, 0))
                 for e in pygame.event.get():
                     self.textBox.checkEvent(e)
@@ -123,7 +123,21 @@ class NetworkController:
                 self.textBox.show(self.Game.screen)
                 self.Game.show()
 
-            self.setupNetworkSettings(join=True, ip_addr=self.textBox.name)
+                if not self.textBox.input._show:
+                    if ping(self.textBox.name):
+                        self.setupNetworkSettings(join=True, ip_addr=self.textBox.name)
+                        break
+                    else:
+                        Dialog(
+                            f"This IP address isn't active in the LAN, enter another one !",
+                            (self.Game.resolution // 2, self.Game.resolution // 2),
+                            self.Game.screen,
+                            ONLINE_DIALOG_COLOR,
+                            self.Game,
+                            error=True
+                        ).mainShow()
+                        self.textBox.reset()
+                        self.textBox.input._show = True
 
             Dialog(
                 f"Joining {self.textBox.name}:{DEFAULT_PORT} !",

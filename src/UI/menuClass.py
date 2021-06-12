@@ -765,21 +765,23 @@ class SelectMenu(MainMenu):
     def nextStep(self):
         # logger.debug(f"{self.stepsCursor} and {self.HeroIndex}")
         if self.stepsCursor == 1 and self.HeroIndex < len(self.HeroesGroup) - 1:
-            if (
-                playerConf.MAX_NAME_LENGTH
-                >= len(self.HeroesGroup[self.HeroIndex].name)
-                > 0
-            ):
-                self.HeroIndex += 1
-            else:
-                Dialog(
-                    f"Please enter a name with a length between 1 and {playerConf.MAX_NAME_LENGTH}",
-                    (self.Game.resolution // 2, self.Game.resolution // 2),
-                    self.Game.screen,
-                    (0, 0, 0),
-                    self.Game,
-                    error=True,
-                ).mainShow()
+            # if (
+            #     playerConf.MAX_NAME_LENGTH
+            #     >= len(self.HeroesGroup[self.HeroIndex].name)
+            #     > 0
+            # ):
+            #     self.HeroIndex += 1
+            # else:
+            #     Dialog(
+            #         f"Please enter a name with a length between 1 and {playerConf.MAX_NAME_LENGTH}",
+            #         (self.Game.resolution // 2, self.Game.resolution // 2),
+            #         self.Game.screen,
+            #         (0, 0, 0),
+            #         self.Game,
+            #         error=True,
+                # ).mainShow()
+            self.HeroIndex += 1
+
             self.textBox.reset()
         else:
             self.stepsCursor = (self.stepsCursor + 1) % len(self.steps)

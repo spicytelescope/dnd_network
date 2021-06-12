@@ -2,7 +2,7 @@ INFO:PHYM_LOGGER:Loading itemConf
 INFO:PHYM_LOGGER:Loading eventConf
 INFO:PHYM_LOGGER:Loading mapConf
 INFO:PHYM_LOGGER:Loading playerConf
-DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 13, 'DEX': 15, 'CON': 17, 'INT': 12, 'WIS': 17, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 20, 'DEF': 4, 'ATK': 2}, 'Wizard': {'STR': 12, 'DEX': 12, 'CON': 17, 'INT': 19, 'WIS': 14, 'CHA': 15, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 24, 'DEF': 1, 'ATK': 4}, 'Hunter': {'STR': 11, 'DEX': 18, 'CON': 13, 'INT': 15, 'WIS': 17, 'CHA': 14, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 15, 'DEF': 4, 'ATK': 1}}
+DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 15, 'DEX': 13, 'CON': 18, 'INT': 12, 'WIS': 16, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 27, 'DEF': 1, 'ATK': 4}, 'Wizard': {'STR': 7, 'DEX': 12, 'CON': 15, 'INT': 14, 'WIS': 18, 'CHA': 13, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 22, 'DEF': 3, 'ATK': 2}, 'Hunter': {'STR': 12, 'DEX': 18, 'CON': 17, 'INT': 16, 'WIS': 17, 'CHA': 13, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 27, 'DEF': 2, 'ATK': 3}}
 INFO:PHYM_LOGGER:Loading UI Conf
 INFO:PHYM_LOGGER:Loading musicConf
 INFO:PHYM_LOGGER:Loading menuConf
@@ -116,13 +116,3 @@ INFO:PHYM_LOGGER:[+] Creating the pipes
 WARNING:PHYM_LOGGER:[x] FIFOs are already created, proceeding ...
 INFO:PHYM_LOGGER:[+] Starting C Module [PARTY JOINER] 
 INFO:PHYM_LOGGER:[+] Starting handle connection thread
-INFO:PHYM_LOGGER:#09320ef0-520a-46e2-ad81-69f6212430ec joined the party !
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Slave.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/PeasantClothing.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/EliteGuardArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Slave.png
-INFO:PHYM_LOGGER:Creating spellbook
-INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png

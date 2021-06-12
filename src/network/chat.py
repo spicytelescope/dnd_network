@@ -67,7 +67,7 @@ class ChatWindow:
             self.addText(
                 "",
                 "Commands : /clear -> clear the window ; /mp {p_name} -> send a private message to {p_name}",
-                True,
+                italic=True,
             )
 
     def updateTextSurf(self, received=False):
