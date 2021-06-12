@@ -2,7 +2,7 @@ INFO:PHYM_LOGGER:Loading itemConf
 INFO:PHYM_LOGGER:Loading eventConf
 INFO:PHYM_LOGGER:Loading mapConf
 INFO:PHYM_LOGGER:Loading playerConf
-DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 16, 'DEX': 10, 'CON': 19, 'INT': 13, 'WIS': 16, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 22, 'DEF': 1, 'ATK': 4}, 'Wizard': {'STR': 8, 'DEX': 12, 'CON': 17, 'INT': 18, 'WIS': 18, 'CHA': 16, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 20, 'DEF': 3, 'ATK': 1}, 'Hunter': {'STR': 13, 'DEX': 15, 'CON': 17, 'INT': 13, 'WIS': 16, 'CHA': 19, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 29, 'DEF': 4, 'ATK': 3}}
+DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 14, 'DEX': 11, 'CON': 19, 'INT': 12, 'WIS': 13, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 21, 'DEF': 1, 'ATK': 4}, 'Wizard': {'STR': 10, 'DEX': 11, 'CON': 19, 'INT': 19, 'WIS': 13, 'CHA': 13, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 17, 'DEF': 4, 'ATK': 3}, 'Hunter': {'STR': 13, 'DEX': 19, 'CON': 15, 'INT': 14, 'WIS': 15, 'CHA': 18, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 15, 'DEF': 2, 'ATK': 1}}
 INFO:PHYM_LOGGER:Loading UI Conf
 INFO:PHYM_LOGGER:Loading musicConf
 INFO:PHYM_LOGGER:Loading menuConf
@@ -113,3 +113,18 @@ INFO:PHYM_LOGGER:[+] Creating the pipes
 WARNING:PHYM_LOGGER:[x] FIFOs are already created, proceeding ...
 INFO:PHYM_LOGGER:[+] Starting C Module [PARTY JOINER] 
 INFO:PHYM_LOGGER:[+] Starting handle connection thread
+INFO:PHYM_LOGGER:#400dcdff-9f21-420c-a6d4-599d539a060e joined the party !
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortIronKatana_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Slave.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/PeasantClothing.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/EliteGuardArmor_Paint.png
+INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
+INFO:PHYM_LOGGER:HEALING Lqeje DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Trwzte DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Dvk DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Lqeje DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Trwzte DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Dvk DUE TO REST MECHANICS
