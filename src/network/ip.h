@@ -30,7 +30,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <time.h>
-
+#include <sys/ioctl.h>
 
 #define CONNECTIONS_MAX 10
 #define PORT_UDP 7000

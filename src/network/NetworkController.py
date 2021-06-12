@@ -287,11 +287,10 @@ class NetworkController:
                                     else "{" + str_data[1:]
                                 )
                             try:
-                                print(str_data)
-
                                 packet = json.loads(str_data)
                                 self.packet_transmitted += 1
                             except:
+                                print("error on this packet : ", str_data)
                                 packet = {
                                     "name": "test_packet_bug",
                                     "sender_id": "Unknown_id",
