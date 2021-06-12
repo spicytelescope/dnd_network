@@ -8,9 +8,8 @@ import time
 import os
 import sys
 import pygame
-import copy
 
-from pygame.constants import KEYDOWN, MOUSEBUTTONDOWN, MOUSEBUTTONUP
+from pygame.constants import MOUSEBUTTONUP
 from Player.Character import Character
 from UI.UI_utils_text import Dialog, SelectPopUp, TextBoxControl
 from config import playerConf
@@ -94,7 +93,7 @@ class NetworkController:
 
         logger.info(f"#{new_id} joined the party !")
 
-        self.players.update({new_id: Character(self.Game, self.Map)})
+        self.players[new_id] = Character(self.Game, self.Map)
         self.players[new_id].initHUD()
         self.players[new_id].name = name
         self.players[new_id].networkId = new_id
@@ -259,9 +258,9 @@ class NetworkController:
         self.threads["connection_handler"].start()
 
         # Packet send to "wake up" the client with the pipe file descriptor e.g add in in the select's active fd
-        fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
-        os.write(fifo, OPEN_CONNEXION_BYTE)
-        os.close(fifo)
+        # fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
+        # os.write(fifo, OPEN_CONNEXION_BYTE)
+        # os.close(fifo)
 
     def handleConnectedPlayers(self):
 
@@ -281,15 +280,19 @@ class NetworkController:
                 while True:
                     # Check if there's data to read. Timeout after config.netCof.POLLIN_TIMEOUT sec.
                     if (fifo, select.POLLIN) in poll.poll(POLLIN_TIMEOUT * 10000):
-                        msg_size_bytes = os.read(fifo, 3)
-                        msg_size = decode_msg_size(msg_size_bytes)
-                        print(f"Reading {msg_size} bytes !")
-                        str_data = os.read(fifo, msg_size).decode("utf-8")
+                        # msg_size_bytes = os.read(fifo, 4)
+                        # msg_size = decode_msg_size(msg_size_bytes)
+                        # print(f"Reading {msg_size} bytes !")
+                        str_data = os.read(fifo, 2048).decode("utf-8")
                         
                         if len(str_data) > 2:
                             self.total_packet_transmitted += 1
                             print("receved from python : ", str_data)
+
                             try:
+                                if "}{" in str_data:
+                                    str_data = str_data[0, str_data.index("}{" + 1)]
+
                                 packet = json.loads(str_data)
                                 self.packet_transmitted += 1
                                 
@@ -420,7 +423,7 @@ class NetworkController:
                                                 if k != packet["sender_id"]
                                             }
                             except:
-                                print("error on this packet : ", str_data)
+                                # print("error on this packet : ", str_data)
                                 packet = {
                                     "name": "test_packet_bug",
                                     "sender_id": "Unknown_id",
@@ -546,8 +549,9 @@ class NetworkController:
         for player in self.players.values():
 
             # HUD Updating
-            # player.Inventory.draw()
-            # player.SpellBook.draw()
+            if player.Inventory != None and player.SpellBook != None and player.CharBar != None:
+                player.Inventory.draw()
+                player.SpellBook.draw()
 
             # Map pos updating
             playersDist = [
@@ -578,10 +582,12 @@ class NetworkController:
             self.ContextMenu.tradeUI.checkActions(event)
 
         for player in self.players.values():
-            if player.SpellBook._show:
-                player.SpellBook.checkActions(event)
-            if player.Inventory._show:
-                player.Inventory.checkActions(event, protected=True)
+            # Handle thread
+            if player.SpellBook != None and player.Inventory != None:  
+                if player.SpellBook._show:
+                    player.SpellBook.checkActions(event)
+                if player.Inventory._show:
+                    player.Inventory.checkActions(event, protected=True)
 
             if event.type == MOUSEBUTTONUP and event.button == 1:
                 if (
@@ -593,7 +599,6 @@ class NetworkController:
                         self.Game.heroesGroup[self.Game.heroIndex], player
                     )
                     self.ContextMenu.show()
-
                     break
 
     # ---------------------- GRAPHICAL UI -------------------------- #

@@ -156,8 +156,8 @@ while Game.currentState != "quit":
                 # ------------------- NETWORK HANDLING ----------------- #
                 if Game.isOnline:
                     if NetworkController.players != {}:
-                        # NetworkController.handleInteractions(event)
-                        pass
+                        NetworkController.handleInteractions(event)
+                        
                     NetworkController.chat.chatWindow.update(event)
                     NetworkController.chat.checkEvent(event)
 
@@ -275,8 +275,6 @@ while Game.currentState != "quit":
                 Hero.SpellBook.draw()
                 Player_Map.miniMap.drawExtendedMap()
                 if Game.isOnline:
-                    # NetworkController.handleConnectedPlayers()
-                    # threading.Thread(target=NetworkController.handleConnectedPlayers).start()
                     NetworkController.chat.show()
                     NetworkController.drawPannel()
                     NetworkController.updateGraphics()

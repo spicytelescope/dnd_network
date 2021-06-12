@@ -181,9 +181,7 @@ class Inventory:
             pygame.quit()
             exit()
 
-        # if self.Game.isOnline:
-        #     self.transmitInvInfos()
-
+        
     def checkSellItem(self, event, Seller):
 
         mousePosTranslated = [
@@ -583,6 +581,11 @@ class Inventory:
 
                         else:
                             continue
+                        
+                        if self.Game.isOnline:
+                            if self.Hero.networkId != None:
+                                logger.info("Transmit inv infos !")
+                                self.transmitInvInfos()
 
                         self.draggedItemCoor = None
 
@@ -787,11 +790,12 @@ class Inventory:
 
     def _showPlayerStats(self):
 
+        cache_stats = self.Hero.stats.copy()
         for statName in self.Hero.stats:
 
             fontText = str(self.Hero.stats[statName])
             
-            cache_stats = self.Hero.stats.copy()
+            
             if statName == "HP":
                 fontText = f"{self.Hero.stats[statName]}/{self.Hero.stats['HP_max']}"
             elif statName == "Mana":
@@ -813,16 +817,14 @@ class Inventory:
             elif statName in ["HP_max", "Mana_max"]:
                 continue
 
-            # Checking wether the information of the player changed, then transmiting charac infos if needed
-            if self.Game.isOnline and cache_stats != self.Hero.stats:
-                self.Hero.transmitCharacInfos()
-
-
             statFont = pygame.font.Font(DUNGEON_FONT, BUTTON_FONT_SIZE).render(
                 fontText, True, (255, 255, 255)
             )
             statRect = statFont.get_rect(center=STAT_BLIT_POINTS[statName])
             self.surf.blit(statFont, statRect)
+         # Checking wether the information of the player changed, then transmiting charac infos if needed
+        if self.Game.isOnline and cache_stats != self.Hero.stats:
+            self.Hero.transmitCharacInfos()
 
     def resetInventoryActions(self):
 

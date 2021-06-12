@@ -43,6 +43,7 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
     {
         printf("ok\n");
         addrcli[(int)*(message + 4)] = hote.sin_addr.s_addr;
+        printf("Stocked IP address : %d %d\n", addrcli[(int)*(message + 4)], (int)*(message + 4));
         strncpy(idc[(int)*(message + 4)], (message + 8), ID_LEN);
 
         //send ids to pipe
@@ -192,21 +193,16 @@ int main(int argc, char *argv[])
     int err;
     int bytesAvailable;
     char udp_to_python_packet[BUFSIZE];
-    if ((from_python_descriptor = open(fifo_output_path, O_RDONLY)) == -1)
+    if ((from_python_descriptor = open(fifo_output_path, O_RDWR)) == -1)
     {
         perror("open - from_python_descriptor");
         exit(EXIT_FAILURE);
     }
-    if ((to_python_descriptor = open(fifo_input_path, O_WRONLY)) == -1)
+    if ((to_python_descriptor = open(fifo_input_path, O_RDWR)) == -1)
     {
         perror("open - to_python_descriptor");
         exit(EXIT_FAILURE);
     }
-
-    //all the packets
-    char selfID[ID_LEN];
-    if (argc == 3)
-        strncpy(selfID, argv[1], ID_LEN);
 
     newP_packet newp;
     new_packet new;
@@ -224,6 +220,17 @@ int main(int argc, char *argv[])
     memset(fd_connect, -1, sizeof(fd_connect));
     memset(under_connect, 0, sizeof(under_connect));
     memset(addrc, 0, sizeof(addrc));
+
+    //all the packets
+    char selfID[ID_LEN];
+    struct sockaddr_in firstContactIP;
+
+    if (argc == 3)
+    {
+        strncpy(selfID, argv[1], ID_LEN);
+        inet_pton(AF_INET, argv[2], &firstContactIP.sin_addr);
+        addrc[0] = firstContactIP.sin_addr.s_addr;
+    }
 
     //file descriptors
     int naddr;
@@ -267,6 +274,7 @@ int main(int argc, char *argv[])
         cliTCP.sin_port = htons(PORT_TCP);
         // printf("%s\n", argv[1]);
         confirmation(fdtcp, fdudp, argv[2], cliTCP, cliUDP, addrc, idc, selfID, to_python_descriptor);
+        printf("list of ip adress  :\n");
         for (int i = 0; i < CONNECTIONS_MAX; i++)
         {
             printf("%d\n", addrc[i]);
@@ -435,16 +443,16 @@ int main(int argc, char *argv[])
 
                 // printf("buffer (size=%d) recv : %s\n", strlen(msg), msg);
                 // Sending packet size first :
-                sprintf(udp_to_python_packet, "%d%s\n", strlen(msg), msg);
-                printf("%s\n", udp_to_python_packet);
-                if (write(to_python_descriptor, udp_to_python_packet, strlen(udp_to_python_packet)) < 0) //transmiting data
+                // sprintf(udp_to_python_packet, "%d%s\n", strlen(msg), msg);
+                // printf("Recv & send to python : %s\n", udp_to_python_packet);
+                if (write(to_python_descriptor, msg, strlen(msg)) < 0) //transmiting data
                 {
                     perror("Writing to to_python_client fifo");
                     exit(EXIT_FAILURE);
                 } //transmiting data
 
                 //player already connected
-                /*if ((naddr = checkin(under_connect, cliUDP.sin_addr.s_addr)) >= 0)
+                if ((naddr = checkin(under_connect, cliUDP.sin_addr.s_addr)) >= 0)
                 {
                     //new connection
                     if (indice_temp != -1)
@@ -464,7 +472,7 @@ int main(int argc, char *argv[])
                     sendto(fdudp, "ok", 3, 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
                     //set son id
                 }
-                else if ((naddr = checkin(addrc, cliUDP.sin_addr.s_addr)) >= 0)
+                /*else if ((naddr = checkin(addrc, cliUDP.sin_addr.s_addr)) >= 0)
                 {
                     /*if (*msg == 'o')
                     {
@@ -561,10 +569,10 @@ int main(int argc, char *argv[])
 
                 if (rval != 0)
                 {
-                    //printf("Transmitting : %s\n", buffer);
+                    // printf("Transmitting : %s\n", buffer);
 
                     //cas de la déco manuelle
-                    if (*buffer == DECONNECTION_MANUAL_BYTES)
+                    /*if (*buffer == DECONNECTION_MANUAL_BYTES)
                     {
                         char msgdeco = DECONNECTION_MANUAL_BYTES;
                         for (int n = 0; n < CONNECTIONS_MAX; n++)
@@ -603,18 +611,21 @@ int main(int argc, char *argv[])
                         }
                     }
                     else
+                    {*/
+                    // Default case - Transmitting packets to every players
+                    for (int n = 0; n < CONNECTIONS_MAX; n++)
                     {
-                        // Default case - Transmitting packets to every players
-                        for (int n = 0; n < CONNECTIONS_MAX; n++)
+                        //printf("Chekcing adress %d : %d\n", n, addrc[n]);
+                        if (addrc[n] != 0)
                         {
-                            if (addrc[n] != 0)
-                            {
-                                cliUDP.sin_addr.s_addr = addrc[n];
-                                sendto(fdudp, &buffer, bytesAvailable, 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
-                                printf("Transmitting packet to network \n");
-                            }
+                            cliUDP.sin_addr.s_addr = addrc[n];
+                            sendto(fdudp, &buffer, bytesAvailable, 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
+                            printf("Transmitting packet to network \n");
                         }
                     }
+                    // printf("-------------\n");
+
+                    //}
                 }
             }
         }

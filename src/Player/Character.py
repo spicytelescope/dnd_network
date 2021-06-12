@@ -68,6 +68,7 @@ class Character:
                 for _ in range(random.randint(1, 9))
             ]
         )
+        self.networkId = None
 
         self._fightName = self.name
 
@@ -211,8 +212,8 @@ class Character:
                 f"{self.name} gain a level ! What characteristic do you want to up ?",
             ).show()
 
-        # if self.Game.isOnline:
-        #     self.transmitCharacInfos()
+            if self.Game.isOnline:
+                self.transmitCharacInfos()
 
     def modifyStat(self, stat, value):
         self.stats[stat] += value
@@ -308,6 +309,9 @@ class Character:
         self.Inventory = Inventory(self.Game, self)
         self.CharBar = CharBar(self.Game, self)
         self.SpellBook = SpellBook(self.Game, self)
+
+        logger.info("Creating spellbook")
+
         if self.genOrder == 0:
             self.QuestJournal = QuestController(self.Game, self)
         else:
