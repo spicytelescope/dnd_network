@@ -58,6 +58,7 @@ TEMPLATE_NEW_CONNECTION = {
     "sender_id": "Unknown_id",  # sample : 92a3c27f-4ee7-4d94-b72d-f29b501fadf4
     "map_seed": 1,
     "player_name": "Unknown_name",
+    "chunkPos": [],  # [1562, 1556]
     "spellsID": [
         # 2,
         # 18,
@@ -101,7 +102,7 @@ TEMPLATE_MESSAGE = {
     "italic": False,
 }
 
-# //TODO
+#TODO
 TEMPLATE_TRADE_OFFER = {"type": "trade"}
 
 
