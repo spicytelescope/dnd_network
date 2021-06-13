@@ -1,3 +1,4 @@
+from copy import deepcopy
 import json
 from logging import Logger
 from network.chat import Chat
@@ -134,10 +135,29 @@ class NetworkController:
                             self.Game.screen,
                             ONLINE_DIALOG_COLOR,
                             self.Game,
-                            error=True
+                            error=True,
                         ).mainShow()
                         self.textBox.reset()
                         self.textBox.input._show = True
+
+            discovery_packet = deepcopy(TEMPLATE_NEW_CONNECTION)
+            discovery_packet["classId"] = self.Hero.classId
+            discovery_packet["map_seed"] = self.Map.mapSeed
+            discovery_packet["player_name"] = self.Hero.name
+            discovery_packet["spellsID"] = self.Hero.spellsID
+            discovery_packet["stats"] = self.Hero.stats
+            discovery_packet["storage"] = {
+                str(self.storage["tab"][j][i].property["Id"]): (i, j)
+                for j in range(INVENTORY_STORAGE_HEIGHT)
+                for i in range(INVENTORY_STORAGE_WIDTH)
+                if self.storage["tab"][j][i] != None
+            }
+            discovery_packet["equipment"] = {
+                str(slot): int(slot_item["item"].property["Id"])
+                for slot, slot_item in self.equipment.items()
+                if slot_item["item"] != None
+            }
+            write_to_pipe(IPC_FIFO_OUTPUT, discovery_packet)
 
             Dialog(
                 f"Joining {self.textBox.name}:{DEFAULT_PORT} !",
@@ -332,7 +352,7 @@ class NetworkController:
 
                                 # --------------- NEW PLAYER DETECTION -------------------------- #
 
-                                if packet["type"] == "info_pos" and packet[
+                                if packet["type"] == "discovery" and packet[
                                     "sender_id"
                                 ] not in list(self.players.keys()) + [
                                     self.Hero.networkId
@@ -341,11 +361,55 @@ class NetworkController:
                                         packet["sender_id"],
                                         packet["player_name"],
                                     )
+                                    self.players[
+                                        packet["sender_id"]
+                                    ].Inventory.updateInventory(
+                                        packet["storage"],
+                                        packet["equipment"],
+                                    )
+
+                                    self.players[packet["sender_id"]].classId = packet[
+                                        "classId"
+                                    ]
+                                    self.players[
+                                        packet["sender_id"]
+                                    ].direction = packet["direction"]
+                                    self.players[packet["sender_id"]].stats = packet[
+                                        "stats"
+                                    ]
+
+                                    p_spells = sorted(
+                                        self.players[packet["sender_id"]].spellsID[::]
+                                    )
+                                    d_spells = sorted(packet["spellsID"][::])
+                                    if p_spells != d_spells:
+                                        self.players[
+                                            packet["sender_id"]
+                                        ].spellsID = packet["spellsID"]
+                                        self.players[
+                                            packet["sender_id"]
+                                        ].SpellBook.updateSpellBook()
+
+                                    discovery_packet = deepcopy(TEMPLATE_NEW_CONNECTION)
+                                    discovery_packet["classId"] = self.Hero.classId
+                                    discovery_packet["map_seed"] = self.Map.mapSeed
+                                    discovery_packet["player_name"] = self.Hero.name
+                                    discovery_packet["spellsID"] = self.Hero.spellsID
+                                    discovery_packet["stats"] = self.Hero.stats
+                                    discovery_packet["storage"] = {
+                                        str(self.storage["tab"][j][i].property["Id"]): (i, j)
+                                        for j in range(INVENTORY_STORAGE_HEIGHT)
+                                        for i in range(INVENTORY_STORAGE_WIDTH)
+                                        if self.storage["tab"][j][i] != None
+                                    }
+                                    discovery_packet["equipment"] = {
+                                        str(slot): int(slot_item["item"].property["Id"])
+                                        for slot, slot_item in self.equipment.items()
+                                        if slot_item["item"] != None
+                                    }
+                                    write_to_pipe(IPC_FIFO_OUTPUT, discovery_packet)
 
                                 for player_id, player in self.players.items():
-                                    print(
-                                        f'{player_id} comparing with {packet["sender_id"]}'
-                                    )
                                     if player_id == packet["sender_id"]:
 
                                         # -------------- MAP RECV ------------ #
@@ -396,7 +460,6 @@ class NetworkController:
 
                                         # ----------------- CHARAC INFO RECV ------------------ #
                                         if packet["type"] == "info_charac":
-                                            player.classId = packet["classId"]
                                             player.direction = packet["direction"]
                                             player.stats = packet["stats"]
 
@@ -412,10 +475,6 @@ class NetworkController:
 
                                         # ------------------ MESSAGE RECV ----------- #
                                         if packet["type"] == "message":
-                                            print(
-                                                "OUI LE MESSAGE : ", packet["content"]
-                                            )
-
                                             self.chat.chatWindow.addText(
                                                 self.players[packet["sender_id"]].name,
                                                 packet["content"],
@@ -684,9 +743,10 @@ class NetworkController:
             else 0
         )
 
-        fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
-        os.write(fifo, DECONNECTION_MANUAL_BYTES)
-        os.close(fifo)
+        deco_packet = deepcopy(TEMPLATE_DECONNEXION)
+        deco_packet["sender_id"]  = self.Hero.networkId
+        deco_packet["player_name"] = self.Hero.name
+        write_to_pipe(IPC_FIFO_OUTPUT, deco_packet)
 
         # for t in self.threads.values():
         #     if t.is_alive:

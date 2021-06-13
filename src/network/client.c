@@ -23,7 +23,7 @@ int is_complete(int *array, int len, int nbNull)
     return 1;
 }
 
-int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, struct sockaddr_in udpcli, in_addr_t *addrcli, char idc[CONNECTIONS_MAX][ID_LEN], char *selfID, int to_python_descriptor)
+int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, struct sockaddr_in udpcli, in_addr_t *addrcli, char idc[CONNECTIONS_MAX][ID_LEN], char *selfID, int to_python_descriptor, int from_python_descriptor)
 {
     // if (inet_aton(addressH, &(udpcli.sin_addr)) == 0)
     //     stop("inet_aton");
@@ -72,6 +72,11 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
         if (addrcli[i] != 0)
         {
             udpcli.sin_addr.s_addr = addrcli[i];
+            if (read(from_python_descriptor, message, BUFSIZE) < 0)
+            {
+                perror("from_python_descriptor - read - discovery packet");
+                exit(EXIT_FAILURE);
+            }
             sendto(fdu, (char *)&selfID, sizeof(long long int), 0, (struct sockaddr *)&udpcli, sizeof(udpcli));
         }
     }
@@ -273,7 +278,7 @@ int main(int argc, char *argv[])
         cliTCP.sin_family = AF_INET;
         cliTCP.sin_port = htons(PORT_TCP);
         // printf("%s\n", argv[1]);
-        confirmation(fdtcp, fdudp, argv[2], cliTCP, cliUDP, addrc, idc, selfID, to_python_descriptor);
+        confirmation(fdtcp, fdudp, argv[2], cliTCP, cliUDP, addrc, idc, selfID, to_python_descriptor, from_python_descriptor);
         printf("list of ip adress  :\n");
         for (int i = 0; i < CONNECTIONS_MAX; i++)
         {
@@ -419,6 +424,7 @@ int main(int argc, char *argv[])
                             strncpy(idc[i], msg, ID_LEN);
                             fd_connect[con] = 0;
                             printf("%d\n", addrc[i]);
+                            bzero(buffer, BUFSIZE);
                             if (write(to_python_descriptor, idc[i], ID_LEN) < 0) //transmiting data
                             {
                                 perror("Writing to to_python_client fifo");
@@ -438,7 +444,7 @@ int main(int argc, char *argv[])
                 bzero(msg, BUFSIZE);
                 bzero(udp_to_python_packet, BUFSIZE);
                 rval = 0;
-                if (rval = recvfrom(fdudp, (char *)&msg, BUFSIZE + 1, 0, (struct sockaddr *)&cliUDP, (unsigned int *)&len) < 0)
+                if ((rval = recvfrom(fdudp, (char *)&msg, BUFSIZE + 1, 0, (struct sockaddr *)&cliUDP, (unsigned int *)&len)) < 0)
                     stop("recvfrom");
 
                 // printf("buffer (size=%d) recv : %s\n", strlen(msg), msg);
@@ -474,7 +480,7 @@ int main(int argc, char *argv[])
                 }
                 /*else if ((naddr = checkin(addrc, cliUDP.sin_addr.s_addr)) >= 0)
                 {
-                    /*if (*msg == 'o')
+                    if (*msg == 'o')
                     {
                         if (write(to_python_descriptor, idc[indice_temp], ID_LEN) < 0) //transmiting data
                         {
@@ -550,7 +556,7 @@ int main(int argc, char *argv[])
                     exit(EXIT_FAILURE);
                 }*/
                 // printf("size: %d \n", atoi(size));
-                if (err = ioctl(from_python_descriptor, FIONREAD, &bytesAvailable) == -1)
+                if ((err = ioctl(from_python_descriptor, FIONREAD, &bytesAvailable)) == -1)
                 {
                     perror("read - from_python_descriptor - ioctl");
                     exit(EXIT_FAILURE);

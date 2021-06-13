@@ -57,8 +57,34 @@ TEMPLATE_NEW_CONNECTION = {
     "classId": 0,  # 0
     "sender_id": "Unknown_id",  # sample : 92a3c27f-4ee7-4d94-b72d-f29b501fadf4
     "map_seed": 1,
-    "creator": False,
     "player_name": "Unknown_name",
+    "spellsID": [
+        # 2,
+        # 18,
+    ],
+    "stats": {  # -1 means unset
+        "STR": -1,
+        "DEX": -1,
+        "CON": -1,
+        "INT": -1,
+        "WIS": -1,
+        "CHA": -1,
+        "HP": -1,
+        "HP_max": -1,
+        "Mana": -1,
+        "Mana_max": -1,
+        "Money": -1,
+        "DEF": -1,
+        "ATK": -1,
+    },
+    "storage": {
+        # "50": [2, 4]
+    },
+    "equipment": {
+        # "0": 26,
+        # "6": 131,
+        # "8": 6,
+    },
 }
 
 TEMPLATE_DECONNEXION = {
