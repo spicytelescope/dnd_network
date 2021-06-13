@@ -298,7 +298,11 @@ class NetworkController:
                         # msg_size_bytes = os.read(fifo, 4)
                         # msg_size = decode_msg_size(msg_size_bytes)
                         # print(f"Reading {msg_size} bytes !")
-                        str_data = os.read(fifo, 2048).decode("utf-8")
+                        try:
+                            str_data = os.read(fifo, 2048).decode("utf-8")
+                        except:
+                            print("UnicodeDecodeError: 'utf-8' codec can't decode byte 0xc0 in position 0: invalid start byte")
+                            str_data = ""
 
                         if len(str_data) > 2:
                             self.total_packet_transmitted += 1

@@ -55,18 +55,17 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
                 strncpy(idc[i], (message + 64 + i * ID_LEN), ID_LEN);
                 nb_addr++;
             }
-            for (int i = 0; i < CONNECTIONS_MAX; i++)
+            /*for (int i = 0; i < CONNECTIONS_MAX; i++)
             {
                 if (strcmp(idc[i], UNKNOWN_ID) != 0)
                     write(to_python_descriptor, idc[i], BUFSIZE);
-            }
+            }*/
         }
         if (nb_addr == 0)
             send(fdt, "ok", 3, 0);
     }
     else
         return -1;
-    sleep(5);
     for (int i = 0; i < CONNECTIONS_MAX; i++)
     {
         if (addrcli[i] != 0)
@@ -419,13 +418,8 @@ int main(int argc, char *argv[])
                             strncpy(idc[i], msg, ID_LEN);
                             fd_connect[con] = 0;
                             printf("%d\n", addrc[i]);
-                            if (write(to_python_descriptor, idc[i], ID_LEN) < 0) //transmiting data
-                            {
-                                perror("Writing to to_python_client fifo");
-                                exit(EXIT_FAILURE);
-                            } //transmiting data
                             printf("A new player joined the game : %s \n", idc[i]);
-                            char* disc_msg = "{type:'discovery_request'}";
+                            char* disc_msg = "{\n  'type': 'discovery_request'\n}";
                             if (write(to_python_descriptor, disc_msg, strlen(disc_msg)) < 0) //transmiting data
                             {
                                 perror("Writing to to_python_client fifo - disc");
