@@ -71,24 +71,24 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
         if (addrcli[i] != 0)
         {
             udpcli.sin_addr.s_addr = addrcli[i];
-            sendto(fdu, (char *)&selfID, sizeof(long long int), 0, (struct sockaddr *)&udpcli, sizeof(udpcli));
+            //sendto(fdu, (char *)&selfID, sizeof(long long int), 0, (struct sockaddr *)&udpcli, sizeof(udpcli));
         }
     }
     int lencli = sizeof(udpcli);
     printf("ok\n");
     while (1)
     {
-        if (nb_addr != 0)
-        {
-            recvfrom(fdu, &message, 3, 0, (struct sockaddr *)&udpcli, (socklen_t *)&lencli);
-            nb_addr--;
-        }
-        if (nb_addr == 0)
-        {
-            send(fdt, selfID, ID_LEN, 0);
-            close(fdt);
-            return 0;
-        }
+        // if (nb_addr != 0)
+        // {
+        //     recvfrom(fdu, &message, 3, 0, (struct sockaddr *)&udpcli, (socklen_t *)&lencli);
+        //     nb_addr--;
+        // }
+        // if (nb_addr == 0)
+        // {
+        send(fdt, selfID, ID_LEN, 0);
+        close(fdt);
+        return 0;
+        // }
         //count (7 for exemple)
         //check the reponse of the others servers
         // pas oublier de close !!!
@@ -419,7 +419,7 @@ int main(int argc, char *argv[])
                             fd_connect[con] = 0;
                             printf("%d\n", addrc[i]);
                             printf("A new player joined the game : %s \n", idc[i]);
-                            char* disc_msg = "{\n  'type': 'discovery_request'\n}";
+                            char *disc_msg = "{\n  'type': 'discovery_request'\n}";
                             if (write(to_python_descriptor, disc_msg, strlen(disc_msg)) < 0) //transmiting data
                             {
                                 perror("Writing to to_python_client fifo - disc");

@@ -338,6 +338,8 @@ class NetworkController:
                                 # --------------- NEW PLAYER DETECTION -------------------------- #
 
                                 if packet["type"] == "discovery_request":
+
+                                    print("Recv disco request paquet from client")
                                     disc_packet = copy.deepcopy(TEMPLATE_NEW_CONNECTION)
                                     disc_packet["classId"] = self.Hero.classId
                                     disc_packet["sender_id"] = self.Hero.networkId
@@ -347,6 +349,7 @@ class NetworkController:
                                     disc_packet["map_seed"] = self.Map.mapSeed
 
                                     write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
+                                    print("End of disc request packet")
                                     
                                 if packet["type"] == "discovery" and packet[
                                     "sender_id"
