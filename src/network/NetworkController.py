@@ -24,6 +24,7 @@ from utils.Network_helpers import *
 from .packet_types import *
 from config.netConf import *
 import socket
+import copy
 
 
 class NetworkController:
@@ -134,7 +135,7 @@ class NetworkController:
                             self.Game.screen,
                             ONLINE_DIALOG_COLOR,
                             self.Game,
-                            error=True
+                            error=True,
                         ).mainShow()
                         self.textBox.reset()
                         self.textBox.input._show = True
@@ -341,6 +342,12 @@ class NetworkController:
                                         packet["sender_id"],
                                         packet["player_name"],
                                     )
+                                    self.chat.chatWindow.addText(
+                                        packet["player_name"],
+                                        "joined the game !",
+                                        True,
+                                        "CONNEXION",
+                                    )
 
                                 for player_id, player in self.players.items():
                                     print(
@@ -434,7 +441,7 @@ class NetworkController:
                                                     ].name,
                                                     "left the game !",
                                                     True,
-                                                    CHAT_COLORS["DECONNEXION"],
+                                                    "DECONNEXION",
                                                 )
                                             )
                                             self.players = {
@@ -684,9 +691,13 @@ class NetworkController:
             else 0
         )
 
-        fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
-        os.write(fifo, DECONNECTION_MANUAL_BYTES)
-        os.close(fifo)
+        # fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
+        # os.write(fifo, DECONNECTION_MANUAL_BYTES)
+        # os.close(fifo)
+        deco_packet = copy.deepcopy(TEMPLATE_DECONNEXION)
+        deco_packet["sender_id"] = self.Hero.networkId
+        deco_packet["player_name"] = self.Hero.name
+        write_to_pipe(IPC_FIFO_OUTPUT, deco_packet)
 
         # for t in self.threads.values():
         #     if t.is_alive:
