@@ -333,7 +333,18 @@ class NetworkController:
 
                                 # --------------- NEW PLAYER DETECTION -------------------------- #
 
-                                if packet["type"] == "info_pos" and packet[
+                                if packet["type"] == "discovery_request":
+                                    disc_packet = copy.deepcopy(TEMPLATE_NEW_CONNECTION)
+                                    disc_packet["classId"] = self.Hero.classId
+                                    disc_packet["sender_id"] = self.Hero.networkId
+                                    disc_packet["spellsID"] = self.Hero.spellsID
+                                    disc_packet["stats"] = self.Hero.stats
+                                    disc_packet["player_name"] = self.Hero.player_name
+                                    disc_packet["map_seed"] = self.Map.mapSeed
+
+                                    write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
+                                    
+                                if packet["type"] == "discovery" and packet[
                                     "sender_id"
                                 ] not in list(self.players.keys()) + [
                                     self.Hero.networkId
@@ -348,11 +359,25 @@ class NetworkController:
                                         True,
                                         "CONNEXION",
                                     )
+                                    print("Receiving desc packet")
+
+                                    self.Hero.classId = packet["classId"]
+                                    self.Hero.name = packet["player_name"]
+                                    self.Map.mapSeed = packet["map_seed"]
+                                    self.Hero.stats = packet["stats"]
+
+                                    print("Sending packet")
+                                    disc_packet = copy.deepcopy(TEMPLATE_NEW_CONNECTION)
+                                    disc_packet["classId"] = self.Hero.classId
+                                    disc_packet["sender_id"] = self.Hero.networkId
+                                    disc_packet["spellsID"] = self.Hero.spellsID
+                                    disc_packet["stats"] = self.Hero.stats
+                                    disc_packet["player_name"] = self.Hero.player_name
+                                    disc_packet["map_seed"] = self.Map.mapSeed
+
+                                    write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
 
                                 for player_id, player in self.players.items():
-                                    print(
-                                        f'{player_id} comparing with {packet["sender_id"]}'
-                                    )
                                     if player_id == packet["sender_id"]:
 
                                         # -------------- MAP RECV ------------ #
@@ -434,21 +459,19 @@ class NetworkController:
                                         # ---------------- DECONNEXION RECV ------------ #
                                         if packet["type"] == "deconnection":
 
+                                            print("deconnection entering")
                                             self.chat.chatWindow.addText(
-                                                (
-                                                    self.players[
-                                                        packet["sender_id"]
-                                                    ].name,
-                                                    "left the game !",
-                                                    True,
-                                                    "DECONNEXION",
-                                                )
+                                                packet["player_name"],
+                                                "left the game !",
+                                                True,
+                                                "DECONNEXION",
                                             )
                                             self.players = {
                                                 k: v
                                                 for k, v in self.players.items()
                                                 if k != packet["sender_id"]
                                             }
+
                             except:
                                 # print("error on this packet : ", str_data)
                                 packet = {

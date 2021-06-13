@@ -425,6 +425,12 @@ int main(int argc, char *argv[])
                                 exit(EXIT_FAILURE);
                             } //transmiting data
                             printf("A new player joined the game : %s \n", idc[i]);
+                            char* disc_msg = "{type:'discovery_request'}";
+                            if (write(to_python_descriptor, disc_msg, strlen(disc_msg)) < 0) //transmiting data
+                            {
+                                perror("Writing to to_python_client fifo - disc");
+                                exit(EXIT_FAILURE);
+                            } //transmiting data
                             break;
                         }
                     }

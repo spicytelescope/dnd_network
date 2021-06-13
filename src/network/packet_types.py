@@ -30,6 +30,15 @@ TEMPLATE_INVENTORY = {
 TEMPLATE_CHARACTER_INFO = {
     "type": "info_charac",
     "sender_id": "Unknown_id",
+    "chunkPos": [],  # [1562, 1556]
+     "storage": {
+        # "50": [2, 4]
+    },
+    "equipment": {
+        # "0": 26,
+        # "6": 131,
+        # "8": 6,
+    },
     "spellsID": [
         # 2,
         # 18,
@@ -57,7 +66,25 @@ TEMPLATE_NEW_CONNECTION = {
     "classId": 0,  # 0
     "sender_id": "Unknown_id",  # sample : 92a3c27f-4ee7-4d94-b72d-f29b501fadf4
     "map_seed": 1,
-    "creator": False,
+    "spellsID": [
+        # 2,
+        # 18,
+    ],
+    "stats": {  # -1 means unset
+        "STR": -1,
+        "DEX": -1,
+        "CON": -1,
+        "INT": -1,
+        "WIS": -1,
+        "CHA": -1,
+        "HP": -1,
+        "HP_max": -1,
+        "Mana": -1,
+        "Mana_max": -1,
+        "Money": -1,
+        "DEF": -1,
+        "ATK": -1,
+    },
     "player_name": "Unknown_name",
 }
 
@@ -71,7 +98,7 @@ TEMPLATE_MESSAGE = {
     "type": "message",
     "sender_id": "Unknown_id",  # To retrieve the type afterward, and display it in the chat;
     "content": "",
-    "color_code": CHAT_COLORS["DEFAULT"],
+    "color_code": "DEFAULT",
     "italic": False,
 }
 
