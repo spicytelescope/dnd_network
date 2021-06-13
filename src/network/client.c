@@ -419,7 +419,7 @@ int main(int argc, char *argv[])
                             fd_connect[con] = 0;
                             printf("%d\n", addrc[i]);
                             printf("A new player joined the game : %s \n", idc[i]);
-                            char *disc_msg = "{\n  'type': 'discovery_request'\n}";
+                            char *disc_msg = "{\n  \"type\": \"discovery_request\"\n}";
                             if (write(to_python_descriptor, disc_msg, strlen(disc_msg)) < 0) //transmiting data
                             {
                                 perror("Writing to to_python_client fifo - disc");

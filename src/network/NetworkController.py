@@ -301,7 +301,9 @@ class NetworkController:
                         try:
                             str_data = os.read(fifo, 2048).decode("utf-8")
                         except:
-                            print("UnicodeDecodeError: 'utf-8' codec can't decode byte 0xc0 in position 0: invalid start byte")
+                            print(
+                                "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xc0 in position 0: invalid start byte"
+                            )
                             str_data = ""
 
                         if len(str_data) > 2:
@@ -316,24 +318,22 @@ class NetworkController:
                                 packet = json.loads(str_data)
                                 self.packet_transmitted += 1
 
-                                print("packet", packet)
-
                                 # --------------- TIMEOUT HANDLING ---------------- #
-                                self.players_timeout[
-                                    packet["sender_id"]
-                                ] = time.time()  # reset the timer
+                                # self.players_timeout[
+                                #     packet["sender_id"]
+                                # ] = time.time()  # reset the timer
 
-                                for (
-                                    player_id,
-                                    current_timer,
-                                ) in self.players_timeout.items():
-                                    if (
-                                        current_timer - time.time()
-                                    ) >= PLAYER_DECONNECTION_TIMEOUT * 60:
-                                        fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
-                                        os.write(fifo, DECONNECTION_TIMEOUT_BYTES)
-                                        os.write(fifo, player_id.encode("utf-8"))
-                                        os.close(fifo)
+                                # for (
+                                #     player_id,
+                                #     current_timer,
+                                # ) in self.players_timeout.items():
+                                #     if (
+                                #         current_timer - time.time()
+                                #     ) >= PLAYER_DECONNECTION_TIMEOUT * 60:
+                                #         fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
+                                #         os.write(fifo, DECONNECTION_TIMEOUT_BYTES)
+                                #         os.write(fifo, player_id.encode("utf-8"))
+                                #         os.close(fifo)
 
                                 # --------------- NEW PLAYER DETECTION -------------------------- #
 
@@ -345,12 +345,12 @@ class NetworkController:
                                     disc_packet["sender_id"] = self.Hero.networkId
                                     disc_packet["spellsID"] = self.Hero.spellsID
                                     disc_packet["stats"] = self.Hero.stats
-                                    disc_packet["player_name"] = self.Hero.player_name
+                                    disc_packet["player_name"] = self.Hero.name
                                     disc_packet["map_seed"] = self.Map.mapSeed
 
                                     write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
                                     print("End of disc request packet")
-                                    
+
                                 if packet["type"] == "discovery" and packet[
                                     "sender_id"
                                 ] not in list(self.players.keys()) + [
@@ -379,7 +379,7 @@ class NetworkController:
                                     disc_packet["sender_id"] = self.Hero.networkId
                                     disc_packet["spellsID"] = self.Hero.spellsID
                                     disc_packet["stats"] = self.Hero.stats
-                                    disc_packet["player_name"] = self.Hero.player_name
+                                    disc_packet["player_name"] = self.Hero.name
                                     disc_packet["map_seed"] = self.Map.mapSeed
 
                                     write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
@@ -480,7 +480,7 @@ class NetworkController:
                                             }
 
                             except:
-                                # print("error on this packet : ", str_data)
+                                print("error on this packet : ", str_data)
                                 packet = {
                                     "name": "test_packet_bug",
                                     "sender_id": "Unknown_id",
@@ -614,22 +614,39 @@ class NetworkController:
                 player.Inventory.draw()
                 player.SpellBook.draw()
 
-            # Map pos updating
-            playersDist = [
-                pos1 - pos2
-                for pos1, pos2 in zip(
-                    player.posMainChunkCenter, self.Hero.posMainChunkCenter
-                )
-            ]
             # logger.debug(f"[+] Bliting image pos for player")
-            self.Game.screen.blit(
-                player.imageState["image"],
-                player.imageState["image"].get_rect(
-                    center=[
-                        self.Game.resolution // 2 + distCoor for distCoor in playersDist
+            if player.currentPlace == self.Hero.currentPlace:
+                if player.currentPlace == "openWorld":
+
+                    # Map pos updating
+                    playersDist = [
+                        (pos2 - pos1)
+                        + 2
+                        * (1 if pos2 > pos1 else -1)
+                        * (self.Map.CHUNK_SIZE // 2 - abs((pos2 - pos1)))
+                        for pos1, pos2, offset in zip(
+                            player.posMainChunkCenter,
+                            self.Hero.posMainChunkCenter,
+                        )
                     ]
-                ),
-            )
+                    print("debug : ", playersDist)
+                else:
+                    playersDist = [
+                        pos1 - pos2
+                        for pos1, pos2 in zip(
+                            [player.buildingPosX, player.buildingPosY],
+                            [self.Hero.buildingPosX, self.Hero.buildingPosY],
+                        )
+                    ]
+                self.Game.screen.blit(
+                    player.imageState["image"],
+                    player.imageState["image"].get_rect(
+                        center=[
+                            self.Game.resolution // 2 + distCoor
+                            for distCoor in playersDist
+                        ]
+                    ),
+                )
 
     def handleInteractions(self, event):
         """Handle the right click and the apparition of the pop-up menu to enable interactions between players"""

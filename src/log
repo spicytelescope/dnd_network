@@ -2,7 +2,7 @@ INFO:PHYM_LOGGER:Loading itemConf
 INFO:PHYM_LOGGER:Loading eventConf
 INFO:PHYM_LOGGER:Loading mapConf
 INFO:PHYM_LOGGER:Loading playerConf
-DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 18, 'DEX': 14, 'CON': 13, 'INT': 9, 'WIS': 15, 'CHA': 16, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 24, 'DEF': 4, 'ATK': 3}, 'Wizard': {'STR': 9, 'DEX': 10, 'CON': 16, 'INT': 16, 'WIS': 18, 'CHA': 15, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 18, 'DEF': 2, 'ATK': 3}, 'Hunter': {'STR': 15, 'DEX': 18, 'CON': 16, 'INT': 19, 'WIS': 14, 'CHA': 15, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 27, 'DEF': 2, 'ATK': 3}}
+DEBUG:PHYM_LOGGER:{'Warrior': {'STR': 19, 'DEX': 10, 'CON': 16, 'INT': 9, 'WIS': 15, 'CHA': 15, 'HP': 15, 'HP_max': 15, 'Mana': 10, 'Mana_max': 10, 'Money': 20, 'DEF': 4, 'ATK': 2}, 'Wizard': {'STR': 11, 'DEX': 12, 'CON': 13, 'INT': 15, 'WIS': 18, 'CHA': 14, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 29, 'DEF': 1, 'ATK': 2}, 'Hunter': {'STR': 14, 'DEX': 13, 'CON': 15, 'INT': 18, 'WIS': 13, 'CHA': 16, 'HP': 10, 'HP_max': 10, 'Mana': 15, 'Mana_max': 15, 'Money': 23, 'DEF': 3, 'ATK': 1}}
 INFO:PHYM_LOGGER:Loading UI Conf
 INFO:PHYM_LOGGER:Loading musicConf
 INFO:PHYM_LOGGER:Loading menuConf
@@ -112,7 +112,12 @@ INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/fire/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/ice/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/wind/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/earth/weak/icon.png
-INFO:PHYM_LOGGER:[+] Creating the pipes
-WARNING:PHYM_LOGGER:[x] FIFOs are already created, proceeding ...
-INFO:PHYM_LOGGER:[+] Starting C Module [PARTY JOINER] 
-INFO:PHYM_LOGGER:[+] Starting handle connection thread
+INFO:PHYM_LOGGER:HEALING Lqeje DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Trwzte DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Dvk DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Lqeje DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Trwzte DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Dvk DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Lqeje DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Trwzte DUE TO REST MECHANICS
+INFO:PHYM_LOGGER:HEALING Dvk DUE TO REST MECHANICS

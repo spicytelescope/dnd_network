@@ -11,6 +11,8 @@ TEMPLATE_POS = {
     "chunkCoor": [],  # [0, 0]
     "imagePos": 0,  # 1
     "direction": "down",
+    "currentPlace": "openWorld",
+    "buildingPos": [],
     "chunkData": {},  # TODO
 }
 

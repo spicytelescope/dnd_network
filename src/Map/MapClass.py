@@ -615,10 +615,12 @@ class OpenWorldMap:
         pos_packet = deepcopy(TEMPLATE_POS)
         pos_packet["sender_id"] = self.Hero.networkId
         pos_packet["chunkPos"] = self.Hero.posMainChunkCenter
-        pos_packet["chunkCoor"] = self.Hero.Map.chunkData["currentChunkPos"]
+        pos_packet["chunkCoor"] = self.chunkData["currentChunkPos"]
         pos_packet["imagePos"] = self.Hero.imageState["imagePos"]
         pos_packet["direction"] = self.Hero.direction
         pos_packet["player_name"] = self.Hero.name
+        pos_packet["buildingPos"] =  [self.Hero.buildingPosX, self.Hero.buildingPosY]
+        pos_packet["current_place"] = self.Hero.currentPlace
         write_to_pipe(
             IPC_FIFO_OUTPUT,
             pos_packet,
