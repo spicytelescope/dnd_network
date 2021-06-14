@@ -408,9 +408,9 @@ class NetworkController:
                                                 "imagePos": packet["imagePos"],
                                             }
                                             player.currentPlace = packet["currentPlace"]
-                                            player.Map.chunkData[
-                                                "currentChunkPos"
-                                            ] = packet["chunkCoor"]
+                                            # player.Map.chunkData[
+                                            #     "currentChunkPos"
+                                            # ] = packet["chunkCoor"]
 
                                             # logger.debug(
                                             #     f"[+] Updating pos for player {player_id}"

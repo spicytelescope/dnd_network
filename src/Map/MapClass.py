@@ -620,7 +620,7 @@ class OpenWorldMap:
         pos_packet["direction"] = self.Hero.direction
         pos_packet["player_name"] = self.Hero.name
         pos_packet["buildingPos"] =  [self.Hero.buildingPosX, self.Hero.buildingPosY]
-        pos_packet["current_place"] = self.Hero.currentPlace
+        pos_packet["currentPlace"] = self.Hero.currentPlace
         write_to_pipe(
             IPC_FIFO_OUTPUT,
             pos_packet,
