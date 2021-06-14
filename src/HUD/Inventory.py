@@ -581,11 +581,6 @@ class Inventory:
 
                         else:
                             continue
-                        
-                        if self.Game.isOnline:
-                            if self.Hero.networkId != None:
-                                logger.info("Transmit inv infos !")
-                                self.transmitInvInfos()
 
                         self.draggedItemCoor = None
 
@@ -665,6 +660,11 @@ class Inventory:
 
                 self.draggedItemCoor = None
                 self.equipmentDraggedCoor = None
+                
+            if self.Game.isOnline:
+                if self.Hero.networkId != None:
+                    logger.info("Transmit inv infos !")
+                    self.transmitInvInfos()
 
     def _showDraggedItem(self):
         if self.draggedItemCoor != None or self.equipmentDraggedCoor != None:
