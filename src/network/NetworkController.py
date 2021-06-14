@@ -26,6 +26,8 @@ from config.netConf import *
 import socket
 import copy
 
+from config.HUDConf import INVENTORY_STORAGE_HEIGHT, INVENTORY_STORAGE_WIDTH
+
 
 class NetworkController:
     def __init__(self, gameController, Map, Hero, ContextMenu) -> None:
@@ -310,261 +312,264 @@ class NetworkController:
                             self.total_packet_transmitted += 1
                             print("receved from python : ", str_data)
 
-                            try:
-                                if "}{" in str_data:
-                                    str_data = str_data[0 : str_data.index("}{") + 1]
-                                    print("corrected : ", str_data)
+                            # try:
+                            if "}{" in str_data:
+                                str_data = str_data[0 : str_data.index("}{") + 1]
+                                print("corrected : ", str_data)
 
-                                packet = json.loads(str_data)
-                                self.packet_transmitted += 1
+                            packet = json.loads(str_data)
+                            self.packet_transmitted += 1
 
-                                # --------------- TIMEOUT HANDLING ---------------- #
-                                # self.players_timeout[
-                                #     packet["sender_id"]
-                                # ] = time.time()  # reset the timer
+                            # --------------- TIMEOUT HANDLING ---------------- #
+                            # self.players_timeout[
+                            #     packet["sender_id"]
+                            # ] = time.time()  # reset the timer
 
-                                # for (
-                                #     player_id,
-                                #     current_timer,
-                                # ) in self.players_timeout.items():
-                                #     if (
-                                #         current_timer - time.time()
-                                #     ) >= PLAYER_DECONNECTION_TIMEOUT * 60:
-                                #         fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
-                                #         os.write(fifo, DECONNECTION_TIMEOUT_BYTES)
-                                #         os.write(fifo, player_id.encode("utf-8"))
-                                #         os.close(fifo)
+                            # for (
+                            #     player_id,
+                            #     current_timer,
+                            # ) in self.players_timeout.items():
+                            #     if (
+                            #         current_timer - time.time()
+                            #     ) >= PLAYER_DECONNECTION_TIMEOUT * 60:
+                            #         fifo = os.open(IPC_FIFO_OUTPUT, os.O_WRONLY)
+                            #         os.write(fifo, DECONNECTION_TIMEOUT_BYTES)
+                            #         os.write(fifo, player_id.encode("utf-8"))
+                            #         os.close(fifo)
 
-                                # --------------- NEW PLAYER DETECTION -------------------------- #
+                            # --------------- NEW PLAYER DETECTION -------------------------- #
 
-                                if packet["type"] == "discovery_request":
+                            if packet["type"] == "discovery_request":
 
-                                    print("Recv disco request paquet from client")
-                                    disc_packet = copy.deepcopy(TEMPLATE_NEW_CONNECTION)
-                                    disc_packet["classId"] = self.Hero.classId
-                                    disc_packet["sender_id"] = self.Hero.networkId
-                                    disc_packet["spellsID"] = self.Hero.spellsID
-                                    disc_packet["stats"] = self.Hero.stats
-                                    disc_packet["player_name"] = self.Hero.name
-                                    disc_packet["map_seed"] = self.Map.mapSeed
-                                    disc_packet["storage"] = {
-                                        str(self.Hero.Inventory.storage["tab"][j][i].property["Id"]): (i, j)
-                                        for j in range(INVENTORY_STORAGE_HEIGHT)
-                                        for i in range(INVENTORY_STORAGE_WIDTH)
-                                        if self.Hero.Inventory.storage["tab"][j][i] != None
-                                    }
-                                    disc_packet["equipment"] = {
-                                        str(slot): int(slot_item["item"].property["Id"])
-                                        for slot, slot_item in self.Hero.Inventory.equipment.items()
-                                        if slot_item["item"] != None
-                                    }
+                                print("Recv disco request paquet from client")
+                                disc_packet = copy.deepcopy(TEMPLATE_NEW_CONNECTION)
+                                disc_packet["classId"] = self.Hero.classId
+                                disc_packet["sender_id"] = self.Hero.networkId
+                                disc_packet["spellsID"] = self.Hero.spellsID
+                                disc_packet["stats"] = self.Hero.stats
+                                disc_packet["player_name"] = self.Hero.name
+                                disc_packet["map_seed"] = self.Map.mapSeed
+                                
+                                disc_packet["storage"] = {
+                                    str(self.Hero.Inventory.storage["tab"][j][i].property["Id"]): (i, j)
+                                    for j in range(INVENTORY_STORAGE_HEIGHT)
+                                    for i in range(INVENTORY_STORAGE_WIDTH)
+                                    if self.Hero.Inventory.storage["tab"][j][i] != None
+                                }
+                                disc_packet["equipment"] = {
+                                    str(slot): int(slot_item["item"].property["Id"])
+                                    for slot, slot_item in self.Hero.Inventory.equipment.items()
+                                    if slot_item["item"] != None
+                                }
+                    
 
-                                    write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
-                                    print("End of disc request packet")
+                                write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
+                                print("End of disc request packet")
 
-                                if packet["type"] == "discovery" and packet[
-                                    "sender_id"
-                                ] not in list(self.players.keys()) + [
-                                    self.Hero.networkId
-                                ]:
-                                    self.addPlayer(
-                                        packet["sender_id"],
-                                        packet["player_name"],
-                                    )
-                                    self.chat.chatWindow.addText(
-                                        packet["player_name"],
-                                        "joined the game !",
-                                        True,
-                                        "CONNEXION",
-                                    )
-                                    print("Receiving desc packet")
+                            if packet["type"] == "discovery" and packet[
+                                "sender_id"
+                            ] not in list(self.players.keys()) + [
+                                self.Hero.networkId
+                            ]:
+                                self.addPlayer(
+                                    packet["sender_id"],
+                                    packet["player_name"],
+                                )
+                                self.chat.chatWindow.addText(
+                                    packet["player_name"],
+                                    "joined the game !",
+                                    True,
+                                    "CONNEXION",
+                                )
+                                print("Receiving desc packet")
+   
+                                self.players[packet["sender_id"]].classId = packet["classId"]
+                                self.players[packet["sender_id"]].name = packet["player_name"]
+                                self.players[packet["sender_id"]].Map.mapSeed = packet["map_seed"]
+                                self.players[packet["sender_id"]].stats = packet["stats"]
+                                self.players[packet["sender_id"]].Inventory.updateInventory(
+                                            packet["storage"],
+                                            packet["equipment"],
+                                        )
 
-                                    self.Hero.classId = packet["classId"]
-                                    self.Hero.name = packet["player_name"]
-                                    self.Map.mapSeed = packet["map_seed"]
-                                    self.Hero.stats = packet["stats"]
-                                    self.Hero.Inventory.updateInventory(
-                                                packet["storage"],
-                                                packet["equipment"],
+                                print("Sending packet")
+                                disc_packet = copy.deepcopy(TEMPLATE_NEW_CONNECTION)
+                                disc_packet["classId"] = self.Hero.classId
+                                disc_packet["sender_id"] = self.Hero.networkId
+                                disc_packet["spellsID"] = self.Hero.spellsID
+                                disc_packet["stats"] = self.Hero.stats
+                                disc_packet["player_name"] = self.Hero.name
+                                disc_packet["map_seed"] = self.Map.mapSeed
+                                disc_packet["storage"] = {
+                                    str(self.Hero.Inventory.storage["tab"][j][i].property["Id"]): (i, j)
+                                    for j in range(INVENTORY_STORAGE_HEIGHT)
+                                    for i in range(INVENTORY_STORAGE_WIDTH)
+                                    if self.Hero.Inventory.storage["tab"][j][i] != None
+                                }
+                                disc_packet["equipment"] = {
+                                    str(slot): int(slot_item["item"].property["Id"])
+                                    for slot, slot_item in self.Hero.Inventory.equipment.items()
+                                    if slot_item["item"] != None
+                                }
+
+                                print("disc packet send !")
+                                write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
+
+                            for player_id, player in self.players.items():
+                                if player_id == packet["sender_id"]:
+
+                                    # -------------- MAP RECV ------------ #
+                                    if packet["type"] == "info_pos":
+
+                                        # if packet["chunkCoor"] not in self.sessionChunks:
+                                        #     self.sessionChunks[packet["chunkCoor"]] = []  # TODO
+
+                                        # Check wether the player and the other connected are on the same chunk or not
+                                        player.posMainChunkCenter = packet[
+                                            "chunkPos"
+                                        ]
+                                        player.direction = packet["direction"]
+                                        player.imageState = {
+                                            "image": playerConf.CLASSES[
+                                                player.classId
+                                            ]["directions"][player.direction][
+                                                packet["imagePos"]
+                                            ],
+                                            "imagePos": packet["imagePos"],
+                                        }
+                                        player.currentPlace = packet["currentPlace"]
+                                        # player.Map.chunkData[
+                                        #     "currentChunkPos"
+                                        # ] = packet["chunkCoor"]
+
+                                        # logger.debug(
+                                        #     f"[+] Updating pos for player {player_id}"
+                                        # )
+
+                                        # Chunk rendering optimisation TODO
+                                        # if (
+                                        #     sqrt(
+                                        #         sum(
+                                        #             [
+                                        #                 (p1coor - p2coor) ** 2
+                                        #                 for p1coor, p2coor in zip(
+                                        #                     data["players"][player_id]["chunkPos"],
+                                        #                     self.Hero.Map.chunkData["currentChsunkPos"],
+                                        #                 )
+                                        #             ]
+                                        #         )
+                                        #     )
+                                        # ) <= self.Map.renderDistance :
+
+                                    # -------------------- FIGHT RECV ------------------- #
+                                    if packet["type"] == "fight":
+                                        if self.Game.fightMode.fightOn == False:
+                                            self.Game.fightMode.fightOn = True
+                                            self.Game.fightMode.challengerId = (
+                                                self.players[packet["sender_id"]]
                                             )
+                                            self.players[
+                                                packet["sender_id"]
+                                            ] = False
 
-                                    print("Sending packet")
-                                    disc_packet = copy.deepcopy(TEMPLATE_NEW_CONNECTION)
-                                    disc_packet["classId"] = self.Hero.classId
-                                    disc_packet["sender_id"] = self.Hero.networkId
-                                    disc_packet["spellsID"] = self.Hero.spellsID
-                                    disc_packet["stats"] = self.Hero.stats
-                                    disc_packet["player_name"] = self.Hero.name
-                                    disc_packet["map_seed"] = self.Map.mapSeed
-                                    disc_packet["storage"] = {
-                                        str(self.Hero.Inventory.storage["tab"][j][i].property["Id"]): (i, j)
-                                        for j in range(INVENTORY_STORAGE_HEIGHT)
-                                        for i in range(INVENTORY_STORAGE_WIDTH)
-                                        if self.Hero.Inventory.storage["tab"][j][i] != None
-                                    }
-                                    disc_packet["equipment"] = {
-                                        str(slot): int(slot_item["item"].property["Id"])
-                                        for slot, slot_item in self.Hero.Inventory.equipment.items()
-                                        if slot_item["item"] != None
-                                    }
-
-                                    print("disc packet send !")
-                                    write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
-
-                                for player_id, player in self.players.items():
-                                    if player_id == packet["sender_id"]:
-
-                                        # -------------- MAP RECV ------------ #
-                                        if packet["type"] == "info_pos":
-
-                                            # if packet["chunkCoor"] not in self.sessionChunks:
-                                            #     self.sessionChunks[packet["chunkCoor"]] = []  # TODO
-
-                                            # Check wether the player and the other connected are on the same chunk or not
-                                            player.posMainChunkCenter = packet[
-                                                "chunkPos"
-                                            ]
-                                            player.direction = packet["direction"]
-                                            player.imageState = {
-                                                "image": playerConf.CLASSES[
-                                                    player.classId
-                                                ]["directions"][player.direction][
-                                                    packet["imagePos"]
-                                                ],
-                                                "imagePos": packet["imagePos"],
-                                            }
-                                            player.currentPlace = packet["currentPlace"]
-                                            # player.Map.chunkData[
-                                            #     "currentChunkPos"
-                                            # ] = packet["chunkCoor"]
-
-                                            # logger.debug(
-                                            #     f"[+] Updating pos for player {player_id}"
-                                            # )
-
-                                            # Chunk rendering optimisation TODO
-                                            # if (
-                                            #     sqrt(
-                                            #         sum(
-                                            #             [
-                                            #                 (p1coor - p2coor) ** 2
-                                            #                 for p1coor, p2coor in zip(
-                                            #                     data["players"][player_id]["chunkPos"],
-                                            #                     self.Hero.Map.chunkData["currentChsunkPos"],
-                                            #                 )
-                                            #             ]
-                                            #         )
-                                            #     )
-                                            # ) <= self.Map.renderDistance :
-
-                                        # -------------------- FIGHT RECV ------------------- #
-                                        if packet["type"] == "fight":
-                                            if self.Game.fightMode.fightOn == False:
-                                                self.Game.fightMode.fightOn = True
-                                                self.Game.fightMode.challengerId = (
-                                                    self.players[packet["sender_id"]]
-                                                )
-                                                self.players[
-                                                    packet["sender_id"]
-                                                ] = False
-
-                                            if len(
-                                                self.Game.fightMode.list_tour
-                                            ) > 1 and packet[
-                                                "dest"
-                                            ] != self.Game.fightMode.list_tour[
-                                                0
-                                            ].trouver_case(
-                                                self.Game.fightMode.list_case
-                                            ).numero_case(
-                                                self.Game.fightMode.list_case
-                                            ):
-                                                print("Entering fight mode")
-                                                self.Game.fightMode.print_anim(
-                                                    self.Game.fightMode.list_tour[
-                                                        0
-                                                    ].trouver_case(
-                                                        self.Game.fightMode.list_case
-                                                    ),
-                                                    self.Game.fightMode.list_case[
-                                                        packet["dest"]
-                                                    ],
-                                                    self.Game.fightMode.list_case,
-                                                )
-                                                print("1")
-
-                                                self.Game.fightMode.list_case[
-                                                    packet["dest"]
-                                                ].in_case = self.Game.fightMode.list_tour[
-                                                    0
-                                                ]
+                                        if len(
+                                            self.Game.fightMode.list_tour
+                                        ) > 1 and packet[
+                                            "dest"
+                                        ] != self.Game.fightMode.list_tour[
+                                            0
+                                        ].trouver_case(
+                                            self.Game.fightMode.list_case
+                                        ).numero_case(
+                                            self.Game.fightMode.list_case
+                                        ):
+                                            print("Entering fight mode")
+                                            self.Game.fightMode.print_anim(
                                                 self.Game.fightMode.list_tour[
                                                     0
                                                 ].trouver_case(
                                                     self.Game.fightMode.list_case
-                                                ).in_case = None
-                                                print("2")
-                                                self.Game.fightMode.running = False
-
-                                        # ------------------ INVENTORY RECV ------------------- #
-                                        if packet["type"] == "info_inv":
-                                            player.Inventory.updateInventory(
-                                                packet["storage"],
-                                                packet["equipment"],
+                                                ),
+                                                self.Game.fightMode.list_case[
+                                                    packet["dest"]
+                                                ],
+                                                self.Game.fightMode.list_case,
                                             )
+                                            print("1")
 
-                                        # ----------------- CHARAC INFO RECV ------------------ #
-                                        if packet["type"] == "info_charac":
-                                            player.classId = packet["classId"]
-                                            player.direction = packet["direction"]
-                                            player.stats = packet["stats"]
+                                            self.Game.fightMode.list_case[
+                                                packet["dest"]
+                                            ].in_case = self.Game.fightMode.list_tour[
+                                                0
+                                            ]
+                                            self.Game.fightMode.list_tour[
+                                                0
+                                            ].trouver_case(
+                                                self.Game.fightMode.list_case
+                                            ).in_case = None
+                                            print("2")
+                                            self.Game.fightMode.running = False
 
-                                            p_spells = sorted(player.spellsID[::])
-                                            d_spells = sorted(packet["spellsID"][::])
-                                            if p_spells != d_spells:
-                                                player.spellsID = packet["spellsID"]
-                                                player.SpellBook.updateSpellBook()
+                                    # ------------------ INVENTORY RECV ------------------- #
+                                    if packet["type"] == "info_inv":
+                                        player.Inventory.updateInventory(
+                                            packet["storage"],
+                                            packet["equipment"],
+                                        )
 
-                                        # ------------------ TRADE RECV ----------- #
-                                        if packet["type"] == "trade":
-                                            pass
+                                    # ----------------- CHARAC INFO RECV ------------------ #
+                                    if packet["type"] == "info_charac":
+                                        player.classId = packet["classId"]
+                                        player.direction = packet["direction"]
+                                        player.stats = packet["stats"]
 
-                                        # ------------------ MESSAGE RECV ----------- #
-                                        if packet["type"] == "message":
-                                            print(
-                                                "OUI LE MESSAGE : ", packet["content"]
-                                            )
+                                        p_spells = sorted(player.spellsID[::])
+                                        d_spells = sorted(packet["spellsID"][::])
+                                        if p_spells != d_spells:
+                                            player.spellsID = packet["spellsID"]
+                                            player.SpellBook.updateSpellBook()
 
-                                            self.chat.chatWindow.addText(
-                                                self.players[packet["sender_id"]].name,
-                                                packet["content"],
-                                                packet["italic"],
-                                                packet["color_code"],
-                                                recv=True,
-                                            )
+                                    # ------------------ TRADE RECV ----------- #
+                                    if packet["type"] == "trade":
+                                        pass
 
-                                        # ---------------- DECONNEXION RECV ------------ #
-                                        if packet["type"] == "deconnection":
+                                    # ------------------ MESSAGE RECV ----------- #
+                                    if packet["type"] == "message":
+                                        print(
+                                            "OUI LE MESSAGE : ", packet["content"]
+                                        )
 
-                                            print("deconnection entering")
-                                            self.chat.chatWindow.addText(
-                                                packet["player_name"],
-                                                "left the game !",
-                                                True,
-                                                "DECONNEXION",
-                                            )
-                                            self.players = {
-                                                k: v
-                                                for k, v in self.players.items()
-                                                if k != packet["sender_id"]
-                                            }
+                                        self.chat.chatWindow.addText(
+                                            self.players[packet["sender_id"]].name,
+                                            packet["content"],
+                                            packet["italic"],
+                                            packet["color_code"],
+                                            recv=True,
+                                        )
 
-                            except:
-                                print("error on this packet : ", str_data)
-                                packet = {
-                                    "name": "test_packet_bug",
-                                    "sender_id": "Unknown_id",
-                                }
+                                    # ---------------- DECONNEXION RECV ------------ #
+                                    if packet["type"] == "deconnection":
+
+                                        print("deconnection entering")
+                                        self.chat.chatWindow.addText(
+                                            packet["player_name"],
+                                            "left the game !",
+                                            True,
+                                            "DECONNEXION",
+                                        )
+                                        self.players = {
+                                            k: v
+                                            for k, v in self.players.items()
+                                            if k != packet["sender_id"]
+                                        }
+
+                        # except:
+                            #     print("error on this packet : ", str_data)
+                            #     print(e)
+                            #     packet = {
+                            #         "name": "test_packet_bug",
+                            #         "sender_id": "Unknown_id",
+                            #     }
             finally:
                 poll.unregister(fifo)
         finally:
