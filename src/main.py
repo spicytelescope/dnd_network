@@ -276,7 +276,7 @@ while Game.currentState != "quit":
                 Player_Map.miniMap.drawExtendedMap()
                 if Game.isOnline:
                     if Game.fightMode.fightOn:
-                        Hero.createFight([Hero, Game.fightMode.challengerId])
+                        Hero.createFight([Game.fightMode.challengerId, Hero])
                     NetworkController.chat.show()
                     NetworkController.drawPannel()
                     NetworkController.updateGraphics()

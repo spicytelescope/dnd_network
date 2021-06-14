@@ -533,9 +533,8 @@ class NetworkController:
                                                 if k != packet["sender_id"]
                                             }
 
-                            except UnicodeDecodeError as e:
+                            except:
                                 print("error on this packet : ", str_data)
-                                print(e)
                                 packet = {
                                     "name": "test_packet_bug",
                                     "sender_id": "Unknown_id",

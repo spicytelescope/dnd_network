@@ -192,6 +192,9 @@ class GameController:
                 self.musicController.setMusic("openWorld")
             for Hero in self.heroesGroup:
                 Hero.currentPlace = self.currentState
+                if Hero.currentPlace == "building":
+                    if self.isOnline:
+                        self.heroesGroup[0].Map.transmitPosInfos()
             while (time.time() - start) < WORLD_TRANS_TIME:
 
                 initAlpha += math.ceil(WORLD_TRANS_ALPHA_SEC / self.refresh_rate)
