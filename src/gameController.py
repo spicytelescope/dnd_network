@@ -1,5 +1,6 @@
 import math
 import pickle
+from HUD.chatbox import ChatBox
 import time
 
 import pygame
@@ -84,11 +85,13 @@ class GameController:
 
         self.cursor = Cursor(self)
         self.musicController = MusicController(self)
-        self.musicController.setMusic("menu")
+        # self.musicController.setMusic("menu")
 
         # ------ FIGHT ---------- #
         self.combatLog = None
         self.fightMode = None
+
+        self.chat_box = ChatBox(self)
 
         # ---------- NETWORK ------------ #
 

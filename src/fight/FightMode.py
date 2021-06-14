@@ -1,963 +1,301 @@
 import math
+import os
+from numpy.lib.arraysetops import isin
 import pygame
 import random
+from math import floor, hypot
 from pygame.locals import *
-from UI.UI_utils_text import Dialog
-from config import HUDConf, playerConf, spellsConf, textureConf
-from config.fightConf import *
-from fight.FightHandler import FightHandler
 import sys
-from pathfinding.core.diagonal_movement import DiagonalMovement
-from pathfinding.core.grid import Grid
-from pathfinding.finder.a_star import AStarFinder
-from fight.FightResume import FightRecap
-
-from utils.utils import logger
+from fight.jordanask import basic_checkevent, load_map, draw_text
+from fight.Case import Case
+from fight.load_img import collide, case_select,explosion
 from gameObjects.Ennemy import Ennemy
 from Player.Character import Character
+from gameController import GameController
 import time
-
-
-class Tile:
-    def __init__(self, centered_x, centered_y, access, num_tile):
-        self.coeffa = 15 / 32
-        self.coeffbhautgauche = centered_y + 49
-        self.coeffbhautdroite = centered_y + 19
-        self.coeffbbasgauche = centered_y + 49
-        self.coeffbbasdroite = centered_y + 79
-        self.access = access
-        self.centerx = centered_x
-        self.tilecenterx = centered_x + 32
-        self.tilecentery = centered_y + 49
-        self.num_tile = num_tile
-        self.entity = None
-
-    def getTilecenter(self):
-        return self.tilecenterx, self.tilecentery
-
-    def getEntity(self):
-        return self.entity
-
-    def getAccess(self):
-        return self.access
-
-    def getNumtile(self):
-        return self.num_tile
-
-    def setAccess(self, access):
-        self.access = access
-
-    def setEntity(self, entity):
-        self.entity = entity
-
-    def ismouseontile(self):
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        mouse_x = mouse_x - self.centerx
-        if (
-            (mouse_y >= -self.coeffa * mouse_x + self.coeffbhautgauche)
-            and (mouse_y >= self.coeffa * mouse_x + self.coeffbhautdroite)
-            and (mouse_y <= self.coeffa * mouse_x + self.coeffbbasgauche)
-            and (mouse_y <= -self.coeffa * mouse_x + self.coeffbbasdroite)
-        ):
-            return True
-        else:
-            return False
-
-
-class Movable_character(pygame.sprite.Sprite):
-    def __init__(self, entity, tilebegin, ID, Fight):
-        super().__init__()
-        self.entity = entity
-        self._fightId = ID
-
-        self.fight = Fight
-        self.asset_path = "./assets/fight"
-        self.MOVE_LIMIT = 15
-        self.MOVE_AMPLITUDE = 5
-
-        # self.position_x, self.position_y = tilebegin.getTilecenter()
-        self._numtilepos = tilebegin.getNumtile()
-        if isinstance(self.entity, Ennemy):
-            self.neutral = [
-                pygame.transform.scale2x(frame) if self.entity.isBoss else frame
-                for frame in textureConf.WORLD_ELEMENTS["Ennemy"][self.entity.name][
-                    "frames"
-                ]["neutral"]
-            ][0]
-            self.image_walk_right = [
-                pygame.transform.scale2x(frame) if self.entity.isBoss else frame
-                for frame in textureConf.WORLD_ELEMENTS["Ennemy"][self.entity.name][
-                    "frames"
-                ]["walk_droit"]
-            ]
-            self.image_walk_bot = [
-                pygame.transform.scale2x(frame) if self.entity.isBoss else frame
-                for frame in textureConf.WORLD_ELEMENTS["Ennemy"][self.entity.name][
-                    "frames"
-                ]["walk_bas"]
-            ]
-            self.image_walk_left = [
-                pygame.transform.scale2x(frame) if self.entity.isBoss else frame
-                for frame in textureConf.WORLD_ELEMENTS["Ennemy"][self.entity.name][
-                    "frames"
-                ]["walk_gauche"]
-            ]
-            self.image_walk_top = [
-                pygame.transform.scale2x(frame) if self.entity.isBoss else frame
-                for frame in textureConf.WORLD_ELEMENTS["Ennemy"][self.entity.name][
-                    "frames"
-                ]["walk_haut"]
-            ]
-
-        if isinstance(self.entity, Character):
-            self.neutral = playerConf.CLASSES[self.entity.classId]["isometricFrame"][
-                "neutral"
-            ][0]
-            self.image_walk_right = playerConf.CLASSES[self.entity.classId][
-                "isometricFrame"
-            ]["walk_droit"]
-            self.image_walk_bot = playerConf.CLASSES[self.entity.classId][
-                "isometricFrame"
-            ]["walk_bas"]
-            self.image_walk_left = playerConf.CLASSES[self.entity.classId][
-                "isometricFrame"
-            ]["walk_gauche"]
-            self.image_walk_top = playerConf.CLASSES[self.entity.classId][
-                "isometricFrame"
-            ]["walk_haut"]
-
-        self.index = 0
-        self.image = self.neutral
-        self.rect = self.image.get_rect()
-        self.rect.x, self.rect.y = tilebegin.getTilecenter()
-        self.rect.x += -19
-        self.rect.y += -73
-        x, y = self._numtilepos
-        self.fight.setEntityonTile(self._numtilepos, self.entity)
-
-        tilebegin.setAccess(False)
-
-        # self.map_pathfinding[x][y] = 0
-
-    def pathfinding(self, matrix, start, end, isdiagonalmovement):
-        grid = Grid(matrix=matrix)
-        start = grid.node(start[1], start[0])
-        end = grid.node(end[1], end[0])
-        if isdiagonalmovement:
-            finder = AStarFinder(diagonal_movement=DiagonalMovement.always)
-        else:
-            finder = AStarFinder()
-
-        path, runs = finder.find_path(start, end, grid)
-
-        logger.debug(f"operations: {runs}, path length: {len(path)}")
-        print(grid.grid_str(path=path, start=start, end=end))
-        return path
-
-    def move(self, endtile):
-
-        path = self.pathfinding(
-            self.fight.map_pathfinding, self._numtilepos, endtile.getNumtile(), False
-        )
-        if len(path) <= self.MOVE_LIMIT:
-            # xtile,ytile=self._numtilepos
-            self.fight.setEntityonTile(self._numtilepos, None)
-            self.fight.setEntityonTile(endtile.getNumtile(), self.entity)
-            # self.map_tile[xtile][ytile].setAccess(True)
-            # self.map_tile[xtile][ytile].setEntity(None)
-            # xtile,ytile=endtile.getNumtile()
-            # self.map_tile[xtile][ytile].setAccess(False)
-            # self.map_tile[xtile][ytile].setEntity(self.entity)
-
-            for k in range(len(path) - 1):
-                y, x = list(path[k + 1])
-                # self.rect.x, self.rect.y = self.map_tile[x][y].getTilecenter()
-                endtile_x, endtile_y = self.fight.map_tile[x][y].getTilecenter()
-                endtile_x += -19
-                endtile_y += -73
-                m = ((endtile_y) - self.rect.y) / ((endtile_x) - self.rect.x)
-                p = self.rect.y - m * self.rect.x
-                while (self.rect.x != endtile_x) and (self.rect.y != endtile_y):
-                    # deplacement droite
-                    if (self.rect.x < endtile_x) and (self.rect.y < endtile_y):
-                        if ((self.rect.x + self.MOVE_AMPLITUDE) > endtile_x) or (
-                            (m * self.rect.x + p) > endtile_y
-                        ):
-                            self.rect.x = endtile_x
-                            self.rect.y = endtile_y
-                        else:
-                            self.rect.x += self.MOVE_AMPLITUDE
-                            self.rect.y = m * self.rect.x + p
-                        self.image = self.image_walk_right[self.index]
-                        self.index += 1
-                        if self.index >= len(self.image_walk_right):
-                            self.index = 0
-                    # deplacement bas
-                    if (self.rect.x > endtile_x) and (self.rect.y < endtile_y):
-                        if ((self.rect.x - self.MOVE_AMPLITUDE) < endtile_x) or (
-                            (m * self.rect.x + p) > endtile_y
-                        ):
-                            self.rect.x = endtile_x
-                            self.rect.y = endtile_y
-                        else:
-                            self.rect.x -= self.MOVE_AMPLITUDE
-                            self.rect.y = m * self.rect.x + p
-                        self.image = self.image_walk_bot[self.index]
-                        self.index += 1
-                        if self.index >= len(self.image_walk_bot):
-                            self.index = 0
-                    # deplacement gauche
-                    if (self.rect.x > endtile_x) and (self.rect.y > endtile_y):
-                        if ((self.rect.x - self.MOVE_AMPLITUDE) < endtile_x) or (
-                            (m * self.rect.x + p) < endtile_y
-                        ):
-                            self.rect.x = endtile_x
-                            self.rect.y = endtile_y
-                        else:
-                            self.rect.x -= self.MOVE_AMPLITUDE
-                            self.rect.y = m * self.rect.x + p
-                        self.image = self.image_walk_left[self.index]
-                        self.index += 1
-                        if self.index >= len(self.image_walk_left):
-                            self.index = 0
-                    # deplacement haut
-                    if (self.rect.x < endtile_x) and (self.rect.y > endtile_y):
-                        if ((self.rect.x + self.MOVE_AMPLITUDE) > endtile_x) or (
-                            (m * self.rect.x + p) < endtile_y
-                        ):
-                            self.rect.x = endtile_x
-                            self.rect.y = endtile_y
-                        else:
-                            self.rect.x += self.MOVE_AMPLITUDE
-                            self.rect.y = m * self.rect.x + p
-                        self.image = self.image_walk_top[self.index]
-                        self.index += 1
-                        if self.index >= len(self.image_walk_top):
-                            self.index = 0
-
-                    self.fight.update()
-                # self.rect.x += -19
-                # self.rect.y += -73
-                self.index = 0
-                self._numtilepos = endtile.getNumtile()
-
-            self.image = self.neutral
-        else:
-            self.fight.Game.combatLog.addText(
-                f"{self.entity._fightName} tried a too large move and lost his turn !"
-            )
-
-    def getId(self):
-        return self._fightId
-
-    def getNumtilepos(self):
-        return self._numtilepos
-
-    def getEntity(self):
-        return self.entity
+import json
 
 
 class FightMode:
     def __init__(self, gameController) -> None:
-
         self.Game = gameController
-        self.Heroes = []
-        self.open = False
-
-        self.turn_based_fight = None
-        self.sprite_list = []
+        self.l = load_map("./fight/map2.txt")
         self.asset_path = "./assets/fight"
-        self.fightResume = None
-
-        self.MAP_SIZE = 12
-        self.n_rocks = 3
-
-        self.map_data = [
-            [-1 if i == 0 else 3 for i in range(self.MAP_SIZE)]
-            for j in range(self.MAP_SIZE)
-        ]
-        self.map_data[0] = [-1 if i == 0 else -2 for i in range(self.MAP_SIZE)]
-        for _ in range(self.n_rocks):
-            i = random.randrange(self.MAP_SIZE)
-            j = random.randrange(self.MAP_SIZE)
-            while self.map_data[j][i] != 3:
-                i = random.randrange(self.MAP_SIZE)
-                j = random.randrange(self.MAP_SIZE)
-
-            self.map_data[j][i] = 0
-
-        self.stats = {}
-        self.initalEntityList = []
-
-        # self.map_data = [
-        #     [-1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2],
-        #     [-1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-        #     [-1, 3, 0, 3, 3, 3, 3, 0, 3, 3, 3, 3],
-        #     [-1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-        #     [-1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-        #     [-1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-        #     [-1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3],
-        #     [-1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-        #     [-1, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3],
-        #     [-1, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3],
-        #     [-1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-        #     [-1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-        #     [-1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-        # ]  # the data for the map expressed as [row[tile]].
-
-        self.map_tile = [x[:] for x in self.map_data]
-        self.map_pathfinding = [x[:] for x in self.map_data]
-        self.highlightedTiles = []
-        self.centerTileOnMouse = None
-
-        self.background = None
-        self.wall_g = pygame.image.load(
-            f"{self.asset_path}/wall_gauche.png"
-        )  # load fi{self.asset_path}
-        self.wall_d = pygame.image.load(f"{self.asset_path}/wall_droit.png")
-        self.grass = pygame.image.load(f"{self.asset_path}/grass_1.png")
-        self.rock = pygame.image.load(f"{self.asset_path}/rock.png")
-        self.highlightsprite = pygame.image.load(
-            f"{self.asset_path}/grass_highlight.png"
+        self.battleground = pygame.transform.scale(
+            pygame.image.load(f"{self.asset_path}/wine-wang-sunshineforest-1.jpg"),
+            (self.Game.screen.get_width(), self.Game.screen.get_height()),
         )
+        self.list_case = []
+        self.list_tour = []
+        self.mask_collide = pygame.mask.from_surface(collide)
+        self.online_fight = False
+        souris_surf = pygame.Surface((1, 1))
+        souris_surf.fill((5, 5, 5))
+        souris_surf.set_colorkey((0, 0, 0))
+        #   pixel_red.set_alpha(0)
+        self.souris_mask = pygame.mask.from_surface(souris_surf)
 
-        self.TILEWIDTH = 64  # holds the tile width and height
-        self.TILEHEIGHT = 64
-        self.TILEHEIGHT_HALF = self.TILEHEIGHT / 2
-        self.TILEWIDTH_HALF = self.TILEWIDTH / 2
-
-        self.firstOpen = True
-
-    def transition(self):
-
-        alpha_value = 0
-        delta = TRANSITION_DURATION / (255 // TRANSITION_FACTOR)
-        black_screen = pygame.Surface(
-            (self.Game.resolution, self.Game.resolution), SRCALPHA
-        )
-        for _ in range(255 // TRANSITION_FACTOR):
-            alpha_value += TRANSITION_FACTOR
-            black_screen.fill((0, 0, 0, alpha_value))
-            self.Game.screen.blit(black_screen, (0, 0))
-            self.Game.show()
-            time.sleep(delta)
+        self.list_player = []
+        self.list_monster = []
 
     def create_map(self):
+        self.Game.screen.fill((0, 0, 0))
+        self.Game.screen.blit(self.battleground, (0, 0))
 
-        for row_nb, row in enumerate(self.map_data):  # for every row of the map...
-            for col_nb, tile_value in enumerate(row):
-                if tile_value == 5:
-                    tileImage = self.highlightsprite
-                elif tile_value == 3:
-                    tileImage = self.grass
-                elif tile_value == -2:
-                    tileImage = self.wall_d
-                elif tile_value == -1:
-                    tileImage = self.wall_g
-                elif tile_value == 0:
-                    tileImage = self.rock
-                else:
-                    tileImage = None
+    def display_battle(self):
+        self.create_map()
+        # Gestion Tours
+        self.current_player().select(True)
+        for x in self.list_case:
+            self.Game.screen.blit(x.display, x.cordo())
+           
+            x.checkIfSelected()
 
-                cart_x = col_nb * self.TILEWIDTH_HALF
-                cart_y = row_nb * self.TILEHEIGHT_HALF
-                iso_x = cart_x - cart_y
-                iso_y = (cart_x + cart_y) / 2
-                centered_x = self.Game.screen.get_rect().centerx + iso_x
-                centered_y = self.Game.screen.get_rect().centery / 2 + iso_y
+            x.print_contains()
+            if x.in_case != None:
+                x.in_case.type_animation = "idle"
+                x.in_case.animate()
+                x.in_case.update_hp_bar(
+                    self.Game.screen,
+                    x.cordo()[0] + 25,
+                    x.cordo()[1] - x.in_case.img.get_height() // 2,
+                    x.in_case.stats["HP"],
+                    x.in_case.stats["HP_max"],
+                )
+        # for x in self.list_tour:
+        # trouver_case = x.trouver_case(self.list_case).cordo()
+        # coordX = trouver_case[0]+x.img.get_width()//2
+        # coordY= trouver_case[1] -x.img.get_height()//2
+        # if(isinstance(x,Character)):
+        #    x.display_classe(self.Game.screen,coordX,coordY)
+        # x.display_lvl(screen,x.trouver_case(self.list_case).cordo()[0]+x.img.get_width()//2,x.trouver_case(self.list_case).cordo()[1]-x.img.get_height()//2)
 
-                if tileImage == self.grass:
-                    self.Game.screen.blit(tileImage, (centered_x, centered_y))
-                    if self.firstOpen:
-                        self.map_tile[row_nb][col_nb] = Tile(
-                            centered_x, centered_y, True, [row_nb, col_nb]
-                        )
-                        self.map_pathfinding[row_nb][col_nb] = 1
-                    # grid
-                    pygame.draw.line(
-                        self.Game.screen,
-                        (0, 0, 0),
-                        (centered_x, centered_y + 49 - 2),
-                        (centered_x + 31, centered_y + 65 - 3),
-                    )
-                    pygame.draw.line(
-                        self.Game.screen,
-                        (0, 0, 0),
-                        (centered_x + 64, centered_y + 49 - 2),
-                        (centered_x + 32, centered_y + 65 - 3),
-                    )
-
-                elif tileImage == self.highlightsprite:
-                    self.Game.screen.blit(
-                        self.highlightsprite, (centered_x, centered_y)
-                    )
-                    self.map_data[row_nb][col_nb] = 3
-
-                elif tileImage != None:
-                    self.Game.screen.blit(self.grass, (centered_x, centered_y))
-                    self.Game.screen.blit(
-                        tileImage, (centered_x, centered_y)
-                    )  # display the actual tile
-                    if self.firstOpen:
-                        tile = Tile(centered_x, centered_y, False, [row_nb, col_nb])
-                        self.map_tile[row_nb][col_nb] = tile
-                        self.map_pathfinding[row_nb][col_nb] = 0
-
-        self.firstOpen = False
+        self.Game.chat_box.update()
+        self.Game.chat_box.draw()
 
     def initFight(self, entityList):
+        # pygame.mouse.set_cursor(*pygame.cursors.broken_x)
+        # pygame.mouse.set_visible(True)
+        running = True
+        click = False
+        i, j = 0, 0
 
-        self.Game.musicController.setMusic("fight")
-        self.Game.cursor.hide()
-        self.transition()
+        for h in self.l:
+            j = 0
+            for g in h:
+                if self.l[i][j] == "w":
+                    self.list_case.append(Case(i, j, self.Game))
+                j += 1
+            i += 1
+        for case in self.list_case:
+            case.in_case = None
+        self.list_tour = entityList[::]
+        i = 0
+        for entity in entityList:
+            self.list_case[i].in_case = entity
+            if isinstance(entity, Character):
+                self.list_player.append(entity)
+                if entity.is_playable == False:
+                    self.online_fight = True
+            i += 1
 
+        i = 0
+        case_select.set_alpha(50)
+        combat = True
+        while combat:
+            if isinstance(self.list_tour[0], Character):
+                if self.list_tour[0].is_playable:
+                    self.mouvement_turn()
+                    self.action_turn()
+                else:
+                    self.other_player_turn()
+                self.next_round()
+            else:
+                self.IA_action()
+        # PIECCE A REPRENDRE
+        """
         self.initalEntityList = entityList[::]
         for entity in entityList:
             if isinstance(entity, Character):
                 self.Heroes.append(entity)
                 break
+            if isinstance(entity, Enemy):
+                self.
+                """
 
-        self.background = pygame.transform.scale(
-            pygame.image.load(
-                f"{self.asset_path}/{self.Heroes[0].currentPlace}_bg.png"
-            ).convert(),
-            (self.Game.resolution, self.Game.resolution),
+    def mouvement_turn(self):
+        current_selec = self.current_player()
+        current_selec.select_neighbour(self.list_case, k=1)
+
+        self.Game.chat_box.write_log(
+            ("white", "Mouvement turn of " + current_selec.in_case.name)
         )
-        self.create_map()
-        self.turn_based_fight = FightHandler(entityList, self, self.Game.combatLog)
-        self.fightResume = FightRecap(self.Game, self)
-        self.fightResume.initLootSurf(entityList)
+        running = True
+        click = False
+        taille = 2
+        while running:
 
-        self.sprite_list = []
-        for k in range(self.turn_based_fight.getLenQueue()):
-            i, j = random.randint(0, 11), random.randint(0, 11)
-            while self.map_tile[i][j].getAccess() == False:
-                i, j = random.randint(0, 11), random.randint(0, 11)
-            self.sprite_list.append(
-                Movable_character(
-                    self.turn_based_fight.getEntityinQueue(k),
-                    self.map_tile[i][j],
-                    self.turn_based_fight.getEntityinQueue(k)._fightId,
-                    self,
+            self.display_battle()
+            if taille < 100:
+                Font = pygame.font.Font(
+                    "./assets/fonts/Elvish/Dungeons.ttf", int(taille)
                 )
-            )
-
-        self.open = True
-        self.mainLoop()
-
-    def resetFight(self):
-        self.Game.combatLog.reset()
-        self.__init__(self.Game)
-
-    def setEntityonTile(self, numtile, entity):
-        x, y = numtile
-        self.map_tile[x][y].setEntity(entity)
-        if entity != None:
-            self.map_pathfinding[x][y] = 0
-            self.map_tile[x][y].setAccess(False)
-        else:
-            self.map_pathfinding[x][y] = 1
-            self.map_tile[x][y].setAccess(True)
-
-    def update(self, spellFrameInfo=()):
-
-        self.Game.screen.blit(
-            self.background,
-            (0, 0),
-        )
-
-        # ------------ MAP DRAWING ----------------- #
-        self.create_map()
-
-        # -------------- ENNEMY DRAWING ---------- #
-        for tilerow_nb, tilerow in enumerate(self.map_tile):
-            for tilecol_nb, x in enumerate(tilerow):
-                tile_destination = self.map_tile[tilerow_nb][tilecol_nb]
-                if tile_destination.getEntity() != None:
-                    for k in range(len(self.sprite_list)):
-                        if (
-                            self.sprite_list[k]._fightId
-                            == tile_destination.getEntity()._fightId
-                        ):
-                            self.sprite_list.append(self.sprite_list.pop(k))
-
-        for k in range(len(self.sprite_list)):
-            self.Game.screen.blit(self.sprite_list[k].image, self.sprite_list[k].rect)
-
-        # ------------ SPELL UPDATING ------------------ #
-        if spellFrameInfo != ():
-            self.Game.screen.blit(*spellFrameInfo)
-
-        # --------------- TURN UPDATING ------------------ #
-        text = "{}'s turn".format(self.turn_based_fight.getEntityinQueue(0)._fightName)
-        turnFont = pygame.font.SysFont("Arial", 40).render(text, True, (0, 0, 0))
-        turnLayout = pygame.transform.scale(
-            HUDConf.NAME_SLOT,
-            (int(turnFont.get_width() * 1.5), int(turnFont.get_height() * 1.5)),
-        )
-
-        turnLayout.blit(
-            turnFont,
-            turnFont.get_rect(
-                center=(turnLayout.get_width() // 2, turnLayout.get_height() // 2)
-            ),
-        )
-        self.Game.screen.blit(
-            turnLayout,
-            turnLayout.get_rect(
-                center=(self.Game.resolution // 2, int(self.Game.resolution * 0.75))
-            ),
-        )
-
-        if isinstance(self.turn_based_fight.getEntityinQueue(0), Character):
-            self.turn_based_fight.getEntityinQueue(0).CharBar.show()
-        self.Game.show(combatMode=True)
-
-    def spellhighlight(
-        self, spell_type="square", spell_range=1
-    ):  # spell_type = 0 -> line  / spell_type = 1 -> square / spell_type = 2 -> diagonal
-
-        self.highlightedTiles = []
-        for tilerow_nb, tilerow in enumerate(self.map_tile):
-            for tilecol_nb, x in enumerate(tilerow):
-                tile_destination = self.map_tile[tilerow_nb][tilecol_nb]
-                if tile_destination.ismouseontile():
-                    self.centerTileOnMouse = tile_destination
-                    if spell_type == "line":
-                        x, y = tile_destination.getNumtile()
-                        for k in range(len(self.sprite_list)):
-                            if (
-                                self.sprite_list[k]._fightId
-                                == self.turn_based_fight.getEntityinQueue(0)._fightId
-                            ):
-                                start = self.sprite_list[k].getNumtilepos()
-                                xstart, ystart = start
-                                break
-
-                        if (
-                            (-spell_range <= xstart - x <= spell_range)
-                            and (ystart - y == 0)
-                        ) or (
-                            (-spell_range <= ystart - y <= spell_range)
-                            and (xstart - x == 0)
-                        ):
-                            if xstart - x == 0:
-                                for k in range(
-                                    min(ystart, y) + 1
-                                    if (y > ystart)
-                                    else min(ystart, y),
-                                    max(ystart, y) + 1
-                                    if (y > ystart)
-                                    else max(ystart, y),
-                                ):
-                                    if 0 <= y <= self.MAP_SIZE:
-
-                                        self.highlightedTiles.append([x, k])
-                                        if self.map_data[x][k] == 3:
-                                            self.map_data[x][k] = 5
-                                        else:
-                                            break
-                            elif ystart - y == 0:
-                                for k in range(
-                                    min(xstart, x) + 1
-                                    if (x > xstart)
-                                    else min(xstart, x),
-                                    max(xstart, x) + 1
-                                    if (x > xstart)
-                                    else max(xstart, x),
-                                ):
-                                    if 0 <= x <= self.MAP_SIZE:
-                                        self.highlightedTiles.append([k, y])
-                                        if self.map_data[k][y] == 3:
-                                            self.map_data[k][y] = 5
-                                        else:
-                                            break
-                        # tile_tab = pathfinding(map_data,start,tile_destination.getNumtile(),True)
-                        # for k in range(len(tile_tab)):
-                        #    y,x = tile_tab[k]
-                        #    tile_tab[k] = [x,y]
-                        #    map_data[x][y] = 5
-
-                    if spell_type == "square":
-                        x, y = tile_destination.getNumtile()
-                        if spell_range == 0:
-                            self.highlightedTiles.append([x, y])
-                            if self.map_data[x][y] == 3:
-                                self.map_data[x][y] = 5
-                        else:
-                            for i in range(x - spell_range, x + spell_range + 1):
-                                for j in range(y - spell_range, y + spell_range + 1):
-                                    if (0 <= i < self.MAP_SIZE) and (
-                                        0 <= j < self.MAP_SIZE
-                                    ):
-                                        self.highlightedTiles.append([i, j])
-                                        if self.map_data[i][j] == 3:
-                                            self.map_data[i][j] = 5
-
-    def makeSpell(
-        self, spell, autoattack=False, monster={}
-    ):  # spell_type = 0 -> line  / spell_type = 1 -> square
-        wait = 1
-        # tile_touched = []
-        # tile_dest = None
-
-        spell_type = spell.type
-        spell_range = spell.dmgRange
-        spell_dmg = spell.dmg
-        spell_size = (
-            [(spell_range + 2) * 64 for _ in range(2)]
-            if spell_type == "square"
-            else (64, spell_range * 64)
-        )
-        targetsTouched = False
-
-        while wait:
-            pygame.event.clear()
-
-            if (
-                monster != {}
-            ):  # Coor are passed in, the monster is in range of the player and hits him
-                p1 = self.turn_based_fight.getEntityinQueue(0)
-                wait = 0
-                spell.loadTextures()
-                spell.show(
-                    self.map_tile[monster["playerCoor"][0]][
-                        monster["playerCoor"][1]
-                    ].getTilecenter(),
-                    spell_size,
-                    self.update,
+                size_x, size_y = Font.size("Mouvement turn")
+                taille += 0.7
+                draw_text(
+                    "Mouvement turn",
+                    Font,
+                    (255, 255, 255),
+                    self.Game.screen,
+                    self.Game.screen.get_width() // 2 - size_x // 2,
+                    self.Game.screen.get_height() // 2 - size_y,
+                )
+            else:
+                Font = pygame.font.Font("./assets/fonts/Elvish/Dungeons.ttf", 40)
+                size_x, size_y = Font.size("Mouvement turn")
+                draw_text(
+                    "Mouvement turn", Font, (255, 255, 255), self.Game.screen, 0, size_y
                 )
 
-                for (x, y) in [
-                    (monster["monsterCoor"][0] + k, monster["monsterCoor"][1] + l)
-                    for k in range(-1, 2)
-                    for l in range(-1, 2)
-                    if 0 <= monster["monsterCoor"][0] + k < len(self.map_tile)
-                    if 0 <= monster["monsterCoor"][1] + l < len(self.map_tile)
-                ]:
-                    if isinstance(self.map_tile[x][y].getEntity(), Character):
-                        p2 = self.map_tile[x][y].getEntity()
-                        actualDmg = int(
-                            p1.stats["ATK"] // 2
-                            + p1.stats["ATK"] * random.randint(1, 5) / 5
-                        )
-                        self.Game.combatLog.rollDice(5, actionName="DMG")
-                        if actualDmg >= 1.25 * p1.stats["ATK"]:
-                            self.Game.combatLog.addText(
-                                f"{p1._fightName} did a critical shot !"
-                            )
-                        self.Game.combatLog.addText(
-                            f"{p1._fightName} touched {p2._fightName} with a {spell.name}, doing {actualDmg} damages !"
-                        )
-                        p2.modifyHP(-actualDmg)
-                        self.stats[p1._fightName] += actualDmg
-
-                        # delete the entity if HP == 0
-                        if p2.stats["HP"] <= 0:
-                            for k in range(len(self.sprite_list)):
-                                if p2._fightId == self.sprite_list[k]._fightId:
-                                    self.sprite_list.pop(k)
-                                    break
-                            self.Game.combatLog.addText(f"{p2._fightName} died !")
-                            self.turn_based_fight.removeEntity(p2._fightId)
-                            self.setEntityonTile(self.map_tile[x][y].getNumtile(), None)
-                            if self.turn_based_fight.isended():
-                                if self.turn_based_fight.getFightresult():
-                                    self.Game.combatLog.addText("Fight won")
-                                else:
-                                    self.Game.combatLog.addText("Fight lose")
-                                    self.fightResume.mainLoop()
-                continue
-
-            for event in pygame.event.get():
-                if event.type == MOUSEMOTION:
-                    self.spellhighlight(spell_type, spell_range)
-                    self.update()
-
-                if (
-                    event.type == pygame.MOUSEBUTTONDOWN
-                    and event.button == 1
-                    and self.centerTileOnMouse != None
-                    and self.highlightedTiles != []
-                ):
-                    wait = 0
-                    p1 = self.turn_based_fight.getEntityinQueue(0)
-                    spell.show(
-                        self.centerTileOnMouse.getTilecenter(),
-                        spell_size,
-                        self.update,
-                    )
-                    for k in range(len(self.highlightedTiles)):
-                        x, y = self.highlightedTiles[k]
-                        if isinstance(
-                            self.map_tile[x][y].getEntity(), Ennemy
-                        ) or isinstance(self.map_tile[x][y].getEntity(), Character):
-                            targetsTouched = True
-                            p2 = self.map_tile[x][y].getEntity()
-                            if not autoattack:
-                                actualDmg = int(
-                                    spell_dmg // 2
-                                    + spell_dmg
-                                    * random.randint(p1.stats["STR"], 100)
-                                    / 100
+            running, click = basic_checkevent(click)
+            mx, my = pygame.mouse.get_pos()
+            i, j = 0, 0
+            for h in self.l:
+                j = 0
+                for g in h:
+                    if self.l[i][j] == "w":
+                        if self.mask_collide.overlap(
+                            self.souris_mask,
+                            (
+                                (
+                                    mx
+                                    - (
+                                        (j - i) * (collide.get_width() + 45) // 2
+                                        + self.Game.screen.get_width() // 2
+                                        - collide.get_width() // 2
+                                    ),
+                                    my
+                                    - ((j + i) * (collide.get_width() + 45) // 4 + 150),
                                 )
-                                self.Game.combatLog.rollDice(100, actionName="SPELL")
-                                if actualDmg >= 1.25 * spell_dmg:
-                                    self.Game.combatLog.addText(
-                                        f"{p1._fightName} did a critical shot !"
-                                    )
-                                self.Game.combatLog.addText(
-                                    f"{p1._fightName} cast the spell {spell.name} on {p2._fightName}, doing {actualDmg} damages !"
-                                )
-                                p2.modifyHP(-actualDmg)
-                                self.stats[p1._fightName] += actualDmg
-                            else:
-                                actualDmg = int(
-                                    p1.stats["ATK"] // 2
-                                    + p1.stats["ATK"] * random.randint(1, 5) / 5
-                                )
-                                self.Game.combatLog.rollDice(5, actionName="DMG")
-                                if actualDmg >= 1.25 * p1.stats["ATK"]:
-                                    self.Game.combatLog.addText(
-                                        f"{p1._fightName} did a critical shot !"
-                                    )
-                                self.Game.combatLog.addText(
-                                    f"{p1._fightName} touched {p2._fightName} with a {spell.name}, doing {actualDmg} damages !"
-                                )
-                                p2.modifyHP(-actualDmg)
-                                self.stats[p1._fightName] += actualDmg
-                            # If the player is taking / doing damages, rest mechanics is reseted
-                            if isinstance(p2, Character):
-                                p2.lastedTurnRest = 1
-                            elif isinstance(p1, Character):
-                                p1.lastedTurnRest = 1
-
-                            # delete the entity if HP == 0
-                            if p2.stats["HP"] <= 0:
-                                for k in range(len(self.sprite_list)):
-                                    if p2._fightId == self.sprite_list[k]._fightId:
-                                        self.sprite_list.pop(k)
-                                        break
-                                self.Game.combatLog.addText(f"{p2._fightName} died !")
-                                self.turn_based_fight.removeEntity(p2._fightId)
-                                self.setEntityonTile(
-                                    self.map_tile[x][y].getNumtile(), None
-                                )
-                                if self.turn_based_fight.isended():
-                                    if self.turn_based_fight.getFightresult():
-                                        self.Game.combatLog.addText("Fight won")
-                                    else:
-                                        self.Game.combatLog.addText("Fight lose")
-                                    self.fightResume.mainLoop()
-
-                    pygame.event.clear()
-                    if not targetsTouched:
-                        self.Game.combatLog.addText(
-                            f"{p1._fightName}'s attack missed !"
-                        )
-
-    def endFight(self):
-        self.open = False
-
-        # TODO : loot items onto player's inventory
-        for entity in self.initalEntityList:
-            if isinstance(entity, Ennemy):
-                for Hero in self.Heroes:
-                    Hero.stats["Money"] += entity.goldValue
-                    # Get a bonus XP for each mob if the player is the MVP
-                    if self.stats[Hero._fightName] == max([self.stats.values()]):
-                        logger.info(
-                            f"{Hero._fightName} gains a special amount of XP because he is the MVP !"
-                        )
-                        Hero.addExp(2 * entity.XP)
-                    else:
-                        Hero.addExp(entity.XP)
-
-                    itemPlaced = False
-                    for j in range(HUDConf.INVENTORY_STORAGE_HEIGHT):
-                        for i in range(HUDConf.INVENTORY_STORAGE_WIDTH):
-                            if (
-                                Hero.Inventory.storage["tab"][j][i] == None
-                                and not itemPlaced
-                            ):
-                                Hero.Inventory.storage["tab"][j][i] = entity.loot
-                                Hero.Inventory.storage["tab"][j][i].setCoor(
-                                    (
-                                        Hero.Inventory.storage["initPoint"][0]
-                                        + i * Hero.Inventory.storage["offset"][0],
-                                        Hero.Inventory.storage["initPoint"][1]
-                                        + j * Hero.Inventory.storage["offset"][1],
-                                    )
-                                )
-                                itemPlaced = True
-
-                    logger.info(
-                        f"Added : {entity.loot.property['name']}, {entity.goldValue} golds and {entity.XP} xp to the Hero !"
-                    )
-
-                    if not itemPlaced:
-
-                        Dialog(
-                            "You've got not enough money to buy this item.",
-                            (self.Game.resolution // 2, self.Game.resolution // 2),
-                            self.Game.screen,
-                            (255, 0, 0),
-                            self.Game,
-                            error=True,
-                            charLimit=100,
-                        ).mainShow()
-
-                self.stats = {}
-                self.initalEntityList = []
-
-    def mainLoop(self):
-
-        self.update()
-        while self.open:
-
-            # --------- Monster behaviour ----------- #
-            if isinstance(self.turn_based_fight.getEntityinQueue(0), Ennemy):
-                ennemyInstance = None
-                for movable_sprite in self.sprite_list:
-                    if (
-                        self.turn_based_fight.getEntityinQueue(0)._fightId
-                        == movable_sprite._fightId
-                    ):
-                        ennemyInstance = movable_sprite
-
-                        char_tab = []
-                        # Fetching Character
-                        for movable_sprite in self.sprite_list:
-
-                            if isinstance(movable_sprite.entity, Character):
-                                char_tab.append(movable_sprite)
-
-                        selectedChar = random.choice(char_tab)
-                        if (
-                            math.sqrt(
-                                sum(
-                                    [
-                                        (coor1 - coor2) ** 2
-                                        for coor1, coor2 in zip(
-                                            selectedChar._numtilepos,
-                                            ennemyInstance._numtilepos,
-                                        )
-                                    ],
-                                )
-                            )
-                            <= 1
+                            ),
                         ):
-                            # Simulate an autoattack
-                            self.makeSpell(
-                                spellsConf.SPELL_DB[0],
-                                autoattack=True,
-                                monster={
-                                    "monsterCoor": ennemyInstance._numtilepos,
-                                    "playerCoor": selectedChar._numtilepos,
-                                },
-                            )
-                        elif (
-                            math.sqrt(
-                                sum(
-                                    [
-                                        (coor1 - coor2) ** 2
-                                        for coor1, coor2 in zip(
-                                            selectedChar._numtilepos,
-                                            ennemyInstance._numtilepos,
-                                        )
-                                    ],
+                            if click:
+                                for x in self.list_case:
+                                    if x.i == i and x.j == j:
+                                        if (
+                                            current_selec != None
+                                            and current_selec.in_case != None
+                                        ):
+                                            if x.is_select and x.in_case == None:
+                                                self.print_anim(
+                                                    current_selec, x, self.list_case
+                                                )
+                                                x.in_case = current_selec.in_case
+                                                current_selec.in_case = None
+                                                if self.online_fight:
+                                                    self.broadcast_info(
+                                                        [
+                                                            i._fightId
+                                                            for i in self.list_player
+                                                        ],
+                                                        "MOUVEMENT",
+                                                    )
+                                            current_selec = x
+                                            self.reset_select()
+                                            running = False
+                    j += 1
+                i += 1
+
+            self.Game.show()
+        self.reset_select()
+
+    def action_turn(self):
+        running = True
+        click = False
+        current_selec = self.current_player()
+        self.Game.chat_box.write_log(
+            ("white", "Action turn of " + current_selec.in_case.name)
+        )
+        self.current_player().select_neighbour(self.list_case)
+        taille = 0
+        while running:
+            self.display_battle()
+            if taille < 100:
+                Font = pygame.font.Font(
+                    "./assets/fonts/Elvish/Dungeons.ttf", int(taille)
+                )
+                size_x, size_y = Font.size("Action turn")
+                taille += 0.7
+                draw_text(
+                    "Action turn",
+                    Font,
+                    (255, 255, 255),
+                    self.Game.screen,
+                    self.Game.screen.get_width() // 2 - size_x // 2,
+                    self.Game.screen.get_height() // 2 - size_y,
+                )
+            else:
+                Font = pygame.font.Font("./assets/fonts/Elvish/Dungeons.ttf", 40)
+                size_x, size_y = Font.size("Action turn")
+                draw_text(
+                    "Action turn", Font, (255, 255, 255), self.Game.screen, 0, size_y
+                )
+
+            
+            running, click = basic_checkevent(click)
+            mx, my = pygame.mouse.get_pos()
+            i, j = 0, 0
+            for h in self.l:
+                j = 0
+                for g in h:
+                    if self.l[i][j] == "w":
+                        if self.mask_collide.overlap(
+                            self.souris_mask,
+                            (
+                                (
+                                    mx
+                                    - (
+                                        (j - i) * (collide.get_width() + 45) // 2
+                                        + self.Game.screen.get_width() // 2
+                                        - collide.get_width() // 2
+                                    ),
+                                    my
+                                    - ((j + i) * (collide.get_width() + 45) // 4 + 150),
                                 )
-                            )
-                            <= selectedChar.MOVE_LIMIT
+                            ),
                         ):
-                            rand_pos = [
-                                elt + randomCoor
-                                if 0 <= elt + randomCoor < self.MAP_SIZE
-                                else elt
-                                for elt, randomCoor in zip(
-                                    selectedChar._numtilepos,
-                                    random.choice([(0, 1), (1, 0), (-1, 0), (0, -1)]),
-                                )
-                            ]
-                            while not self.map_tile[rand_pos[0]][
-                                rand_pos[1]
-                            ].getAccess():
-                                rand_pos = [
-                                    elt + randomCoor
-                                    if 0 <= elt + randomCoor < self.MAP_SIZE
-                                    else elt
-                                    for elt, randomCoor in zip(
-                                        selectedChar._numtilepos,
-                                        random.choice(
-                                            [(0, 1), (1, 0), (-1, 0), (0, -1)]
-                                        ),
-                                    )
-                                ]
-                            ennemyInstance.move(self.map_tile[rand_pos[0]][rand_pos[1]])
-                        else:  # Player is too far away
-                            x, y = (
-                                random.randint(1, self.MAP_SIZE),
-                                random.randint(1, self.MAP_SIZE),
-                            )
-                            while not self.map_tile[x][y].getAccess():
-                                x, y = (
-                                    random.randint(1, self.MAP_SIZE),
-                                    random.randint(1, self.MAP_SIZE),
-                                )
-                            ennemyInstance.move(self.map_tile[x][y])
+                            if click:
+                                for x in self.list_case:
+                                    if x.i == i and x.j == j:
+                                        if (
+                                            current_selec != None
+                                            and current_selec.in_case != None
+                                        ):
+                                            if x.is_select and x.in_case != None:
+                                                self.lunch_attack(x)
+                                                if self.online_fight:
+                                                    self.broadcast_info(
+                                                        [
+                                                            x.in_case._fightId
+                                                        ],
+                                                        "ATTACK",
+                                                    )
+                                                
+                                            current_selec = x
+                                            self.reset_select()
+                                            
 
-                        self.turn_based_fight.rotation()
-                        break
-                continue
+                                            running = False
+                                
+                    j += 1
+                i += 1
+            self.Game.show()
+        
+        self.reset_select()
+        
 
-            for event in pygame.event.get():
-
-                # deplacement
-                if event.type == pygame.MOUSEBUTTONDOWN:
-
-                    if event.button in [4, 5]:
-                        self.Game.combatLog.update(event)
-                        self.update()
-                    if event.button == 1:
-                        for tilerow_nb, tilerow in enumerate(
-                            self.map_tile
-                        ):  # for every row of the map...
-                            for tilecol_nb, x in enumerate(tilerow):
-                                tile_destination = self.map_tile[tilerow_nb][tilecol_nb]
-
-                                if tile_destination.ismouseontile() and (
-                                    not tile_destination.getAccess()
-                                ):
-                                    self.Game.combatLog.addText(
-                                        f"Something is blocking the way ... {self.turn_based_fight.getEntityinQueue(0)._fightName}'s move is canceled !"
-                                    )
-                                    self.turn_based_fight.rotation()
-                                elif tile_destination.ismouseontile():
-
-                                    id_turn = self.turn_based_fight.getEntityinQueue(
-                                        0
-                                    )._fightId
-                                    for k in range(len(self.sprite_list)):
-                                        if self.sprite_list[k]._fightId == id_turn:
-                                            self.sprite_list[k].move(tile_destination)
-                                            self.turn_based_fight.rotation()
-                                            break
-
-                if event.type == KEYDOWN:
-
-                    if event.key == self.Game.KeyBindings["Toggle Spell Book"]["value"]:
-                        self.turn_based_fight.getEntityinQueue(0).SpellBook.show(
-                            combatMode=True
-                        )
-                        self.turn_based_fight.rotation()
-                    if event.key == K_a:
-                        self.Game.combatLog.reset()
-
-                # quit
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-
+    # FIN COMBAT :
+    """
         self.transition()
         if self.Game.heroesGroup[0].currentPlace == "building":
             self.Game.musicController.setMusic("dungeon")
@@ -965,3 +303,347 @@ class FightMode:
             self.Game.musicController.setMusic("openWorld")
         self.resetFight()
         self.Game.cursor.show()
+"""
+
+    def print_anim(self, case1, case2, list_case, anim_type="walk", mouvement=True):
+        running = True
+        i = 0
+        j = 0
+        complete = False
+        dist = case1.cordo()[0] - case2.cordo()[0]
+        dist_2 = case1.cordo()[1] - case2.cordo()[1]
+        running = True
+        click = False
+        self.reset_select()
+        while running:
+            self.create_map()
+            for x in list_case:
+                self.Game.screen.blit(x.display, x.cordo())
+                x.checkIfSelected()
+                if x != case1:
+                    x.print_contains()
+                    if x.in_case != None:
+                        x.in_case.type_animation = "idle"
+                        x.in_case.animate()
+            case1.in_case.type_animation = anim_type
+            if anim_type == "ranged" or anim_type == "attack":
+                complete = case1.in_case.animate_attack()
+            else:
+                complete = case1.in_case.animate()
+            if mouvement:
+                if dist > 0:
+                    i += 5
+                    if i > dist:
+                        i = dist
+                else:
+                    i -= 5
+                    if i < dist:
+                        i = dist
+                if dist_2 > 0:
+                    j += 5
+                    if j > dist_2:
+                        j = dist_2
+                else:
+                    j -= 5
+                    if j < dist_2:
+                        j = dist_2
+            if dist > 0:
+                case1.print_contains(x=-i, y=-j)
+            else:
+                case1.print_contains(flip=False, x=-i, y=-j)
+            self.Game.show()
+            if mouvement:
+                if abs(i) >= abs(dist) and abs(j) >= abs(dist_2):
+                    running = False
+                else:
+                    running, click = basic_checkevent(click)
+            else:
+                if complete:
+                    running = False
+                else:
+                    running, click = basic_checkevent(click)
+
+    def next_round(self):
+        self.list_tour.append(self.list_tour[0])
+        self.list_tour.remove(self.list_tour[0])
+
+    def reset_select(self):
+        for x in self.list_case:
+            x.select(False)
+
+    def current_player(self):
+        for x in self.list_case:
+            if x.in_case == self.list_tour[0]:
+                return x
+        return None
+
+    def IA_action(self):
+        have_attacked = False
+        current_not_playable = self.list_tour[0]
+        case_monstre = current_not_playable.trouver_case(self.list_case)
+        case_monstre.select_neighbour(self.list_case)
+        for player in self.list_player:
+            if player.trouver_case(self.list_case).is_select:
+                self.lunch_attack(player.trouver_case(self.list_case))
+                have_attacked = True
+                break
+        self.reset_select()
+
+        if not have_attacked:
+            # Trouver le joueur le plus pret
+            if self.game.player.hp > 0:
+                distance = self.find_distance(
+                    self.game.player.trouver_case(self.list_case), case_monstre
+                )
+                nearest = self.game.player
+            else:
+                distance = 10000
+            for x in self.game.player.crew_mate:
+                if x.hp > 0:
+                    if (
+                        self.find_distance(x.trouver_case(self.list_case), case_monstre)
+                        <= distance
+                    ):
+                        distance = self.find_distance(
+                            x.trouver_case(self.list_case), case_monstre
+                        )
+
+                        nearest = x
+            nearest.trouver_case(self.list_case).select(True)
+            # Se deplacer vers lui
+            case_monstre.select_neighbour(self.list_case, k=1)
+            distance_case = 15000
+            for x in self.list_case:
+                if x.is_select and x.in_case == None:
+                    if (
+                        self.find_distance(x, nearest.trouver_case(self.list_case))
+                        < distance_case
+                    ):
+                        distance_case = self.find_distance(
+                            x, nearest.trouver_case(self.list_case)
+                        )
+                        nearest_case = x
+
+            self.print_anim(case_monstre, nearest_case, anim_type="walk")
+            nearest_case.in_case = current_not_playable
+            case_monstre.in_case = None
+
+            self.reset_select()
+            nearest_case.select_neighbour(self.list_case, k=0)
+            if self.game.player.trouver_case(self.list_case).is_select:
+                self.lunch_attack(self.game.player.trouver_case(self.list_case))
+                have_attacked = True
+            if not have_attacked:
+                for x in self.player.crew_mate:
+                    if x.hp > 0:
+                        if x.trouver_case(self.list_case).is_select:
+                            self.lunch_attack(x.trouver_case(self.list_case))
+                            have_attacked = True
+            self.reset_select()
+            
+
+    def other_player_turn(self):
+        running = True
+        Font = pygame.font.Font("./assets/fonts/Elvish/Dungeons.ttf", 40)
+        size_x, size_y = Font.size("Wait for the other player.")
+        pending = 0
+        click = False
+        time_line = 0
+        while running:
+            self.display_battle()
+            running, click = basic_checkevent(click)
+
+            if int(pending) == 0:
+                draw_text(
+                    "Wait for the other player.",
+                    Font,
+                    (255, 255, 255),
+                    self.Game.screen,
+                    self.Game.screen.get_width() // 2 - size_x // 2,
+                    self.Game.screen.get_height() // 2 - size_y,
+                )
+            if int(pending) == 1:
+                draw_text(
+                    "Wait for the other player..",
+                    Font,
+                    (255, 255, 255),
+                    self.Game.screen,
+                    self.Game.screen.get_width() // 2 - size_x // 2,
+                    self.Game.screen.get_height() // 2 - size_y,
+                )
+            if int(pending) == 2:
+                draw_text(
+                    "Wait for the other player...",
+                    Font,
+                    (255, 255, 255),
+                    self.Game.screen,
+                    self.Game.screen.get_width() // 2 - size_x // 2,
+                    self.Game.screen.get_height() // 2 - size_y,
+                )
+            pending += 0.01
+            pending = pending % 3
+            datas = json.load(open("datas.json"))
+            combat = json.load(open("combat.json"))
+            if (
+                datas["player"][str(self.list_tour[0]._fightId)]["action_type"]
+                == "MOUVEMENT"
+            ):
+                if datas["player"][str(self.list_tour[0]._fightId)][
+                    "dest"
+                ] != self.list_tour[0].trouver_case(self.list_case).numero_case(
+                    self.list_case
+                ):
+                    self.print_anim(
+                        self.list_tour[0].trouver_case(self.list_case),
+                        self.list_case[
+                            datas["player"][str(self.list_tour[0]._fightId)]["dest"]
+                        ],
+                        self.list_case,
+                    )
+                    self.list_case[
+                        datas["player"][str(self.list_tour[0]._fightId)]["dest"]
+                    ].in_case = self.list_tour[0]
+                    self.list_tour[0].trouver_case(self.list_case).in_case = None
+                    running = False
+            
+            # for x in combat["player"]:
+            #     self.lunch_attack(self.list_case[int(x["dest"])])
+            self.Game.show()
+
+    def lunch_attack(self, defenseur):
+        self.Game.chat_box.write_log(
+            (
+                "red",
+                self.current_player().in_case.name
+                + " attack "
+                + defenseur.in_case.name,
+            )
+        )
+        # self.print_anim(
+        #     self.current_player(),
+        #     defenseur,
+        #     self.list_case,
+        #     anim_type="attack",
+        #     mouvement=False,
+        # )
+        damages = 1
+        self.Game.chat_box.write_log(("red", "Dammage : " + str(damages)))
+        self.print_explosion(defenseur,"dmg")
+
+        defenseur.in_case.stats["HP"] -= damages
+        if defenseur.in_case.stats["HP"] <= 0:
+            self.list_tour.remove(defenseur.in_case)
+            defenseur.in_case = None
+        self.broadcast_info([defenseur.in_case._fightId],"ATTACK")
+        self.reset_select()
+
+    def print_explosion(self, case, which_explosion="dmg"):
+        running = True
+        click = False
+        complete = False
+        i = 1
+        while running:
+            self.display_battle()
+            running, click = basic_checkevent(click)
+            if which_explosion == "dmg":
+                self.Game.screen.blit(
+                    explosion["explosion_" + str(i) + ".png"],
+                    (
+                       
+                        case.cordo()[0]
+                        - explosion["explosion_" + str(i) + ".png"].get_width() // 3,
+                        case.cordo()[1]
+                        - int(
+                            explosion["explosion_" + str(i) + ".png"].get_height()
+                            // 2.5
+                        ),
+                    ),
+                )
+                if i >= 46:
+                    running=False
+                i += 1
+            self.Game.show()
+            # else:
+            #     if i < 10:
+            #         screen.blit(
+            #             explosion_heal["explosion000" + str(i) + ".png"],
+            #             (
+            #                 case.cordo()[0]
+            #                 - explosion_heal[
+            #                     "explosion000" + str(i) + ".png"
+            #                 ].get_width()
+            #                 // 3,
+            #                 case.cordo()[1]
+            #                 - int(
+            #                     explosion_heal[
+            #                         "explosion000" + str(i) + ".png"
+            #                     ].get_height()
+            #                     // 2.5
+            #                 ),
+            #             ),
+            #         )
+
+            #     else:
+            #         screen.blit(
+            #             explosion_heal["explosion00" + str(i) + ".png"],
+            #             (
+            #                 case.cordo()[0]
+            #                 - explosion_heal[
+            #                     "explosion00" + str(i) + ".png"
+            #                 ].get_width()
+            #                 // 3,
+            #                 case.cordo()[1]
+            #                 - int(
+            #                     explosion_heal[
+            #                         "explosion00" + str(i) + ".png"
+            #                     ].get_height()
+            #                     // 2.5
+            #                 ),
+            #             ),
+            #         )
+            #     if i >= 60:
+            #         running = False
+            
+            
+
+    def broadcast_info(self, player_id, action_type, award=None):
+        send_dict = dict()
+        send_dict["player"] = dict()
+        if action_type == "MOUVEMENT":
+            for _id in player_id:
+                for x in self.list_player:
+                    if x._fightId == _id:
+                        dest = x.trouver_case(self.list_case).numero_case(
+                            self.list_case
+                        )
+
+                send_dict["player"][_id] = {
+                    "action_type": action_type,
+                    "dest": dest,
+                }
+            with open("./datas.json", "w") as f:
+                json.dump(send_dict, f)
+        if action_type == "ATTACK":
+            for _id in player_id:
+                for x in self.list_tour:
+                    if x._fightId == _id:
+                        dest = x.trouver_case(self.list_case).numero_case(
+                            self.list_case
+                        )
+
+                send_dict["player"][_id] = {
+                    "action_type": action_type,
+                    "dest": dest,
+                }
+            with open("./combat.json", "w") as f:
+                json.dump(send_dict, f)
+            """ AJOUTER UPDATE CARACT"""
+        if action_type == "SPELL":
+            pass
+            """ AJOUTER UPDATE CARACT POUR TOUT LES JOUEURS ID"""
+
+        
+
+
+
+# test_2.initFight([])
