@@ -408,7 +408,9 @@ class NetworkController:
                                                 "imagePos": packet["imagePos"],
                                             }
                                             player.currentPlace = packet["currentPlace"]
-                                            player.Map.chunkData["currentChunkPos"] = packet["chunkCoor"]
+                                            player.Map.chunkData[
+                                                "currentChunkPos"
+                                            ] = packet["chunkCoor"]
 
                                             # logger.debug(
                                             #     f"[+] Updating pos for player {player_id}"
@@ -422,12 +424,38 @@ class NetworkController:
                                             #                 (p1coor - p2coor) ** 2
                                             #                 for p1coor, p2coor in zip(
                                             #                     data["players"][player_id]["chunkPos"],
-                                            #                     self.Hero.Map.chunkData["currentChunkPos"],
+                                            #                     self.Hero.Map.chunkData["currentChsunkPos"],
                                             #                 )
                                             #             ]
                                             #         )
                                             #     )
                                             # ) <= self.Map.renderDistance :
+
+                                        # -------------------- FIGHT RECV ------------------- #
+                                        if packet["type"] == "fight":
+                                            if packet["dest"] != self.Game.fightMode.list_tour[
+                                                0
+                                            ].trouver_case(
+                                                self.Game.fightMode.list_case
+                                            ).numero_case(
+                                                self.Game.fightMode.list_case
+                                            ):
+                                                self.Game.fightMode.print_anim(
+                                                    self.Game.fightMode.list_tour[0].trouver_case(
+                                                        self.Game.fightMode.list_case
+                                                    ),
+                                                    self.Game.fightMode.list_case[
+                                                        packet["dest"]
+                                                    ],
+                                                    self.Game.fightMode.list_case,
+                                                )
+                                                self.Game.fightMode.list_case[
+                                                    packet["dest"]
+                                                ].in_case = self.Game.fightMode.list_tour[0]
+                                                self.Game.fightMode.list_tour[0].trouver_case(
+                                                    self.Game.fightMode.list_case
+                                                ).in_case = None
+                                                self.Game.fightMode.running = False
 
                                         # ------------------ INVENTORY RECV ------------------- #
                                         if packet["type"] == "info_inv":
@@ -622,7 +650,10 @@ class NetworkController:
                 if player.currentPlace == "openWorld":
 
                     # Map pos updating
-                    if self.Hero.Map.chunkData["currentChunkPos"] != player.Map.chunkData["currentChunkPos"]:
+                    if (
+                        self.Hero.Map.chunkData["currentChunkPos"]
+                        != player.Map.chunkData["currentChunkPos"]
+                    ):
                         playersDist = [
                             (pos2 - pos1)
                             + 2

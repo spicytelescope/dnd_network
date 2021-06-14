@@ -14,7 +14,8 @@ from Player.Character import Character
 from gameController import GameController
 import time
 import json
-
+from config.netConf import *
+import copy
 
 class FightMode:
     def __init__(self, gameController) -> None:
@@ -76,7 +77,7 @@ class FightMode:
     def initFight(self, entityList):
         # pygame.mouse.set_cursor(*pygame.cursors.broken_x)
         # pygame.mouse.set_visible(True)
-        running = True
+        self.running = True
         click = False
         i, j = 0, 0
 
@@ -130,10 +131,10 @@ class FightMode:
         self.Game.chat_box.write_log(
             ("white", "Mouvement turn of " + current_selec.in_case.name)
         )
-        running = True
+        self.running = True
         click = False
         taille = 2
-        while running:
+        while self.running:
 
             self.display_battle()
             if taille < 100:
@@ -157,7 +158,7 @@ class FightMode:
                     "Mouvement turn", Font, (255, 255, 255), self.Game.screen, 0, size_y
                 )
 
-            running, click = basic_checkevent(click)
+            self.running, click = basic_checkevent(click)
             mx, my = pygame.mouse.get_pos()
             i, j = 0, 0
             for h in self.l:
@@ -195,14 +196,14 @@ class FightMode:
                                                 if self.online_fight:
                                                     self.broadcast_info(
                                                         [
-                                                            i._fightId
+                                                            i.networkId
                                                             for i in self.list_player
                                                         ],
                                                         "MOUVEMENT",
                                                     )
                                             current_selec = x
                                             self.reset_select()
-                                            running = False
+                                            self.running = False
                     j += 1
                 i += 1
 
@@ -210,7 +211,7 @@ class FightMode:
         self.reset_select()
 
     def action_turn(self):
-        running = True
+        self.running = True
         click = False
         current_selec = self.current_player()
         self.Game.chat_box.write_log(
@@ -218,7 +219,7 @@ class FightMode:
         )
         self.current_player().select_neighbour(self.list_case)
         taille = 0
-        while running:
+        while self.running:
             self.display_battle()
             if taille < 100:
                 Font = pygame.font.Font(
@@ -242,7 +243,7 @@ class FightMode:
                 )
 
             
-            running, click = basic_checkevent(click)
+            self.running, click = basic_checkevent(click)
             mx, my = pygame.mouse.get_pos()
             i, j = 0, 0
             for h in self.l:
@@ -276,7 +277,7 @@ class FightMode:
                                                 if self.online_fight:
                                                     self.broadcast_info(
                                                         [
-                                                            x.in_case._fightId
+                                                            x.in_case.networkId
                                                         ],
                                                         "ATTACK",
                                                     )
@@ -285,7 +286,7 @@ class FightMode:
                                             self.reset_select()
                                             
 
-                                            running = False
+                                            self.running = False
                                 
                     j += 1
                 i += 1
@@ -306,16 +307,16 @@ class FightMode:
 """
 
     def print_anim(self, case1, case2, list_case, anim_type="walk", mouvement=True):
-        running = True
+        self.running = True
         i = 0
         j = 0
         complete = False
         dist = case1.cordo()[0] - case2.cordo()[0]
         dist_2 = case1.cordo()[1] - case2.cordo()[1]
-        running = True
+        self.running = True
         click = False
         self.reset_select()
-        while running:
+        while self.running:
             self.create_map()
             for x in list_case:
                 self.Game.screen.blit(x.display, x.cordo())
@@ -354,14 +355,14 @@ class FightMode:
             self.Game.show()
             if mouvement:
                 if abs(i) >= abs(dist) and abs(j) >= abs(dist_2):
-                    running = False
+                    self.running = False
                 else:
-                    running, click = basic_checkevent(click)
+                    self.running, click = basic_checkevent(click)
             else:
                 if complete:
-                    running = False
+                    self.running = False
                 else:
-                    running, click = basic_checkevent(click)
+                    self.running, click = basic_checkevent(click)
 
     def next_round(self):
         self.list_tour.append(self.list_tour[0])
@@ -443,15 +444,15 @@ class FightMode:
             
 
     def other_player_turn(self):
-        running = True
+        self.running = True
         Font = pygame.font.Font("./assets/fonts/Elvish/Dungeons.ttf", 40)
         size_x, size_y = Font.size("Wait for the other player.")
         pending = 0
         click = False
         time_line = 0
-        while running:
+        while self.running:
             self.display_battle()
-            running, click = basic_checkevent(click)
+            self.running, click = basic_checkevent(click)
 
             if int(pending) == 0:
                 draw_text(
@@ -482,13 +483,11 @@ class FightMode:
                 )
             pending += 0.01
             pending = pending % 3
-            datas = json.load(open("datas.json"))
-            combat = json.load(open("combat.json"))
             if (
-                datas["player"][str(self.list_tour[0]._fightId)]["action_type"]
+                datas["player"][str(self.list_tour[0].networkId)]["action_type"]
                 == "MOUVEMENT"
             ):
-                if datas["player"][str(self.list_tour[0]._fightId)][
+                if datas["player"][str(self.list_tour[0].networkId)][
                     "dest"
                 ] != self.list_tour[0].trouver_case(self.list_case).numero_case(
                     self.list_case
@@ -496,15 +495,15 @@ class FightMode:
                     self.print_anim(
                         self.list_tour[0].trouver_case(self.list_case),
                         self.list_case[
-                            datas["player"][str(self.list_tour[0]._fightId)]["dest"]
+                            datas["player"][str(self.list_tour[0].networkId)]["dest"]
                         ],
                         self.list_case,
                     )
                     self.list_case[
-                        datas["player"][str(self.list_tour[0]._fightId)]["dest"]
+                        datas["player"][str(self.list_tour[0].networkId)]["dest"]
                     ].in_case = self.list_tour[0]
                     self.list_tour[0].trouver_case(self.list_case).in_case = None
-                    running = False
+                    self.running = False
             
             # for x in combat["player"]:
             #     self.lunch_attack(self.list_case[int(x["dest"])])
@@ -534,17 +533,17 @@ class FightMode:
         if defenseur.in_case.stats["HP"] <= 0:
             self.list_tour.remove(defenseur.in_case)
             defenseur.in_case = None
-        self.broadcast_info([defenseur.in_case._fightId],"ATTACK")
+        self.broadcast_info([defenseur.in_case.networkId],"ATTACK")
         self.reset_select()
 
     def print_explosion(self, case, which_explosion="dmg"):
-        running = True
+        self.running = True
         click = False
         complete = False
         i = 1
-        while running:
+        while self.running:
             self.display_battle()
-            running, click = basic_checkevent(click)
+            self.running, click = basic_checkevent(click)
             if which_explosion == "dmg":
                 self.Game.screen.blit(
                     explosion["explosion_" + str(i) + ".png"],
@@ -560,7 +559,7 @@ class FightMode:
                     ),
                 )
                 if i >= 46:
-                    running=False
+                    self.running=False
                 i += 1
             self.Game.show()
             # else:
@@ -602,31 +601,30 @@ class FightMode:
             #             ),
             #         )
             #     if i >= 60:
-            #         running = False
+            #         self.running = False
             
             
 
     def broadcast_info(self, player_id, action_type, award=None):
-        send_dict = dict()
-        send_dict["player"] = dict()
+        send_dict = {"player": {}}
         if action_type == "MOUVEMENT":
             for _id in player_id:
                 for x in self.list_player:
-                    if x._fightId == _id:
+                    if x.networkId == _id:
                         dest = x.trouver_case(self.list_case).numero_case(
                             self.list_case
                         )
+                if _id = self.Game.heroesGroup[0].networkId:
+                    send_dict = copy.deepcopy(TEMPLATE_FIGHT)
+                    send_dict[_id]["sender_id"] =_id
+                    send_dict["action_type"] = action_type
+                    send_dict["dest"]  = dest
+                    write_to_pipe(IPC_FIFO_OUTPUT, send_dict)
 
-                send_dict["player"][_id] = {
-                    "action_type": action_type,
-                    "dest": dest,
-                }
-            with open("./datas.json", "w") as f:
-                json.dump(send_dict, f)
         if action_type == "ATTACK":
             for _id in player_id:
                 for x in self.list_tour:
-                    if x._fightId == _id:
+                    if x.networkId == _id:
                         dest = x.trouver_case(self.list_case).numero_case(
                             self.list_case
                         )
@@ -635,8 +633,6 @@ class FightMode:
                     "action_type": action_type,
                     "dest": dest,
                 }
-            with open("./combat.json", "w") as f:
-                json.dump(send_dict, f)
             """ AJOUTER UPDATE CARACT"""
         if action_type == "SPELL":
             pass

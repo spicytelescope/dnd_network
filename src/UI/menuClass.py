@@ -849,6 +849,8 @@ class SelectMenu(MainMenu):
         if self.stepsCursor == 1:
 
             self.HeroesGroup[self.HeroIndex].classId = self.characSelecCursor
+            self.HeroesGroup[self.HeroIndex].refresh_class()
+
             self.buttons = (
                 [self.stepTitle]
                 + [self.selectedClassName]

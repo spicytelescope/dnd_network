@@ -104,6 +104,13 @@ TEMPLATE_MESSAGE = {
     "italic": False,
 }
 
+TEMPLATE_FIGHT =  {
+                    "type": "fight",
+                    "sender_id": "Unknown_id"
+                    "action_type": "MOVEMENT",
+                    "dest": 15,
+                }
+
 # //TODO
 TEMPLATE_TRADE_OFFER = {"type": "trade"}
 
