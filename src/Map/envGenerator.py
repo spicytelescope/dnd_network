@@ -13,7 +13,6 @@ from gameObjects.Ennemy import Ennemy
 from gameObjects.NPC import NPC, Seller
 from UI.UI_utils_text import InfoTip
 import random
-random.seed(0)
 
 class EnvGenerator:
     def __init__(self, gameController, Map):
