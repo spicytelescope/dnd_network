@@ -516,9 +516,6 @@ class Character(Entity):
                     #         f"{self.Map.chunkData['currentChunkPos']} - {self.direction} -> {self.blitOffset}"
                     #     )
 
-                    if self.Game.isOnline:
-                        self.Map.transmitPosInfos()
-
                 elif mapName == "building":
                     self.buildingPosX -= DELTA_X
                     self.buildingPosY -= DELTA_Y
@@ -531,7 +528,9 @@ class Character(Entity):
                                 for coor, offset in zip(ennemy.pos, (DELTA_X, DELTA_Y))
                             ]
                         )
-
+                if self.Game.isOnline:
+                    self.Map.transmitPosInfos()
+                
                 for item in envGenerator.items:
                     item.setPos(
                         [
