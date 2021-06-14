@@ -347,6 +347,17 @@ class NetworkController:
                                     disc_packet["stats"] = self.Hero.stats
                                     disc_packet["player_name"] = self.Hero.name
                                     disc_packet["map_seed"] = self.Map.mapSeed
+                                    disc_packet["storage"] = {
+                                        str(self.Hero.Inventory.storage["tab"][j][i].property["Id"]): (i, j)
+                                        for j in range(INVENTORY_STORAGE_HEIGHT)
+                                        for i in range(INVENTORY_STORAGE_WIDTH)
+                                        if self.Hero.Inventory.storage["tab"][j][i] != None
+                                    }
+                                    disc_packet["equipment"] = {
+                                        str(slot): int(slot_item["item"].property["Id"])
+                                        for slot, slot_item in self.Hero.Inventory.equipment.items()
+                                        if slot_item["item"] != None
+                                    }
 
                                     write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
                                     print("End of disc request packet")
@@ -372,6 +383,10 @@ class NetworkController:
                                     self.Hero.name = packet["player_name"]
                                     self.Map.mapSeed = packet["map_seed"]
                                     self.Hero.stats = packet["stats"]
+                                    self.Hero.Inventory.updateInventory(
+                                                packet["storage"],
+                                                packet["equipment"],
+                                            )
 
                                     print("Sending packet")
                                     disc_packet = copy.deepcopy(TEMPLATE_NEW_CONNECTION)
@@ -381,6 +396,17 @@ class NetworkController:
                                     disc_packet["stats"] = self.Hero.stats
                                     disc_packet["player_name"] = self.Hero.name
                                     disc_packet["map_seed"] = self.Map.mapSeed
+                                    disc_packet["storage"] = {
+                                        str(self.Hero.Inventory.storage["tab"][j][i].property["Id"]): (i, j)
+                                        for j in range(INVENTORY_STORAGE_HEIGHT)
+                                        for i in range(INVENTORY_STORAGE_WIDTH)
+                                        if self.Hero.Inventory.storage["tab"][j][i] != None
+                                    }
+                                    disc_packet["equipment"] = {
+                                        str(slot): int(slot_item["item"].property["Id"])
+                                        for slot, slot_item in self.Hero.Inventory.equipment.items()
+                                        if slot_item["item"] != None
+                                    }
 
                                     print("disc packet send !")
                                     write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)

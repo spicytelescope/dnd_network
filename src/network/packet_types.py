@@ -88,6 +88,14 @@ TEMPLATE_NEW_CONNECTION = {
         "ATK": -1,
     },
     "player_name": "Unknown_name",
+    "storage": {
+        # "50": [2, 4]
+    },
+    "equipment": {
+        # "0": 26,
+        # "6": 131,
+        # "8": 6,
+    }
 }
 
 TEMPLATE_DECONNEXION = {
