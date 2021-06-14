@@ -62,18 +62,15 @@ INFO:PHYM_LOGGER:LOADING ITEM RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to ItemDBLoading : 20 
 INFO:PHYM_LOGGER:LOADING SPELL RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to spellDBLoading : 20 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/HunterBow.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/FalconLightArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/HunterBow.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Slave.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/HunterTunic.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Scout_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/SteelHelm_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/BanditArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/IronArmor_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/KnightArmor.png
 INFO:PHYM_LOGGER:Creating spellbook
-INFO:PHYM_LOGGER:Current player's spell's ID : [1, 3, 6, 9, 12]
+INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/fire/weak/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/ice/weak/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/wind/weak/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/earth/weak/icon.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
 INFO:PHYM_LOGGER:LOADING OPEN WORLD RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to biomeTextures : 10 
 INFO:PHYM_LOGGER:LOADING MINIMAP RESSOURCES
@@ -90,20 +87,11 @@ INFO:PHYM_LOGGER:Generating Init_Zone
 INFO:PHYM_LOGGER:BLITED AT CHUNK : [(0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)]
 INFO:PHYM_LOGGER:Generating Danger Zone
 DEBUG:PHYM_LOGGER:ADDING to worldElements : 15 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/PeasantClothing.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/GuardArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/HardwoodWand.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/LeatherLightArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/HardwoodWand.png
-INFO:PHYM_LOGGER:Creating spellbook
-INFO:PHYM_LOGGER:Current player's spell's ID : [0, 16]
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/HunterBow.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/FalconLightArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/HunterBow.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Shields/MilitiamanShield.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Slave.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/HunterTunic.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/HunterLightArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/ExpertHunterHat.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/Machete_Paint.png
 INFO:PHYM_LOGGER:Creating spellbook
 INFO:PHYM_LOGGER:Current player's spell's ID : [1, 3, 6, 9, 12]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
@@ -111,20 +99,16 @@ INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/fire/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/ice/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/wind/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/earth/weak/icon.png
-INFO:PHYM_LOGGER:[+] Creating the pipes
-INFO:PHYM_LOGGER:[+] Starting C Module [PARTY JOINER] 
-INFO:PHYM_LOGGER:[+] Starting handle connection thread
-INFO:PHYM_LOGGER:#59ccad5b-161f-4a37-80d5-9fb155674763 joined the party !
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/Bows/BattleBow.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Cleric_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Scout_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/SteelHelm_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/BanditArmor.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/IronArmor_Paint.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/KnightArmor.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/BanditLightArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/FireAdept.png
 INFO:PHYM_LOGGER:Creating spellbook
 INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Hermit.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/HunterHat2.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/HunterTunic.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/GuardArmor_Paint.png
+INFO:PHYM_LOGGER:[+] Creating the pipes
+WARNING:PHYM_LOGGER:[x] FIFOs are already created, proceeding ...
+INFO:PHYM_LOGGER:[+] Starting C Module [PARTY JOINER] 
+INFO:PHYM_LOGGER:[+] Starting handle connection thread

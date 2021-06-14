@@ -310,12 +310,14 @@ class NetworkController:
 
                         if len(str_data) > 2:
                             self.total_packet_transmitted += 1
-                            print("receved from python : ", str_data)
+                            # print("receved from python : ", str_data)
 
                             try:
                                 if "}{" in str_data:
                                     str_data = str_data[0 : str_data.index("}{") + 1]
-                                    print("corrected : ", str_data)
+                                    print("\033[92m [Python Client] \033[0;37m Corrected packet from C client : ", str_data)
+                                else:
+                                    print("\033[92m [Python Client] \033[0;37m Received from C client : ", str_data)
 
                                 packet = json.loads(str_data)
                                 self.packet_transmitted += 1
@@ -341,7 +343,7 @@ class NetworkController:
 
                                 if packet["type"] == "discovery_request":
 
-                                    print("Recv disco request paquet from client")
+                                    # print("Recv disco request paquet from client")
                                     disc_packet = copy.deepcopy(TEMPLATE_NEW_CONNECTION)
                                     disc_packet["classId"] = self.Hero.classId
                                     disc_packet["sender_id"] = self.Hero.networkId
@@ -364,7 +366,7 @@ class NetworkController:
                         
 
                                     write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
-                                    print("End of disc request packet")
+                                    # print("End of disc request packet")
 
                                 if packet["type"] == "discovery" and packet[
                                     "sender_id"
@@ -381,7 +383,7 @@ class NetworkController:
                                         True,
                                         "CONNEXION",
                                     )
-                                    print("Receiving desc packet")
+                                    # print("Receiving desc packet")
     
                                     self.players[packet["sender_id"]].classId = packet["classId"]
                                     self.players[packet["sender_id"]].name = packet["player_name"]
@@ -412,7 +414,7 @@ class NetworkController:
                                         if slot_item["item"] != None
                                     }
 
-                                    print("disc packet send !")
+                                    # print("disc packet send !")
                                     write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
 
                                 for player_id, player in self.players.items():
@@ -483,7 +485,7 @@ class NetworkController:
                                             ).numero_case(
                                                 self.Game.fightMode.list_case
                                             ):
-                                                print("Entering fight mode")
+                                                # print("Entering fight mode")
                                                 self.Game.fightMode.print_anim(
                                                     self.Game.fightMode.list_tour[
                                                         0
@@ -495,7 +497,7 @@ class NetworkController:
                                                     ],
                                                     self.Game.fightMode.list_case,
                                                 )
-                                                print("1")
+                                                # print("1")
 
                                                 self.Game.fightMode.list_case[
                                                     packet["dest"]
@@ -507,7 +509,7 @@ class NetworkController:
                                                 ].trouver_case(
                                                     self.Game.fightMode.list_case
                                                 ).in_case = None
-                                                print("2")
+                                                # print("2")
                                                 self.Game.fightMode.running = False
 
                                         # ------------------ INVENTORY RECV ------------------- #
@@ -535,9 +537,6 @@ class NetworkController:
 
                                         # ------------------ MESSAGE RECV ----------- #
                                         if packet["type"] == "message":
-                                            print(
-                                                "OUI LE MESSAGE : ", packet["content"]
-                                            )
 
                                             self.chat.chatWindow.addText(
                                                 self.players[packet["sender_id"]].name,
@@ -550,7 +549,7 @@ class NetworkController:
                                         # ---------------- DECONNEXION RECV ------------ #
                                         if packet["type"] == "deconnection":
 
-                                            print("deconnection entering")
+                                            # print("deconnection entering")
                                             self.chat.chatWindow.addText(
                                                 packet["player_name"],
                                                 "left the game !",
@@ -564,7 +563,7 @@ class NetworkController:
                                             }
 
                             except:
-                                print("error on this packet : ", str_data)
+                                # print("error on this packet : ", str_data)
                                 packet = {
                                     "name": "test_packet_bug",
                                     "sender_id": "Unknown_id",
@@ -716,7 +715,7 @@ class NetworkController:
                                 player.posMainChunkCenter, self.Hero.posMainChunkCenter
                             )
                         ]
-                        print("debug : ", playersDist)
+                        # print("debug : ", playersDist)
                     else:
                         playersDist = [
                             pos1 - pos2

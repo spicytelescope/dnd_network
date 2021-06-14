@@ -23,6 +23,16 @@ int is_complete(int *array, int len, int nbNull)
     return 1;
 }
 
+void print_ip(unsigned int ip)
+{
+    unsigned char bytes[4];
+    bytes[0] = ip & 0xFF;
+    bytes[1] = (ip >> 8) & 0xFF;
+    bytes[2] = (ip >> 16) & 0xFF;
+    bytes[3] = (ip >> 24) & 0xFF;
+    printf("%d.%d.%d.%d\n", bytes[0], bytes[1], bytes[2], bytes[3]);
+}
+
 int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, struct sockaddr_in udpcli, in_addr_t *addrcli, char idc[CONNECTIONS_MAX][ID_LEN], char *selfID, int to_python_descriptor)
 {
     // if (inet_aton(addressH, &(udpcli.sin_addr)) == 0)
@@ -42,9 +52,9 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
     recv(fdt, &message, BUFSIZE + 1, 0);
     if ((int)*message == 1)
     {
-        printf("ok\n");
+        printf("\033[0;33m[C Client]\033[0;37m : Confirmation Protocol - 1\n");
         addrcli[(int)*(message + 4)] = hote.sin_addr.s_addr;
-        printf("Stocked IP address : %d %d\n", addrcli[(int)*(message + 4)], (int)*(message + 4));
+        // printf("Stocked IP address : %d %d\n", addrcli[(int)*(message + 4)], (int)*(message + 4));
         strncpy(idc[(int)*(message + 4)], (message + 8), ID_LEN);
 
         //send ids to pipe
@@ -76,7 +86,8 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
         }
     }
     int lencli = sizeof(udpcli);
-    printf("ok\n");
+    printf("\033[0;33m[C Client]\033[0;37m : Confirmation - 2\n");
+
     while (1)
     {
         // if (nb_addr != 0)
@@ -274,10 +285,10 @@ int main(int argc, char *argv[])
         cliTCP.sin_port = htons(PORT_TCP);
         // printf("%s\n", argv[1]);
         confirmation(fdtcp, fdudp, argv[2], cliTCP, cliUDP, addrc, idc, selfID, to_python_descriptor);
-        printf("list of ip adress  :\n");
+        printf("\033[0;33m[C Client]\033[0;37m : List of ip adress in decimal conversion :\n");
         for (int i = 0; i < CONNECTIONS_MAX; i++)
         {
-            printf("%d\n", addrc[i]);
+            print_ip(addrc[i]);
         }
     }
     if ((fdtcp = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -333,7 +344,8 @@ int main(int argc, char *argv[])
                 {
                     stop("accept");
                 }
-                printf("ok\n");
+
+                printf("\033[0;33m[C Client]\033[0;37m : Confirmation - 3\n");
                 if ((naddr = checkin(under_connect, cliTCP.sin_addr.s_addr)) != -1)
                 {
                     char message = 0x00;
@@ -359,7 +371,7 @@ int main(int argc, char *argv[])
                         {
                             if (fd_connect[con] == -1)
                             {
-                                printf("CONFIRMATION DEBUGGING \n");
+                                printf("\033[0;33m[C Client]\033[0;37m : Confirmation - 4\n");
                                 fd_connect[con] = new_sock;
                                 under_connect[con] = cliTCP.sin_addr.s_addr;
                                 memset(&cliTCP, 0, sizeof(cliTCP));
@@ -418,8 +430,8 @@ int main(int argc, char *argv[])
                             addrc[i] = under_connect[con];
                             strncpy(idc[i], msg, ID_LEN);
                             fd_connect[con] = 0;
-                            printf("%d\n", addrc[i]);
-                            printf("A new player joined the game : %s \n", idc[i]);
+                            // printf("%d\n", addrc[i]);
+                            // printf("A new player joined the game : %s \n", idc[i]);
                             char *disc_msg = "{\n  \"type\": \"discovery_request\"\n}";
                             if (write(to_python_descriptor, disc_msg, strlen(disc_msg)) < 0) //transmiting data
                             {
@@ -559,7 +571,7 @@ int main(int argc, char *argv[])
                 else
                 {
                     if (bytesAvailable != 0)
-                        printf("Packet size : %d\n", bytesAvailable);
+                        printf("\033[0;33m[C Client]\033[0;37m : Packet size transmitted : %d\n", bytesAvailable);
                 }
 
                 if ((rval = read(from_python_descriptor, buffer, bytesAvailable)) < 0)
@@ -621,7 +633,7 @@ int main(int argc, char *argv[])
                         {
                             cliUDP.sin_addr.s_addr = addrc[n];
                             sendto(fdudp, &buffer, bytesAvailable, 0, (struct sockaddr *)&cliUDP, sizeof(cliUDP));
-                            printf("Transmitting packet to network \n");
+                            printf("\033[0;33m[C Client]\033[0;37m : Transmitting packet to network \n");
                         }
                     }
                     // printf("-------------\n");
