@@ -435,9 +435,18 @@ class NetworkController:
                                         if packet["type"] == "fight":
                                             if self.Game.fightMode.fightOn == False:
                                                 self.Game.fightMode.fightOn = True
-                                                self.Game.fightMode.challengerId = self.players[packet["sender_id"]]
-                                                self.players[packet["sender_id"]] = False
-                                            if packet["dest"] != self.Game.fightMode.list_tour[
+                                                self.Game.fightMode.challengerId = (
+                                                    self.players[packet["sender_id"]]
+                                                )
+                                                self.players[
+                                                    packet["sender_id"]
+                                                ] = False
+
+                                            if len(
+                                                self.Game.fightMode.list_tour
+                                            ) > 1 and packet[
+                                                "dest"
+                                            ] != self.Game.fightMode.list_tour[
                                                 0
                                             ].trouver_case(
                                                 self.Game.fightMode.list_case
@@ -446,7 +455,9 @@ class NetworkController:
                                             ):
                                                 print("Entering fight mode")
                                                 self.Game.fightMode.print_anim(
-                                                    self.Game.fightMode.list_tour[0].trouver_case(
+                                                    self.Game.fightMode.list_tour[
+                                                        0
+                                                    ].trouver_case(
                                                         self.Game.fightMode.list_case
                                                     ),
                                                     self.Game.fightMode.list_case[
@@ -458,8 +469,12 @@ class NetworkController:
 
                                                 self.Game.fightMode.list_case[
                                                     packet["dest"]
-                                                ].in_case = self.Game.fightMode.list_tour[0]
-                                                self.Game.fightMode.list_tour[0].trouver_case(
+                                                ].in_case = self.Game.fightMode.list_tour[
+                                                    0
+                                                ]
+                                                self.Game.fightMode.list_tour[
+                                                    0
+                                                ].trouver_case(
                                                     self.Game.fightMode.list_case
                                                 ).in_case = None
                                                 print("2")
@@ -518,8 +533,9 @@ class NetworkController:
                                                 if k != packet["sender_id"]
                                             }
 
-                            except:
+                            except UnicodeDecodeError as e:
                                 print("error on this packet : ", str_data)
+                                print(e)
                                 packet = {
                                     "name": "test_packet_bug",
                                     "sender_id": "Unknown_id",

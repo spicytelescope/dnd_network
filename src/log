@@ -62,11 +62,11 @@ INFO:PHYM_LOGGER:LOADING ITEM RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to ItemDBLoading : 20 
 INFO:PHYM_LOGGER:LOADING SPELL RESSOURCES
 DEBUG:PHYM_LOGGER:ADDING to spellDBLoading : 20 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon2H/SteelAxe.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Militiaman.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/LeatherJacket.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/IronArmor_Paint.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Militiaman.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortSword_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/PeasantClothing.png
 INFO:PHYM_LOGGER:Creating spellbook
 INFO:PHYM_LOGGER:Current player's spell's ID : [1, 3, 6, 9, 12]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
@@ -90,11 +90,11 @@ INFO:PHYM_LOGGER:Generating Init_Zone
 INFO:PHYM_LOGGER:BLITED AT CHUNK : [(0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)]
 INFO:PHYM_LOGGER:Generating Danger Zone
 DEBUG:PHYM_LOGGER:ADDING to worldElements : 15 
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon2H/SteelAxe.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Militiaman.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/LeatherJacket.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/IronArmor_Paint.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Militiaman.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortSword_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/PeasantClothing.png
 INFO:PHYM_LOGGER:Creating spellbook
 INFO:PHYM_LOGGER:Current player's spell's ID : [1, 3, 6, 9, 12]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
@@ -102,11 +102,11 @@ INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/fire/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/ice/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/wind/weak/icon.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/earth/weak/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/WaterAdeptWand2.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/RustySword.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortIronKatana_Paint.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Slave.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/PeasantClothing.png
 INFO:PHYM_LOGGER:Creating spellbook
 INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
@@ -115,16 +115,13 @@ INFO:PHYM_LOGGER:[+] Creating the pipes
 WARNING:PHYM_LOGGER:[x] FIFOs are already created, proceeding ...
 INFO:PHYM_LOGGER:[+] Starting C Module [PARTY OWNER] 
 INFO:PHYM_LOGGER:[+] Starting handle connection thread
-INFO:PHYM_LOGGER:#7b4abe13-5310-4e29-ad3c-5a89fb0f4801 joined the party !
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon2H/SteelAxe.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Militiaman.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/LeatherJacket.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/IronArmor_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Militiaman.png
+INFO:PHYM_LOGGER:#b65ae65a-3f9e-4fd8-8a2c-773cc1780bc1 joined the party !
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/RustySword.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortIronKatana_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Slave.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/PeasantClothing.png
 INFO:PHYM_LOGGER:Creating spellbook
-INFO:PHYM_LOGGER:Current player's spell's ID : [1, 3, 6, 9, 12]
+INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/fire/weak/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/ice/weak/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/wind/weak/icon.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Wizard/earth/weak/icon.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
