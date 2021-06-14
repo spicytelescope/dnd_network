@@ -498,7 +498,6 @@ class Character:
 
                     if self.Game.isOnline:
                         self.Map.transmitPosInfos()
-                    print(self.blitOffset)
 
                 elif mapName == "building":
                     self.buildingPosX -= DELTA_X

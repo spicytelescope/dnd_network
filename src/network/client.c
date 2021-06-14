@@ -38,6 +38,7 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
     if (connect(fdt, (struct sockaddr *)&hote, lh) == -1)
         stop("connect [1]");
 
+    bzero(message, BUFSIZE);
     recv(fdt, &message, BUFSIZE + 1, 0);
     if ((int)*message == 1)
     {
@@ -47,7 +48,7 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
         strncpy(idc[(int)*(message + 4)], (message + 8), ID_LEN);
 
         //send ids to pipe
-        for (int i = 0; i < CONNECTIONS_MAX + 4; i++)
+        /*for (int i = 0; i < CONNECTIONS_MAX + 4; i++)
         {
             if ((in_addr_t) * (message + 4 * i + 16) != 0)
             {
@@ -55,12 +56,12 @@ int confirmation(int fdt, int fdu, char *addressH, struct sockaddr_in hote, stru
                 strncpy(idc[i], (message + 64 + i * ID_LEN), ID_LEN);
                 nb_addr++;
             }
-            /*for (int i = 0; i < CONNECTIONS_MAX; i++)
+            for (int i = 0; i < CONNECTIONS_MAX; i++)
             {
                 if (strcmp(idc[i], UNKNOWN_ID) != 0)
                     write(to_python_descriptor, idc[i], BUFSIZE);
-            }*/
-        }
+            }
+        }*/
         if (nb_addr == 0)
             send(fdt, "ok", 3, 0);
     }

@@ -382,6 +382,7 @@ class NetworkController:
                                     disc_packet["player_name"] = self.Hero.name
                                     disc_packet["map_seed"] = self.Map.mapSeed
 
+                                    print("disc packet send !")
                                     write_to_pipe(IPC_FIFO_OUTPUT, disc_packet)
 
                                 for player_id, player in self.players.items():
@@ -406,6 +407,8 @@ class NetworkController:
                                                 ],
                                                 "imagePos": packet["imagePos"],
                                             }
+                                            player.currentPlace = packet["currentPlace"]
+                                            player.Map.chunkData["currentChunkPos"] = packet["chunkCoor"]
 
                                             # logger.debug(
                                             #     f"[+] Updating pos for player {player_id}"
@@ -619,17 +622,24 @@ class NetworkController:
                 if player.currentPlace == "openWorld":
 
                     # Map pos updating
-                    playersDist = [
-                        (pos2 - pos1)
-                        + 2
-                        * (1 if pos2 > pos1 else -1)
-                        * (self.Map.CHUNK_SIZE // 2 - abs((pos2 - pos1)))
-                        for pos1, pos2, offset in zip(
-                            player.posMainChunkCenter,
-                            self.Hero.posMainChunkCenter,
-                        )
-                    ]
-                    print("debug : ", playersDist)
+                    if self.Hero.Map.chunkData["currentChunkPos"] != player.Map.chunkData["currentChunkPos"]:
+                        playersDist = [
+                            (pos2 - pos1)
+                            + 2
+                            * (1 if pos2 > pos1 else -1)
+                            * (self.Map.CHUNK_SIZE // 2 - abs((pos2 - pos1)))
+                            for pos1, pos2 in zip(
+                                player.posMainChunkCenter, self.Hero.posMainChunkCenter
+                            )
+                        ]
+                        print("debug : ", playersDist)
+                    else:
+                        playersDist = [
+                            pos1 - pos2
+                            for pos1, pos2 in zip(
+                                player.posMainChunkCenter, self.Hero.posMainChunkCenter
+                            )
+                        ]
                 else:
                     playersDist = [
                         pos1 - pos2
