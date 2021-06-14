@@ -112,9 +112,10 @@ INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
 INFO:PHYM_LOGGER:[+] Creating the pipes
+WARNING:PHYM_LOGGER:[x] FIFOs are already created, proceeding ...
 INFO:PHYM_LOGGER:[+] Starting C Module [PARTY JOINER] 
 INFO:PHYM_LOGGER:[+] Starting handle connection thread
-INFO:PHYM_LOGGER:#44902787-f785-48b8-8c6a-f16c5dc5e59e joined the party !
+INFO:PHYM_LOGGER:#3827f54c-9303-4c84-b141-8bf56a47260e joined the party !
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/RustySword.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortIronKatana_Paint.png
 INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Slave.png

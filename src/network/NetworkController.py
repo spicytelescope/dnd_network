@@ -433,6 +433,11 @@ class NetworkController:
 
                                         # -------------------- FIGHT RECV ------------------- #
                                         if packet["type"] == "fight":
+                                            if self.Game.fightMode.fightOn == False:
+                                                self.Game.fightMode.fightOn = True
+                                                self.Game.fightMode.challengerId = self.players[packet["sender_id"]]
+                                                self.players[packet["sender_id"]] = False
+
                                             if packet["dest"] != self.Game.fightMode.list_tour[
                                                 0
                                             ].trouver_case(

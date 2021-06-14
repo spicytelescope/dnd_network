@@ -16,9 +16,11 @@ import time
 import json
 from config.netConf import *
 import copy
+from network.packet_types import *
 
 class FightMode:
     def __init__(self, gameController) -> None:
+        self.fightOn = False
         self.Game = gameController
         self.l = load_map("./fight/map2.txt")
         self.asset_path = "./assets/fight"
@@ -78,6 +80,7 @@ class FightMode:
         # pygame.mouse.set_cursor(*pygame.cursors.broken_x)
         # pygame.mouse.set_visible(True)
         self.running = True
+        self.fightOn = True
         click = False
         i, j = 0, 0
 
@@ -614,7 +617,7 @@ class FightMode:
                         dest = x.trouver_case(self.list_case).numero_case(
                             self.list_case
                         )
-                if _id = self.Game.heroesGroup[0].networkId:
+                if _id != self.Game.heroesGroup[0].networkId:
                     send_dict = copy.deepcopy(TEMPLATE_FIGHT)
                     send_dict[_id]["sender_id"] =_id
                     send_dict["action_type"] = action_type

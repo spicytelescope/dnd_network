@@ -33,7 +33,7 @@ TEMPLATE_CHARACTER_INFO = {
     "type": "info_charac",
     "sender_id": "Unknown_id",
     "chunkPos": [],  # [1562, 1556]
-     "storage": {
+    "storage": {
         # "50": [2, 4]
     },
     "equipment": {
@@ -104,12 +104,12 @@ TEMPLATE_MESSAGE = {
     "italic": False,
 }
 
-TEMPLATE_FIGHT =  {
-                    "type": "fight",
-                    "sender_id": "Unknown_id"
-                    "action_type": "MOVEMENT",
-                    "dest": 15,
-                }
+TEMPLATE_FIGHT = {
+    "type": "fight",
+    "sender_id": "Unknown_id",
+    "action_type": "MOVEMENT",
+    "dest": 15,
+}
 
 # //TODO
 TEMPLATE_TRADE_OFFER = {"type": "trade"}
