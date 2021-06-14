@@ -275,7 +275,6 @@ while Game.currentState != "quit":
                 Hero.SpellBook.draw()
                 Player_Map.miniMap.drawExtendedMap()
                 if Game.isOnline:
-
                     if Game.fightMode.fightOn:
                         Hero.createFight([Hero, Game.fightMode.challengerId])
                     NetworkController.chat.show()

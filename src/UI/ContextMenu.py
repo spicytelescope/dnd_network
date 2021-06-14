@@ -361,7 +361,7 @@ class NonBlockingPopupMenu(PopupMenu):
                         self.Target.is_playable = False
 
                         fight_packet = copy.deepcopy(TEMPLATE_FIGHT)
-                        TEMPLATE_FIGHT["sender_id"] = self.Hero.networkId
+                        fight_packet["sender_id"] = self.Hero.networkId
                         write_to_pipe(IPC_FIFO_OUTPUT, fight_packet)
                         self.Hero.createFight([self.Hero, self.Target])
 

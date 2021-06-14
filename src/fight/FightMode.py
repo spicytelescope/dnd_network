@@ -8,7 +8,7 @@ from pygame.locals import *
 import sys
 from fight.jordanask import basic_checkevent, load_map, draw_text
 from fight.Case import Case
-from fight.load_img import collide, case_select,explosion
+from fight.load_img import collide, case_select, explosion
 from gameObjects.Ennemy import Ennemy
 from Player.Character import Character
 from gameController import GameController
@@ -18,8 +18,11 @@ from config.netConf import *
 import copy
 from network.packet_types import *
 from utils.Network_helpers import write_to_pipe
+
+
 class FightMode:
     def __init__(self, gameController) -> None:
+
         self.fightOn = False
         self.Game = gameController
         self.l = load_map("./fight/map2.txt")
@@ -51,7 +54,7 @@ class FightMode:
         self.current_player().select(True)
         for x in self.list_case:
             self.Game.screen.blit(x.display, x.cordo())
-           
+
             x.checkIfSelected()
 
             x.print_contains()
@@ -245,7 +248,6 @@ class FightMode:
                     "Action turn", Font, (255, 255, 255), self.Game.screen, 0, size_y
                 )
 
-            
             self.running, click = basic_checkevent(click)
             mx, my = pygame.mouse.get_pos()
             i, j = 0, 0
@@ -279,24 +281,20 @@ class FightMode:
                                                 self.lunch_attack(x)
                                                 if self.online_fight:
                                                     self.broadcast_info(
-                                                        [
-                                                            x.in_case.networkId
-                                                        ],
+                                                        [x.in_case.networkId],
                                                         "ATTACK",
                                                     )
-                                                
+
                                             current_selec = x
                                             self.reset_select()
-                                            
 
                                             self.running = False
-                                
+
                     j += 1
                 i += 1
             self.Game.show()
-        
+
         self.reset_select()
-        
 
     # FIN COMBAT :
     """
@@ -444,7 +442,6 @@ class FightMode:
                             self.lunch_attack(x.trouver_case(self.list_case))
                             have_attacked = True
             self.reset_select()
-            
 
     def other_player_turn(self):
         self.running = True
@@ -486,7 +483,7 @@ class FightMode:
                 )
             pending += 0.01
             pending = pending % 3
-            
+
             # for x in combat["player"]:
             #     self.lunch_attack(self.list_case[int(x["dest"])])
             self.Game.show()
@@ -509,13 +506,13 @@ class FightMode:
         # )
         damages = 1
         self.Game.chat_box.write_log(("red", "Dammage : " + str(damages)))
-        self.print_explosion(defenseur,"dmg")
+        self.print_explosion(defenseur, "dmg")
 
         defenseur.in_case.stats["HP"] -= damages
         if defenseur.in_case.stats["HP"] <= 0:
             self.list_tour.remove(defenseur.in_case)
             defenseur.in_case = None
-        self.broadcast_info([defenseur.in_case.networkId],"ATTACK")
+        self.broadcast_info([defenseur.in_case.networkId], "ATTACK")
         self.reset_select()
 
     def print_explosion(self, case, which_explosion="dmg"):
@@ -530,7 +527,6 @@ class FightMode:
                 self.Game.screen.blit(
                     explosion["explosion_" + str(i) + ".png"],
                     (
-                       
                         case.cordo()[0]
                         - explosion["explosion_" + str(i) + ".png"].get_width() // 3,
                         case.cordo()[1]
@@ -541,7 +537,7 @@ class FightMode:
                     ),
                 )
                 if i >= 46:
-                    self.running=False
+                    self.running = False
                 i += 1
             self.Game.show()
             # else:
@@ -584,8 +580,6 @@ class FightMode:
             #         )
             #     if i >= 60:
             #         self.running = False
-            
-            
 
     def broadcast_info(self, player_id, action_type, award=None):
         send_dict = {"player": {}}
@@ -598,9 +592,9 @@ class FightMode:
                         )
                 if _id != self.Game.heroesGroup[0].networkId:
                     send_dict = copy.deepcopy(TEMPLATE_FIGHT)
-                    send_dict["sender_id"] =_id
+                    send_dict["sender_id"] = _id
                     send_dict["action_type"] = action_type
-                    send_dict["dest"]  = dest
+                    send_dict["dest"] = dest
                     write_to_pipe(IPC_FIFO_OUTPUT, send_dict)
 
         if action_type == "ATTACK":
@@ -619,9 +613,6 @@ class FightMode:
         if action_type == "SPELL":
             pass
             """ AJOUTER UPDATE CARACT POUR TOUT LES JOUEURS ID"""
-
-        
-
 
 
 # test_2.initFight([])

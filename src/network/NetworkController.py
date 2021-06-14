@@ -437,7 +437,6 @@ class NetworkController:
                                                 self.Game.fightMode.fightOn = True
                                                 self.Game.fightMode.challengerId = self.players[packet["sender_id"]]
                                                 self.players[packet["sender_id"]] = False
-
                                             if packet["dest"] != self.Game.fightMode.list_tour[
                                                 0
                                             ].trouver_case(
@@ -445,6 +444,7 @@ class NetworkController:
                                             ).numero_case(
                                                 self.Game.fightMode.list_case
                                             ):
+                                                print("Entering fight mode")
                                                 self.Game.fightMode.print_anim(
                                                     self.Game.fightMode.list_tour[0].trouver_case(
                                                         self.Game.fightMode.list_case
@@ -454,12 +454,15 @@ class NetworkController:
                                                     ],
                                                     self.Game.fightMode.list_case,
                                                 )
+                                                print("1")
+
                                                 self.Game.fightMode.list_case[
                                                     packet["dest"]
                                                 ].in_case = self.Game.fightMode.list_tour[0]
                                                 self.Game.fightMode.list_tour[0].trouver_case(
                                                     self.Game.fightMode.list_case
                                                 ).in_case = None
+                                                print("2")
                                                 self.Game.fightMode.running = False
 
                                         # ------------------ INVENTORY RECV ------------------- #
