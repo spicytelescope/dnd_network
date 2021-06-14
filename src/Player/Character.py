@@ -1,16 +1,18 @@
-from UI.UI_utils_text import Dialog, SelectPopUp
-import random
+from copy import deepcopy
+from UI.UI_utils_text import SelectPopUp
 import string
 import time
-from threading import Thread
 from config import spellsConf, textureConf
 from config.ennemyConf import ENNEMY_DETECTION_RANGE
+from network.packet_types import TEMPLATE_CHARACTER_INFO
+from utils.Network_helpers import write_to_pipe
 
 import utils.RessourceHandler as RessourceHandler
 from assets.animation import *
 from config import playerConf
 from config.HUDConf import *
 from config.playerConf import *
+from config.netConf import *
 from config.textureConf import *
 from gameController import *
 from gameObjects import *
@@ -19,15 +21,16 @@ from HUD.Inventory import Inventory
 from HUD.spellBook import SpellBook
 from HUD.QuestController import QuestController
 
-# ------------------- Anthony ------------------- #
+from pathfinding.core.grid import Grid
+from pathfinding.finder.a_star import AStarFinder
+from queue import Queue
+
 from fight.Entity import Entity
 from fight.load_img import hunter_animation, Warrior_animation, Wizard_animation
 
-# ------------------- Anthony ------------------- #
-
 
 class Character(Entity):
-    def __init__(self, gameController, Map, genOrder=0) -> None:
+    def __init__(self, gameController, Map, genOrder=-1) -> None:
 
         self.genOrder = genOrder
 
@@ -42,7 +45,7 @@ class Character(Entity):
         self.Inventory = None
         self.SpellBook = None
         if self.genOrder == 0:
-           self.Map.Hero = self
+            self.Map.Hero = self
         self._fightId = None
 
         # Rest mechanics
@@ -68,10 +71,12 @@ class Character(Entity):
                 for _ in range(random.randint(1, 9))
             ]
         )
+        self.networkId = None
 
         self._fightName = self.name
 
         # ------------------ ANIMATIONS --------------- #
+
         self.imageState = {
             "image": playerConf.CLASSES[self.classId]["directions"]["down"][0],
             "imagePos": 0,
@@ -107,8 +112,6 @@ class Character(Entity):
 
         # ------------------ CHUNKS HANDLING (OPEN WORLD) -------- #
 
-        self.reGenChunkFlag = False
-
         self.initChunkPosX = (
             -self.Map.chunkData["mainChunk"].get_width() / 2 + self.pos[0]
         )
@@ -117,6 +120,7 @@ class Character(Entity):
         )
         self.mainChunkPosX = self.initChunkPosX
         self.mainChunkPosY = self.initChunkPosY
+
         # Values tracking the movement of the player regarding of his position in the chunks, used mainly for the chunkController method
         self.blitOffset = [0, 0]
         self.keys = {
@@ -125,7 +129,8 @@ class Character(Entity):
             "left": {"name": pygame.K_LEFT, "value": [1, 0]},
             "down": {"name": pygame.K_DOWN, "value": [0, -1]},
         }
-        self.playerPosMainChunkCenter = [
+
+        self.posMainChunkCenter = [
             int(self.Map.chunkData["mainChunk"].get_width() / 2 - self.blitOffset[0]),
             int(self.Map.chunkData["mainChunk"].get_height() / 2 - self.blitOffset[1]),
         ]
@@ -133,13 +138,17 @@ class Character(Entity):
         if self.genOrder == 0:
             self.Map.envHandler.Hero = self
             self.Map.envHandler.envGenerator.Hero = self
+
         # ----------------------- BUILDING HANDLING ----------------- #
 
         # Keep tracks of the player pos in a closed map
         self.buildingPosX = 0
         self.buildingPosY = 0
 
-        # ------------------- Anthony ------------------- #
+        # ----------------------- PATHFINDING -------------- #
+        self.pathfinding_q = Queue()
+
+        # ------------------------- FIGHT ANIMS ----------------- #
         Entity.__init__(
             self,
             hunter_animation["idle"]["idle_1.png"],
@@ -148,7 +157,6 @@ class Character(Entity):
         )
         self.is_playable = True
 
-    # ------------------- Anthony ------------------- #
     def refresh_class(self):
         if self.classId == 0:
             self.animation_dict = Warrior_animation
@@ -198,14 +206,14 @@ class Character(Entity):
         self.SpellBook.updateSpellBook()
 
         if not self._Level == 1:  # The inital level up does not require something else
-            Dialog(
-                f"{self.name} gain a level ! What characteristic do you want to up ?",
-                (self.Game.resolution // 2, self.Game.resolution // 2),
-                self.Game.screen,
-                (255, 0, 0),
-                self.Game,
-                charLimit=50,
-            ).mainShow()
+            # Dialog(
+            #     f,
+            #     (self.Game.resolution // 2, self.Game.resolution // 2),
+            #     self.Game.screen,
+            #     (255, 0, 0),
+            #     self.Game,
+            #     charLimit=50,
+            # ).mainShow()
 
             def addStat(stat, value):
                 def int_func():
@@ -221,7 +229,11 @@ class Character(Entity):
                 self.Game.screen,
                 self.Game,
                 (self.Game.resolution // 2, self.Game.resolution // 2),
+                f"{self.name} gain a level ! What characteristic do you want to up ?",
             ).show()
+
+            if self.Game.isOnline:
+                self.transmitCharacInfos()
 
     def modifyStat(self, stat, value):
         self.stats[stat] += value
@@ -230,41 +242,55 @@ class Character(Entity):
         self._fightId = id
         self._fightName = self.name
 
-    def createFight(self):
+    def createFight(self, preConfig=[]):
 
-        entitieOnContact = [
-            Hero for Hero in self.Game.heroesGroup if Hero.stats["HP"] > 0
-        ]
-        if len(entitieOnContact) == 0:
-            logger.error("All heroes are dead, can't start fight")
+        if preConfig != []:
+            self.Game.fightMode.initFight(preConfig)
+
         else:
-            if self.currentPlace == "openWorld":
-                for i, ennemy in enumerate(self.Map.envGenerator.ennemies):
-                    if (
-                        math.sqrt(
-                            (ennemy["value"]["entity"].pos[0] - self.pos[0]) ** 2
-                            + (ennemy["value"]["entity"].pos[1] - self.pos[1]) ** 2
-                        )
-                        // self.Map.stepGeneration
-                        <= ENNEMY_DETECTION_RANGE
-                    ):
-                        entitieOnContact.append(
-                            self.Map.envGenerator.ennemies.pop(i)["value"]["entity"]
-                        )
+            entitieOnContact = [
+                Hero for Hero in self.Game.heroesGroup if Hero.stats["HP"] > 0
+            ]
+            if len(entitieOnContact) == 0:
+                logger.error("All heroes are dead, can't start fight")
+            else:
+                if self.currentPlace == "openWorld":
+                    for i, ennemy in enumerate(self.Map.envGenerator.ennemies):
+                        if (
+                            math.sqrt(
+                                (
+                                    ennemy["value"]["entity"].chunkPos[0]
+                                    - self.posMainChunkCenter[0]
+                                )
+                                ** 2
+                                + (
+                                    ennemy["value"]["entity"].chunkPos[1]
+                                    - self.posMainChunkCenter[1]
+                                )
+                                ** 2
+                            )
+                            // self.Map.stepGeneration
+                            <= ENNEMY_DETECTION_RANGE
+                        ):
+                            entitieOnContact.append(
+                                self.Map.envGenerator.ennemies.pop(i)["value"]["entity"]
+                            )
 
-            elif self.currentPlace == "building":
-                for i, ennemy in enumerate(self.currentBuilding.ennemies):
-                    if (
-                        math.sqrt(
-                            (ennemy.pos[0] - self.pos[0]) ** 2
-                            + (ennemy.pos[1] - self.pos[1]) ** 2
-                        )
-                        // self.Map.stepGeneration
-                        <= ENNEMY_DETECTION_RANGE
-                    ):
-                        entitieOnContact.append(self.currentBuilding.ennemies.pop(i))
+                elif self.currentPlace == "building":
+                    for i, ennemy in enumerate(self.currentBuilding.ennemies):
+                        if (
+                            math.sqrt(
+                                (ennemy.pos[0] - self.pos[0]) ** 2
+                                + (ennemy.pos[1] - self.pos[1]) ** 2
+                            )
+                            // self.Map.stepGeneration
+                            <= ENNEMY_DETECTION_RANGE
+                        ):
+                            entitieOnContact.append(
+                                self.currentBuilding.ennemies.pop(i)
+                            )
 
-            self.Game.fightMode.initFight([*entitieOnContact])
+                self.Game.fightMode.initFight(entitieOnContact)
 
     def __str__(self) -> str:
 
@@ -272,8 +298,7 @@ class Character(Entity):
 
     # ---------------------- GRPAPHIC METHOD ------------------ #
 
-    def initHUD(self, LoadingMenu) -> None:
-
+    def initHUD(self, LoadingMenu=None) -> None:
         """
         Initialise the Hero HUD except the minimap which is instancied by the Map object and update the flag on the Loading Menu passed in.
 
@@ -304,6 +329,9 @@ class Character(Entity):
         self.Inventory = Inventory(self.Game, self)
         self.CharBar = CharBar(self.Game, self)
         self.SpellBook = SpellBook(self.Game, self)
+
+        logger.info("Creating spellbook")
+
         if self.genOrder == 0:
             self.QuestJournal = QuestController(self.Game, self)
         else:
@@ -354,7 +382,7 @@ class Character(Entity):
                     # Checking collision with the open world
                     if not self.Map.envGenerator.isColliding(
                         self.imageState["image"].get_rect(
-                            center=self.playerPosMainChunkCenter
+                            center=self.posMainChunkCenter
                         ),
                         self.direction,
                     ):
@@ -384,6 +412,35 @@ class Character(Entity):
 
     def moveByClick(self, envGenerator, mapName):
 
+        # if self.genOrder >0:
+
+        #     if not (
+        #     abs(self.Game.heroesGroup[0].XDistanceToTarget) < self.normalizedDistance
+        #     and abs(self.Game.heroesGroup[0].YDistanceToTarget) < self.normalizedDistance
+        # ):
+        #         self.prevDir = self.direction
+
+        #         if abs(self.Game.heroesGroup[0].XDistanceToTarget) >= abs(self.Game.heroesGroup[0].YDistanceToTarget):
+
+        #             self.direction = "right" if self.Game.heroesGroup[0].XDistanceToTarget > 0 else "left"
+
+        #         else:
+        #             self.direction = "down" if self.Game.heroesGroup[0].YDistanceToTarget > 0 else "up"
+
+        #         # Updating running animation
+        #         if (
+        #             self.prevDir == self.direction
+        #             and (time.time() - self.lastTimePlayerAnimated)
+        #             > self.animationMinTimeRendering
+        #         ):
+        #             self.lastTimePlayerAnimated = time.time()
+        #             self.imageState["imagePos"] = (
+        #                 0
+        #                 if self.imageState["imagePos"]
+        #                 == PLAYER_ANIMATION_FRAME_LENGTH - 1
+        #                 else self.imageState["imagePos"] + 1
+        #             )
+        # else:
         # Computing the direction to get
         if not (
             abs(self.XDistanceToTarget) < self.normalizedDistance
@@ -401,7 +458,7 @@ class Character(Entity):
 
             # First checking collision with the open world then computing and updating character pos
             if not envGenerator.isColliding(
-                self.imageState["image"].get_rect(center=self.playerPosMainChunkCenter),
+                self.imageState["image"].get_rect(center=self.posMainChunkCenter),
                 self.direction,
             ):
 
@@ -440,7 +497,7 @@ class Character(Entity):
                     self.blitOffset[0] += DELTA_X
                     self.blitOffset[1] += DELTA_Y
 
-                    self.playerPosMainChunkCenter = [
+                    self.posMainChunkCenter = [
                         int(
                             self.Map.chunkData["mainChunk"].get_width() / 2
                             - self.blitOffset[0]
@@ -452,19 +509,15 @@ class Character(Entity):
                     ]
 
                     for ennemy in envGenerator.ennemies:
-                        ennemy["value"]["entity"].setPos(
-                            [
-                                coor + offset
-                                for coor, offset in zip(
-                                    ennemy["value"]["entity"].pos, (DELTA_X, DELTA_Y)
-                                )
-                            ]
-                        )
+                        ennemy["value"]["entity"].setPos((DELTA_X, DELTA_Y))
 
                     # if self.Game.debug_mode:
                     #     logger.debug(
                     #         f"{self.Map.chunkData['currentChunkPos']} - {self.direction} -> {self.blitOffset}"
                     #     )
+
+                    if self.Game.isOnline:
+                        self.Map.transmitPosInfos()
 
                 elif mapName == "building":
                     self.buildingPosX -= DELTA_X
@@ -486,85 +539,103 @@ class Character(Entity):
                             for coor, offset in zip(item.pos, (DELTA_X, DELTA_Y))
                         ],
                     )
+        else:
+            if not self.pathfinding_q.empty():
+                self.updateClickPoint(subclick=self.pathfinding_q.get())
 
-    def updateClickPoint(self):
+    def updateClickPoint(self, subclick=[]):
 
-        # Updated at each click, so the tuple is converted to be exploited
-        self.targetPos = list(pygame.mouse.get_pos())
-        self.XDistanceToTarget = self.targetPos[0] - self.pos[0]
-        self.YDistanceToTarget = self.targetPos[1] - self.pos[1]
+        if subclick != []:
+            self.XDistanceToTarget, self.YDistanceToTarget = subclick
 
-    def chunkController(self):
-        """
-        Update the self.chunkData["currentChunkPos"] array by keeping tracks of where the player
-        is regarding of the chunks.
+        else:
+            self.pathfinding_q.queue.clear()
+            # Updated at each click, so the tuple is converted to be exploited
 
-        If the player goes on a bordered chunks (a chunk that didn't generated other chunks yet),
-        it will call the generateMainChunk method with the following way :
+            # pathfinding
+            grid = Grid(matrix=self.Map.matrix)
 
-        XXX                                       XXXY
-        XXX => (player goes on the right side) => XXXY (Y are the new chunks)
-        XXX                                       XXXY
-        """
-
-        if abs(self.blitOffset[0]) >= self.Map.CHUNK_SIZE / 2:
-
-            # We need to re compute the coordonates as we redefine a new center for the big chunkss
-            if self.blitOffset[0] < 0:  # Go to the right chunk
-                self.Map.chunkData["currentChunkPos"][0] += 1
-                self.blitOffset[0] = self.Map.CHUNK_SIZE + self.blitOffset[0]
-                self.mainChunkPosX = self.initChunkPosX + self.blitOffset[0]
-
-            else:
-                self.Map.chunkData["currentChunkPos"][0] -= 1
-                self.blitOffset[0] = -(self.Map.CHUNK_SIZE - self.blitOffset[0])
-                self.mainChunkPosX = self.initChunkPosX + self.blitOffset[0]
-            self.reGenChunkFlag = True
-
-        if abs(self.blitOffset[1]) >= self.Map.CHUNK_SIZE / 2:
-            if self.blitOffset[1] < 0:  # Go to the down chunk
-                self.Map.chunkData["currentChunkPos"][1] += 1
-                self.blitOffset[1] = self.Map.CHUNK_SIZE + self.blitOffset[1]
-                self.mainChunkPosY = self.initChunkPosY + self.blitOffset[1]
-
-            else:
-                self.Map.chunkData["currentChunkPos"][1] -= 1
-                self.blitOffset[1] = -(self.Map.CHUNK_SIZE - self.blitOffset[1])
-                self.mainChunkPosY = self.initChunkPosY + self.blitOffset[1]
-            self.reGenChunkFlag = True
-
-        # If there is a change of chunk, we need to regenerate if needed some chunks, and reset the flag system
-        if self.reGenChunkFlag:
-
-            self.playerPosMainChunkCenter = [
+            # Case - Movement within the tilee
+            if [pos // self.Map.stepGeneration for pos in self.posMainChunkCenter] == [
                 int(
-                    self.Map.chunkData["mainChunk"].get_width() / 2 - self.blitOffset[0]
-                ),
-                int(
-                    self.Map.chunkData["mainChunk"].get_height() / 2
-                    - self.blitOffset[1]
-                ),
-            ]
-
-            chunkCoorsRegen = [
-                (
-                    self.Map.chunkData["currentChunkPos"][0] + i,
-                    self.Map.chunkData["currentChunkPos"][1] + j,
+                    (coor + self.Map.CHUNK_SIZE * self.Map.renderDistance - offset)
+                    // self.Map.stepGeneration
                 )
-                for i in range(-self.Map.renderDistance, self.Map.renderDistance + 1)
-                for j in range(-self.Map.renderDistance, self.Map.renderDistance + 1)
-                if f"{self.Map.chunkData['currentChunkPos'][0]+i};{self.Map.chunkData['currentChunkPos'][1] + j}"
-                not in self.Map.chunkData.keys()
-            ]
-            # Check if the chunk supposely needed for regen are already generated or not
-            if len(chunkCoorsRegen) != 0:
-                loadingIconThread = Thread(
-                    target=self.Map.loadingMenu.blitLoadingIcon, args=(self,)
+                for coor, offset in zip(list(pygame.mouse.get_pos()), self.blitOffset)
+            ]:
+                self.updateClickPoint(
+                    subclick=[
+                        coor
+                        + self.Map.CHUNK_SIZE * self.Map.renderDistance
+                        - offset
+                        - mainChunkPos
+                        for coor, offset, mainChunkPos in zip(
+                            list(pygame.mouse.get_pos()),
+                            self.blitOffset,
+                            self.posMainChunkCenter,
+                        )
+                    ]
                 )
-                loadingIconThread.start()
+            else:
 
-            self.Map.generateMainChunk(len(chunkCoorsRegen))
-            self.reGenChunkFlag = False
+                start = grid.node(
+                    *[pos // self.Map.stepGeneration for pos in self.posMainChunkCenter]
+                )
+                end = grid.node(
+                    *[
+                        int(
+                            (
+                                coor
+                                + self.Map.CHUNK_SIZE * self.Map.renderDistance
+                                - offset
+                            )
+                            // self.Map.stepGeneration
+                        )
+                        for coor, offset in zip(pygame.mouse.get_pos(), self.blitOffset)
+                    ]
+                )
+
+                finder = AStarFinder()
+                paths, runs = finder.find_path(start, end, grid)
+
+                self.pathfinding_q.queue.clear()
+
+                if len(paths) > 0:
+                    for i in range(len(paths)):
+                        if i == 0:
+                            self.pathfinding_q.put(
+                                [
+                                    p_coor * self.Map.stepGeneration
+                                    + PLAYER_SIZE // 2
+                                    - mainChunkPos
+                                    for p_coor, mainChunkPos in zip(
+                                        paths[i], self.posMainChunkCenter
+                                    )
+                                ]
+                            )
+                        # elif i == (len(paths)-1):
+                        #     self.pathfinding_q.put(
+                        #         [
+                        #             coor
+                        #             + self.Map.CHUNK_SIZE * self.Map.renderDistance
+                        #             - offset
+                        #             - prev_p * self.Map.stepGeneration
+                        #             for coor, offset, prev_p in zip(
+                        #                 pygame.mouse.get_pos(),
+                        #                 self.blitOffset,
+                        #                 paths[i - 1],
+                        #             )
+                        #         ]
+                        #     )
+                        else:
+                            self.pathfinding_q.put(
+                                [
+                                    (p_coor - prev_p_coor) * self.Map.stepGeneration
+                                    for p_coor, prev_p_coor in zip(
+                                        paths[i], paths[i - 1]
+                                    )
+                                ]
+                            )
 
     def handleMovements(self, mapName):
         """Function updating pos and bliting it to the game screen every delta_t period of time"""
@@ -573,7 +644,7 @@ class Character(Entity):
 
             if mapName == "openWorld":
                 # Checking chunks
-                self.chunkController()
+                self.Map.chunkController()
 
                 # Updating pos
                 self.moveByClick(self.Map.envGenerator, mapName)
@@ -587,7 +658,11 @@ class Character(Entity):
             self.lastRenderedTime = time.time()
 
     def show(self):
-
+        if self.genOrder > 0:
+            self.direction = self.Game.heroesGroup[0].direction
+            self.imageState["imagePos"] = self.Game.heroesGroup[0].imageState[
+                "imagePos"
+            ]
         # Changing animation
         self.imageState["image"] = playerConf.CLASSES[self.classId]["directions"][
             self.direction
@@ -610,6 +685,18 @@ class Character(Entity):
         self.Game.screen.blit(
             self.zoomedSurf,
             self.zoomedRect,
+        )
+
+    # -------------------- NETWORK --------------- #
+
+    def transmitCharacInfos(self):
+        charac_packet = deepcopy(TEMPLATE_CHARACTER_INFO)
+        charac_packet["sender_id"] = self.networkId
+        charac_packet["spellsID"] = self.spellsID
+        charac_packet["stats"] = self.stats
+        write_to_pipe(
+            IPC_FIFO_OUTPUT,
+            charac_packet,
         )
 
     # def __getstate__(self):

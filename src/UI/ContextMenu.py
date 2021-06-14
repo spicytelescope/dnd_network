@@ -355,6 +355,7 @@ class NonBlockingPopupMenu(PopupMenu):
                         self.tradeUI._show = not self.tradeUI._show
 
                     elif e.text == "Fight":
+                        self.Target.is_playable = False
                         self.Hero.createFight([self.Hero, self.Target])
 
 
