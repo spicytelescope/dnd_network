@@ -17,7 +17,7 @@ import json
 from config.netConf import *
 import copy
 from network.packet_types import *
-
+from utils.Network_helpers import write_to_pipe
 class FightMode:
     def __init__(self, gameController) -> None:
         self.fightOn = False
@@ -486,27 +486,6 @@ class FightMode:
                 )
             pending += 0.01
             pending = pending % 3
-            if (
-                datas["player"][str(self.list_tour[0].networkId)]["action_type"]
-                == "MOUVEMENT"
-            ):
-                if datas["player"][str(self.list_tour[0].networkId)][
-                    "dest"
-                ] != self.list_tour[0].trouver_case(self.list_case).numero_case(
-                    self.list_case
-                ):
-                    self.print_anim(
-                        self.list_tour[0].trouver_case(self.list_case),
-                        self.list_case[
-                            datas["player"][str(self.list_tour[0].networkId)]["dest"]
-                        ],
-                        self.list_case,
-                    )
-                    self.list_case[
-                        datas["player"][str(self.list_tour[0].networkId)]["dest"]
-                    ].in_case = self.list_tour[0]
-                    self.list_tour[0].trouver_case(self.list_case).in_case = None
-                    self.running = False
             
             # for x in combat["player"]:
             #     self.lunch_attack(self.list_case[int(x["dest"])])
@@ -619,7 +598,7 @@ class FightMode:
                         )
                 if _id != self.Game.heroesGroup[0].networkId:
                     send_dict = copy.deepcopy(TEMPLATE_FIGHT)
-                    send_dict[_id]["sender_id"] =_id
+                    send_dict["sender_id"] =_id
                     send_dict["action_type"] = action_type
                     send_dict["dest"]  = dest
                     write_to_pipe(IPC_FIFO_OUTPUT, send_dict)

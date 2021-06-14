@@ -113,15 +113,15 @@ INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
 INFO:PHYM_LOGGER:[+] Creating the pipes
 WARNING:PHYM_LOGGER:[x] FIFOs are already created, proceeding ...
-INFO:PHYM_LOGGER:[+] Starting C Module [PARTY JOINER] 
+INFO:PHYM_LOGGER:[+] Starting C Module [PARTY OWNER] 
 INFO:PHYM_LOGGER:[+] Starting handle connection thread
-INFO:PHYM_LOGGER:#3827f54c-9303-4c84-b141-8bf56a47260e joined the party !
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/RustySword.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Weapon/MeleeWeapon1H/ShortIronKatana_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/Slave.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Boots/ArielDress_Paint.png
-INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/PeasantClothing.png
+INFO:PHYM_LOGGER:#c591d15d-03ff-4e51-bfc3-c5221d5e5779 joined the party !
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Gloves/Hunter.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Hermit.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Deserter.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Plate/Deserter.png
+INFO:PHYM_LOGGER:LOADING ./assets/Items/Transparent/Armor/Helmets/LeatherCap.png
 INFO:PHYM_LOGGER:Creating spellbook
-INFO:PHYM_LOGGER:Current player's spell's ID : [2, 18]
+INFO:PHYM_LOGGER:Current player's spell's ID : [0, 16]
 INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/attack.png
-INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Warrior/Buff/Shield/icon.png
+INFO:PHYM_LOGGER:LOADING ./assets/Spells/spellIcons/Hunter/Bow/FireArrow/icon.png

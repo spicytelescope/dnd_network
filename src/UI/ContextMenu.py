@@ -11,7 +11,10 @@ from pygame import Rect, MOUSEBUTTONDOWN, MOUSEBUTTONUP, MOUSEMOTION, USEREVENT
 from UI.TradeUI import TradeUI
 from config import HUDConf
 from config.UIConf import *
+from utils.Network_helpers import *
+from network.packet_types import *
 
+import copy
 
 class PopupMenu(object):
     """popup_menu.PopupMenu
@@ -356,6 +359,10 @@ class NonBlockingPopupMenu(PopupMenu):
 
                     elif e.text == "Fight":
                         self.Target.is_playable = False
+
+                        fight_packet = copy.deepcopy(TEMPLATE_FIGHT)
+                        TEMPLATE_FIGHT["sender_id"] = self.Hero.networkId
+                        write_to_pipe(IPC_FIFO_OUTPUT, fight_packet)
                         self.Hero.createFight([self.Hero, self.Target])
 
 
